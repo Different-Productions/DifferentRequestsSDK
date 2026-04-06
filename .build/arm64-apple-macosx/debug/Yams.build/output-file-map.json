@@ -1,0 +1,152 @@
+{
+  "": {
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/primary.swiftdeps"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/Yams/Sources/Yams/AliasDereferencingStrategy.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/AliasDereferencingStrategy.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/AliasDereferencingStrategy.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/AliasDereferencingStrategy~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/AliasDereferencingStrategy.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/AliasDereferencingStrategy.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/Yams/Sources/Yams/Anchor.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Anchor.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Anchor.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Anchor~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Anchor.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Anchor.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/Yams/Sources/Yams/Constructor.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Constructor.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Constructor.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Constructor~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Constructor.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Constructor.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/Yams/Sources/Yams/Decoder.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Decoder.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Decoder.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Decoder~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Decoder.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Decoder.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/Yams/Sources/Yams/Emitter.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Emitter.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Emitter.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Emitter~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Emitter.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Emitter.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/Yams/Sources/Yams/Encoder.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Encoder.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Encoder.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Encoder~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Encoder.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Encoder.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/Yams/Sources/Yams/Mark.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Mark.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Mark.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Mark~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Mark.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Mark.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/Yams/Sources/Yams/Node.Alias.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Node.Alias.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Node.Alias.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Node.Alias~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Node.Alias.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Node.Alias.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/Yams/Sources/Yams/Node.Mapping.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Node.Mapping.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Node.Mapping.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Node.Mapping~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Node.Mapping.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Node.Mapping.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/Yams/Sources/Yams/Node.Scalar.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Node.Scalar.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Node.Scalar.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Node.Scalar~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Node.Scalar.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Node.Scalar.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/Yams/Sources/Yams/Node.Sequence.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Node.Sequence.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Node.Sequence.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Node.Sequence~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Node.Sequence.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Node.Sequence.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/Yams/Sources/Yams/Node.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Node.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Node.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Node~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Node.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Node.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/Yams/Sources/Yams/Parser.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Parser.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Parser.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Parser~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Parser.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Parser.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/Yams/Sources/Yams/RedundancyAliasingStrategy.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/RedundancyAliasingStrategy.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/RedundancyAliasingStrategy.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/RedundancyAliasingStrategy~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/RedundancyAliasingStrategy.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/RedundancyAliasingStrategy.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/Yams/Sources/Yams/Representer.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Representer.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Representer.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Representer~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Representer.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Representer.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/Yams/Sources/Yams/Resolver.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Resolver.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Resolver.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Resolver~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Resolver.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Resolver.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/Yams/Sources/Yams/String+Yams.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/String+Yams.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/String+Yams.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/String+Yams~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/String+Yams.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/String+Yams.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/Yams/Sources/Yams/Tag.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Tag.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Tag.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Tag~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Tag.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/Tag.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/Yams/Sources/Yams/YamlAnchorProviding.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/YamlAnchorProviding.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/YamlAnchorProviding.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/YamlAnchorProviding~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/YamlAnchorProviding.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/YamlAnchorProviding.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/Yams/Sources/Yams/YamlError.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/YamlError.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/YamlError.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/YamlError~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/YamlError.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/YamlError.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/Yams/Sources/Yams/YamlTagProviding.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/YamlTagProviding.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/YamlTagProviding.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/YamlTagProviding~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/YamlTagProviding.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/YamlTagProviding.dia"
+  }
+}

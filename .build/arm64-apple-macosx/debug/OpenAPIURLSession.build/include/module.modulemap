@@ -1,0 +1,3 @@
+module OpenAPIURLSession {
+    header "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIURLSession.build/include/OpenAPIURLSession-Swift.h"
+}

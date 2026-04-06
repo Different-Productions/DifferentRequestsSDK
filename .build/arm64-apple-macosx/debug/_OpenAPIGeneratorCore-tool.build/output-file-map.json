@@ -1,0 +1,649 @@
+{
+  "": {
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/primary.swiftdeps"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Config.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Config.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Config.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Config~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Config.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Config.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Diagnostics.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Diagnostics.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Diagnostics.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Diagnostics~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Diagnostics.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Diagnostics.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/DiagnosticsCollectorProvider.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/DiagnosticsCollectorProvider.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/DiagnosticsCollectorProvider.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/DiagnosticsCollectorProvider~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/DiagnosticsCollectorProvider.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/DiagnosticsCollectorProvider.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Errors.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Errors.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Errors.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Errors~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Errors.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Errors.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Extensions/Foundation.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Foundation.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Foundation.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Foundation~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Foundation.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Foundation.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Extensions/OpenAPIKit.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/OpenAPIKit.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/OpenAPIKit.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/OpenAPIKit~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/OpenAPIKit.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/OpenAPIKit.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Extensions/String.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/String.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/String.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/String~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/String.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/String.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Extensions/SwiftStandardLibrary.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/SwiftStandardLibrary.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/SwiftStandardLibrary.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/SwiftStandardLibrary~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/SwiftStandardLibrary.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/SwiftStandardLibrary.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/FeatureFlags.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/FeatureFlags.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/FeatureFlags.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/FeatureFlags~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/FeatureFlags.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/FeatureFlags.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/GeneratorMode.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/GeneratorMode.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/GeneratorMode.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/GeneratorMode~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/GeneratorMode.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/GeneratorMode.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/GeneratorPipeline.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/GeneratorPipeline.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/GeneratorPipeline.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/GeneratorPipeline~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/GeneratorPipeline.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/GeneratorPipeline.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/GeneratorPipelineStage.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/GeneratorPipelineStage.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/GeneratorPipelineStage.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/GeneratorPipelineStage~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/GeneratorPipelineStage.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/GeneratorPipelineStage.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Hooks/DocumentFilter.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/DocumentFilter.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/DocumentFilter.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/DocumentFilter~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/DocumentFilter.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/DocumentFilter.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Hooks/FilteredDocument.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/FilteredDocument.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/FilteredDocument.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/FilteredDocument~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/FilteredDocument.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/FilteredDocument.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Layers/ParsedOpenAPIRepresentation.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ParsedOpenAPIRepresentation.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ParsedOpenAPIRepresentation.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ParsedOpenAPIRepresentation~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ParsedOpenAPIRepresentation.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ParsedOpenAPIRepresentation.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Layers/RenderedSwiftRepresentation.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/RenderedSwiftRepresentation.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/RenderedSwiftRepresentation.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/RenderedSwiftRepresentation~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/RenderedSwiftRepresentation.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/RenderedSwiftRepresentation.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Layers/StructuredSwiftRepresentation.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/StructuredSwiftRepresentation.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/StructuredSwiftRepresentation.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/StructuredSwiftRepresentation~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/StructuredSwiftRepresentation.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/StructuredSwiftRepresentation.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Parser/ParserProtocol.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ParserProtocol.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ParserProtocol.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ParserProtocol~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ParserProtocol.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ParserProtocol.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Parser/YamsParser.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/YamsParser.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/YamsParser.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/YamsParser~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/YamsParser.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/YamsParser.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Parser/validateDoc.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/validateDoc.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/validateDoc.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/validateDoc~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/validateDoc.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/validateDoc.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/PlatformChecks.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/PlatformChecks.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/PlatformChecks.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/PlatformChecks~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/PlatformChecks.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/PlatformChecks.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Renderer/RendererProtocol.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/RendererProtocol.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/RendererProtocol.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/RendererProtocol~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/RendererProtocol.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/RendererProtocol.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Renderer/TextBasedRenderer.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TextBasedRenderer.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TextBasedRenderer.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TextBasedRenderer~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TextBasedRenderer.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TextBasedRenderer.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/ClientTranslator/ClientTranslator.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ClientTranslator.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ClientTranslator.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ClientTranslator~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ClientTranslator.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ClientTranslator.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/ClientTranslator/translateClientMethod.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateClientMethod.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateClientMethod.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateClientMethod~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateClientMethod.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateClientMethod.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/CommonTranslations/translateAllAnyOneOf.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateAllAnyOneOf.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateAllAnyOneOf.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateAllAnyOneOf~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateAllAnyOneOf.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateAllAnyOneOf.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/CommonTranslations/translateArray.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateArray.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateArray.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateArray~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateArray.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateArray.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/CommonTranslations/translateCodable.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateCodable.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateCodable.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateCodable~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateCodable.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateCodable.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/CommonTranslations/translateObjectStruct.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateObjectStruct.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateObjectStruct.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateObjectStruct~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateObjectStruct.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateObjectStruct.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/CommonTranslations/translateRawEnum.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateRawEnum.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateRawEnum.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateRawEnum~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateRawEnum.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateRawEnum.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/CommonTranslations/translateRawRepresentableEnum.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateRawRepresentableEnum.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateRawRepresentableEnum.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateRawRepresentableEnum~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateRawRepresentableEnum.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateRawRepresentableEnum.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/CommonTranslations/translateSchema.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateSchema.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateSchema.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateSchema~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateSchema.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateSchema.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/CommonTranslations/translateStructBlueprint.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateStructBlueprint.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateStructBlueprint.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateStructBlueprint~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateStructBlueprint.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateStructBlueprint.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/CommonTranslations/translateTypealias.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateTypealias.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateTypealias.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateTypealias~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateTypealias.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateTypealias.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/CommonTypes/Annotations.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Annotations.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Annotations.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Annotations~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Annotations.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Annotations.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/CommonTypes/CommentExtensions.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/CommentExtensions.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/CommentExtensions.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/CommentExtensions~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/CommentExtensions.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/CommentExtensions.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/CommonTypes/Constants.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Constants.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Constants.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Constants~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Constants.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Constants.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/CommonTypes/DiscriminatorExtensions.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/DiscriminatorExtensions.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/DiscriminatorExtensions.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/DiscriminatorExtensions~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/DiscriminatorExtensions.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/DiscriminatorExtensions.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/CommonTypes/SchemaOverrides.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/SchemaOverrides.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/SchemaOverrides.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/SchemaOverrides~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/SchemaOverrides.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/SchemaOverrides.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/CommonTypes/StructBlueprint.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/StructBlueprint.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/StructBlueprint.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/StructBlueprint~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/StructBlueprint.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/StructBlueprint.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/Content/CodingStrategy.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/CodingStrategy.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/CodingStrategy.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/CodingStrategy~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/CodingStrategy.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/CodingStrategy.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/Content/ContentInspector.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ContentInspector.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ContentInspector.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ContentInspector~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ContentInspector.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ContentInspector.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/Content/ContentType.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ContentType.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ContentType.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ContentType~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ContentType.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ContentType.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/Content/SchemaContent.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/SchemaContent.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/SchemaContent.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/SchemaContent~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/SchemaContent.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/SchemaContent.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/FileTranslator+FeatureFlags.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/FileTranslator+FeatureFlags.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/FileTranslator+FeatureFlags.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/FileTranslator+FeatureFlags~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/FileTranslator+FeatureFlags.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/FileTranslator+FeatureFlags.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/FileTranslator.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/FileTranslator.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/FileTranslator.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/FileTranslator~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/FileTranslator.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/FileTranslator.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/Multipart/MultipartAdditionalProperties.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/MultipartAdditionalProperties.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/MultipartAdditionalProperties.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/MultipartAdditionalProperties~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/MultipartAdditionalProperties.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/MultipartAdditionalProperties.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/Multipart/MultipartContent.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/MultipartContent.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/MultipartContent.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/MultipartContent~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/MultipartContent.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/MultipartContent.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/Multipart/MultipartContentInspector.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/MultipartContentInspector.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/MultipartContentInspector.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/MultipartContentInspector~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/MultipartContentInspector.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/MultipartContentInspector.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/Multipart/translateMultipart.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateMultipart.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateMultipart.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateMultipart~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateMultipart.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateMultipart.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/MultiplexTranslator.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/MultiplexTranslator.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/MultiplexTranslator.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/MultiplexTranslator~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/MultiplexTranslator.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/MultiplexTranslator.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/Operations/OperationDescription.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/OperationDescription.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/OperationDescription.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/OperationDescription~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/OperationDescription.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/OperationDescription.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/Parameters/TypedParameter.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypedParameter.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypedParameter.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypedParameter~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypedParameter.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypedParameter.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/Parameters/translateParameter.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateParameter.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateParameter.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateParameter~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateParameter.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateParameter.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/Recursion/DeclarationRecursionDetector.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/DeclarationRecursionDetector.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/DeclarationRecursionDetector.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/DeclarationRecursionDetector~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/DeclarationRecursionDetector.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/DeclarationRecursionDetector.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/Recursion/RecursionDetector.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/RecursionDetector.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/RecursionDetector.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/RecursionDetector~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/RecursionDetector.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/RecursionDetector.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/RequestBody/TypedRequestBody.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypedRequestBody.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypedRequestBody.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypedRequestBody~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypedRequestBody.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypedRequestBody.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/RequestBody/translateRequestBody.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateRequestBody.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateRequestBody.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateRequestBody~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateRequestBody.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateRequestBody.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/Responses/HTTPStatusCodes.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/HTTPStatusCodes.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/HTTPStatusCodes.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/HTTPStatusCodes~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/HTTPStatusCodes.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/HTTPStatusCodes.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/Responses/ResponseKind.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ResponseKind.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ResponseKind.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ResponseKind~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ResponseKind.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ResponseKind.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/Responses/TypedResponse.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypedResponse.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypedResponse.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypedResponse~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypedResponse.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypedResponse.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/Responses/TypedResponseHeader.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypedResponseHeader.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypedResponseHeader.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypedResponseHeader~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypedResponseHeader.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypedResponseHeader.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/Responses/acceptHeaderContentTypes.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/acceptHeaderContentTypes.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/acceptHeaderContentTypes.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/acceptHeaderContentTypes~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/acceptHeaderContentTypes.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/acceptHeaderContentTypes.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/Responses/translateResponse.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateResponse.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateResponse.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateResponse~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateResponse.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateResponse.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/Responses/translateResponseHeader.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateResponseHeader.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateResponseHeader.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateResponseHeader~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateResponseHeader.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateResponseHeader.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/Responses/translateResponseOutcome.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateResponseOutcome.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateResponseOutcome.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateResponseOutcome~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateResponseOutcome.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateResponseOutcome.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/ServerTranslator/ServerTranslator.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ServerTranslator.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ServerTranslator.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ServerTranslator~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ServerTranslator.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ServerTranslator.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/ServerTranslator/translateServerMethod.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateServerMethod.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateServerMethod.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateServerMethod~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateServerMethod.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateServerMethod.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/TranslatorProtocol.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TranslatorProtocol.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TranslatorProtocol.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TranslatorProtocol~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TranslatorProtocol.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TranslatorProtocol.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/TypeAssignment/Builtins.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Builtins.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Builtins.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Builtins~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Builtins.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/Builtins.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/TypeAssignment/ReferenceStack.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ReferenceStack.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ReferenceStack.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ReferenceStack~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ReferenceStack.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/ReferenceStack.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/TypeAssignment/SafeNameGenerator.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/SafeNameGenerator.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/SafeNameGenerator.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/SafeNameGenerator~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/SafeNameGenerator.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/SafeNameGenerator.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/TypeAssignment/TypeAssigner.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypeAssigner.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypeAssigner.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypeAssigner~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypeAssigner.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypeAssigner.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/TypeAssignment/TypeLocation.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypeLocation.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypeLocation.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypeLocation~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypeLocation.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypeLocation.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/TypeAssignment/TypeMatcher.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypeMatcher.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypeMatcher.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypeMatcher~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypeMatcher.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypeMatcher.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/TypeAssignment/TypeName.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypeName.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypeName.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypeName~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypeName.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypeName.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/TypeAssignment/TypeUsage.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypeUsage.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypeUsage.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypeUsage~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypeUsage.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypeUsage.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/TypeAssignment/isSchemaSupported.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/isSchemaSupported.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/isSchemaSupported.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/isSchemaSupported~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/isSchemaSupported.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/isSchemaSupported.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/TypesTranslator/TypesFileTranslator.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypesFileTranslator.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypesFileTranslator.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypesFileTranslator~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypesFileTranslator.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypesFileTranslator.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/TypesTranslator/translateAPIProtocol.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateAPIProtocol.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateAPIProtocol.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateAPIProtocol~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateAPIProtocol.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateAPIProtocol.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/TypesTranslator/translateBoxedTypes.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateBoxedTypes.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateBoxedTypes.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateBoxedTypes~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateBoxedTypes.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateBoxedTypes.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/TypesTranslator/translateComponentHeaders.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateComponentHeaders.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateComponentHeaders.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateComponentHeaders~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateComponentHeaders.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateComponentHeaders.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/TypesTranslator/translateComponentParameters.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateComponentParameters.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateComponentParameters.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateComponentParameters~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateComponentParameters.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateComponentParameters.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/TypesTranslator/translateComponentRequestBodies.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateComponentRequestBodies.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateComponentRequestBodies.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateComponentRequestBodies~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateComponentRequestBodies.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateComponentRequestBodies.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/TypesTranslator/translateComponentResponses.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateComponentResponses.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateComponentResponses.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateComponentResponses~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateComponentResponses.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateComponentResponses.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/TypesTranslator/translateComponents.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateComponents.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateComponents.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateComponents~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateComponents.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateComponents.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/TypesTranslator/translateOperations.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateOperations.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateOperations.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateOperations~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateOperations.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateOperations.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/TypesTranslator/translateSchemas.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateSchemas.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateSchemas.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateSchemas~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateSchemas.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateSchemas.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/TypesTranslator/translateServers.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateServers.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateServers.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateServers~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateServers.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateServers.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/Translator/TypesTranslator/translateServersVariables.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateServersVariables.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateServersVariables.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateServersVariables~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateServersVariables.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/translateServersVariables.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/TypeOverrides.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypeOverrides.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypeOverrides.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypeOverrides~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypeOverrides.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/TypeOverrides.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-generator/Sources/_OpenAPIGeneratorCore/YamlFileDiagnosticsCollector.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/YamlFileDiagnosticsCollector.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/YamlFileDiagnosticsCollector.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/YamlFileDiagnosticsCollector~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/YamlFileDiagnosticsCollector.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/_OpenAPIGeneratorCore-tool.build/YamlFileDiagnosticsCollector.dia"
+  }
+}

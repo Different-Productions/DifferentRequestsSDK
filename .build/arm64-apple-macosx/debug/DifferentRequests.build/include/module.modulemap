@@ -1,0 +1,3 @@
+module DifferentRequests {
+    header "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequests.build/include/DifferentRequests-Swift.h"
+}

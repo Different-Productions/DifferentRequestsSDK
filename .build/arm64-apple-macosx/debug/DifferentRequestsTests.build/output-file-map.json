@@ -1,0 +1,12 @@
+{
+  "": {
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequestsTests.build/primary.swiftdeps"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/Tests/DifferentRequestsTests/ClientTests.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequestsTests.build/ClientTests.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequestsTests.build/ClientTests.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequestsTests.build/ClientTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequestsTests.build/ClientTests.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequestsTests.build/ClientTests.dia"
+  }
+}

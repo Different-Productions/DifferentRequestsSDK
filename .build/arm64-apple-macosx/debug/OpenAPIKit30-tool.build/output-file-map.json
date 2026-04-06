@@ -1,0 +1,467 @@
+{
+  "": {
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/primary.swiftdeps"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/AnyCodable+Validatable.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/AnyCodable+Validatable.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/AnyCodable+Validatable.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/AnyCodable+Validatable~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/AnyCodable+Validatable.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/AnyCodable+Validatable.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Callbacks.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Callbacks.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Callbacks.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Callbacks~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Callbacks.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Callbacks.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/CodableVendorExtendable.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/CodableVendorExtendable.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/CodableVendorExtendable.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/CodableVendorExtendable~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/CodableVendorExtendable.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/CodableVendorExtendable.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Components Object/Components+JSONReference.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Components+JSONReference.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Components+JSONReference.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Components+JSONReference~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Components+JSONReference.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Components+JSONReference.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Components Object/Components+Locatable.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Components+Locatable.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Components+Locatable.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Components+Locatable~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Components+Locatable.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Components+Locatable.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Components Object/Components.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Components.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Components.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Components~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Components.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Components.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Content/Content.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Content.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Content.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Content~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Content.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Content.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Content/ContentEncoding.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ContentEncoding.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ContentEncoding.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ContentEncoding~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ContentEncoding.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ContentEncoding.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Content/DereferencedContent.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedContent.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedContent.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedContent~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedContent.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedContent.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Content/DereferencedContentEncoding.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedContentEncoding.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedContentEncoding.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedContentEncoding~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedContentEncoding.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedContentEncoding.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Document/DereferencedDocument.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedDocument.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedDocument.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedDocument~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedDocument.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedDocument.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Document/Document.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Document.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Document.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Document~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Document.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Document.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Document/DocumentInfo.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DocumentInfo.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DocumentInfo.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DocumentInfo~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DocumentInfo.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DocumentInfo.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Document/ResolvedDocument.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ResolvedDocument.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ResolvedDocument.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ResolvedDocument~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ResolvedDocument.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ResolvedDocument.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Either/Either+Convenience.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Either+Convenience.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Either+Convenience.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Either+Convenience~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Either+Convenience.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Either+Convenience.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Either/Either+LocallyDereferenceable.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Either+LocallyDereferenceable.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Either+LocallyDereferenceable.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Either+LocallyDereferenceable~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Either+LocallyDereferenceable.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Either+LocallyDereferenceable.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Either/Either+Validatable.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Either+Validatable.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Either+Validatable.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Either+Validatable~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Either+Validatable.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Either+Validatable.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Encoding and Decoding Errors/DocumentDecodingError.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DocumentDecodingError.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DocumentDecodingError.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DocumentDecodingError~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DocumentDecodingError.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DocumentDecodingError.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Encoding and Decoding Errors/OperationDecodingError.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/OperationDecodingError.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/OperationDecodingError.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/OperationDecodingError~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/OperationDecodingError.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/OperationDecodingError.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Encoding and Decoding Errors/PathDecodingError.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/PathDecodingError.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/PathDecodingError.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/PathDecodingError~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/PathDecodingError.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/PathDecodingError.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Encoding and Decoding Errors/ResponseDecodingError.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ResponseDecodingError.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ResponseDecodingError.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ResponseDecodingError~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ResponseDecodingError.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ResponseDecodingError.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Example.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Example.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Example.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Example~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Example.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Example.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/ExternalDocumentation.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ExternalDocumentation.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ExternalDocumentation.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ExternalDocumentation~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ExternalDocumentation.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ExternalDocumentation.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Header/DereferencedHeader.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedHeader.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedHeader.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedHeader~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedHeader.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedHeader.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Header/Header.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Header.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Header.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Header~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Header.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Header.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/JSONReference.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/JSONReference.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/JSONReference.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/JSONReference~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/JSONReference.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/JSONReference.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Link.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Link.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Link.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Link~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Link.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Link.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/OpenAPI.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/OpenAPI.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/OpenAPI.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/OpenAPI~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/OpenAPI.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/OpenAPI.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Operation/DereferencedOperation.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedOperation.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedOperation.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedOperation~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedOperation.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedOperation.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Operation/Operation.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Operation.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Operation.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Operation~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Operation.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Operation.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Operation/ResolvedEndpoint.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ResolvedEndpoint.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ResolvedEndpoint.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ResolvedEndpoint~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ResolvedEndpoint.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ResolvedEndpoint.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/OrderedDictionary+Validatable.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/OrderedDictionary+Validatable.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/OrderedDictionary+Validatable.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/OrderedDictionary+Validatable~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/OrderedDictionary+Validatable.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/OrderedDictionary+Validatable.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Parameter/DereferencedParameter.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedParameter.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedParameter.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedParameter~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedParameter.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedParameter.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Parameter/DereferencedSchemaContext.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedSchemaContext.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedSchemaContext.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedSchemaContext~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedSchemaContext.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedSchemaContext.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Parameter/Parameter.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Parameter.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Parameter.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Parameter~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Parameter.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Parameter.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Parameter/ParameterContext.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ParameterContext.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ParameterContext.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ParameterContext~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ParameterContext.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ParameterContext.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Parameter/ParameterSchemaContext.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ParameterSchemaContext.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ParameterSchemaContext.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ParameterSchemaContext~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ParameterSchemaContext.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ParameterSchemaContext.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Path Item/DereferencedPathItem.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedPathItem.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedPathItem.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedPathItem~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedPathItem.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedPathItem.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Path Item/PathItem.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/PathItem.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/PathItem.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/PathItem~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/PathItem.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/PathItem.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Path Item/ResolvedRoute.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ResolvedRoute.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ResolvedRoute.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ResolvedRoute~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ResolvedRoute.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/ResolvedRoute.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Request/DereferencedRequest.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedRequest.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedRequest.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedRequest~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedRequest.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedRequest.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Request/Request.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Request.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Request.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Request~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Request.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Request.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Response/DereferencedResponse.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedResponse.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedResponse.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedResponse~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedResponse.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedResponse.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Response/Response.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Response.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Response.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Response~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Response.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Response.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/RuntimeExpression.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/RuntimeExpression.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/RuntimeExpression.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/RuntimeExpression~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/RuntimeExpression.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/RuntimeExpression.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Schema Conformances/SchemaProtocols.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/SchemaProtocols.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/SchemaProtocols.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/SchemaProtocols~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/SchemaProtocols.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/SchemaProtocols.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Schema Conformances/SwiftPrimitiveTypes+OpenAPI.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/SwiftPrimitiveTypes+OpenAPI.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/SwiftPrimitiveTypes+OpenAPI.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/SwiftPrimitiveTypes+OpenAPI~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/SwiftPrimitiveTypes+OpenAPI.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/SwiftPrimitiveTypes+OpenAPI.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Schema Object/DereferencedJSONSchema.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedJSONSchema.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedJSONSchema.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedJSONSchema~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedJSONSchema.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedJSONSchema.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Schema Object/JSONSchema+Combining.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/JSONSchema+Combining.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/JSONSchema+Combining.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/JSONSchema+Combining~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/JSONSchema+Combining.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/JSONSchema+Combining.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Schema Object/JSONSchema.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/JSONSchema.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/JSONSchema.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/JSONSchema~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/JSONSchema.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/JSONSchema.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Schema Object/JSONSchemaContext.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/JSONSchemaContext.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/JSONSchemaContext.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/JSONSchemaContext~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/JSONSchemaContext.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/JSONSchemaContext.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Schema Object/SimplifiedJSONSchema.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/SimplifiedJSONSchema.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/SimplifiedJSONSchema.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/SimplifiedJSONSchema~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/SimplifiedJSONSchema.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/SimplifiedJSONSchema.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Schema Object/TypesAndFormats.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/TypesAndFormats.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/TypesAndFormats.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/TypesAndFormats~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/TypesAndFormats.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/TypesAndFormats.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Security/DereferencedSecurityRequirement.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedSecurityRequirement.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedSecurityRequirement.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedSecurityRequirement~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedSecurityRequirement.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/DereferencedSecurityRequirement.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Security/SecurityScheme.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/SecurityScheme.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/SecurityScheme.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/SecurityScheme~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/SecurityScheme.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/SecurityScheme.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Server.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Server.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Server.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Server~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Server.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Server.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Tag.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Tag.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Tag.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Tag~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Tag.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Tag.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/URLTemplate+Validatable.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/URLTemplate+Validatable.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/URLTemplate+Validatable.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/URLTemplate+Validatable~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/URLTemplate+Validatable.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/URLTemplate+Validatable.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Utility/Container+DecodeURLAsString.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Container+DecodeURLAsString.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Container+DecodeURLAsString.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Container+DecodeURLAsString~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Container+DecodeURLAsString.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Container+DecodeURLAsString.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Utility/OrderedDictionry+LocallyDereferenceable.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/OrderedDictionry+LocallyDereferenceable.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/OrderedDictionry+LocallyDereferenceable.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/OrderedDictionry+LocallyDereferenceable~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/OrderedDictionry+LocallyDereferenceable.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/OrderedDictionry+LocallyDereferenceable.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Validator/Validation+Builtins.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Validation+Builtins.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Validation+Builtins.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Validation+Builtins~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Validation+Builtins.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Validation+Builtins.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Validator/Validation.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Validation.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Validation.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Validation~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Validation.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Validation.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Validator/Validator+Convenience.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Validator+Convenience.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Validator+Convenience.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Validator+Convenience~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Validator+Convenience.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Validator+Convenience.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Validator/Validator.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Validator.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Validator.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Validator~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Validator.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/Validator.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/XML.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/XML.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/XML.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/XML~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/XML.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/XML.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/_CoreReExport.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/_CoreReExport.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/_CoreReExport.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/_CoreReExport~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/_CoreReExport.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit30-tool.build/_CoreReExport.dia"
+  }
+}

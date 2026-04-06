@@ -1,0 +1,47 @@
+{
+  "": {
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIURLSession.build/primary.swiftdeps"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-urlsession/Sources/OpenAPIURLSession/BufferedStream/BufferedStream.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIURLSession.build/BufferedStream.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIURLSession.build/BufferedStream.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIURLSession.build/BufferedStream~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIURLSession.build/BufferedStream.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIURLSession.build/BufferedStream.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-urlsession/Sources/OpenAPIURLSession/BufferedStream/Lock.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIURLSession.build/Lock.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIURLSession.build/Lock.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIURLSession.build/Lock~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIURLSession.build/Lock.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIURLSession.build/Lock.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-urlsession/Sources/OpenAPIURLSession/URLSessionBidirectionalStreaming/BidirectionalStreamingURLSessionDelegate.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIURLSession.build/BidirectionalStreamingURLSessionDelegate.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIURLSession.build/BidirectionalStreamingURLSessionDelegate.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIURLSession.build/BidirectionalStreamingURLSessionDelegate~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIURLSession.build/BidirectionalStreamingURLSessionDelegate.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIURLSession.build/BidirectionalStreamingURLSessionDelegate.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-urlsession/Sources/OpenAPIURLSession/URLSessionBidirectionalStreaming/HTTPBodyOutputStreamBridge.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIURLSession.build/HTTPBodyOutputStreamBridge.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIURLSession.build/HTTPBodyOutputStreamBridge.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIURLSession.build/HTTPBodyOutputStreamBridge~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIURLSession.build/HTTPBodyOutputStreamBridge.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIURLSession.build/HTTPBodyOutputStreamBridge.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-urlsession/Sources/OpenAPIURLSession/URLSessionBidirectionalStreaming/URLSession+Extensions.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIURLSession.build/URLSession+Extensions.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIURLSession.build/URLSession+Extensions.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIURLSession.build/URLSession+Extensions~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIURLSession.build/URLSession+Extensions.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIURLSession.build/URLSession+Extensions.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/swift-openapi-urlsession/Sources/OpenAPIURLSession/URLSessionTransport.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIURLSession.build/URLSessionTransport.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIURLSession.build/URLSessionTransport.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIURLSession.build/URLSessionTransport~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIURLSession.build/URLSessionTransport.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIURLSession.build/URLSessionTransport.dia"
+  }
+}

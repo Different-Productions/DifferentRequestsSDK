@@ -1,0 +1,3 @@
+module Yams {
+    header "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/Yams.build/include/Yams-Swift.h"
+}

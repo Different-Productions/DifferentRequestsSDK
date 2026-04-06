@@ -1,0 +1,47 @@
+{
+  "": {
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequests.build/primary.swiftdeps"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/Sources/DifferentRequests/DifferentRequestsClient.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequests.build/DifferentRequestsClient.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequests.build/DifferentRequestsClient.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequests.build/DifferentRequestsClient~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequests.build/DifferentRequestsClient.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequests.build/DifferentRequestsClient.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/Sources/DifferentRequests/DifferentRequestsError.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequests.build/DifferentRequestsError.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequests.build/DifferentRequestsError.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequests.build/DifferentRequestsError~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequests.build/DifferentRequestsError.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequests.build/DifferentRequestsError.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/Sources/DifferentRequests/Models.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequests.build/Models.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequests.build/Models.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequests.build/Models~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequests.build/Models.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequests.build/Models.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/plugins/outputs/differentrequestssdk/DifferentRequests/destination/OpenAPIGenerator/GeneratedSources/Client.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequests.build/Client.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequests.build/Client.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequests.build/Client~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequests.build/Client.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequests.build/Client.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/plugins/outputs/differentrequestssdk/DifferentRequests/destination/OpenAPIGenerator/GeneratedSources/Server.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequests.build/Server.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequests.build/Server.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequests.build/Server~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequests.build/Server.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequests.build/Server.dia"
+  },
+  "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/plugins/outputs/differentrequestssdk/DifferentRequests/destination/OpenAPIGenerator/GeneratedSources/Types.swift": {
+    "dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequests.build/Types.d",
+    "object": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequests.build/Types.swift.o",
+    "swiftmodule": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequests.build/Types~partial.swiftmodule",
+    "swift-dependencies": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequests.build/Types.swiftdeps",
+    "diagnostics": "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/DifferentRequests.build/Types.dia"
+  }
+}

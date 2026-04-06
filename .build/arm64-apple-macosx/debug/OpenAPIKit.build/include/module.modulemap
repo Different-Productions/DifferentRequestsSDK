@@ -1,0 +1,3 @@
+module OpenAPIKit {
+    header "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIKit.build/include/OpenAPIKit-Swift.h"
+}

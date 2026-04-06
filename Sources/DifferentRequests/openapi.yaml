@@ -1,0 +1,406 @@
+openapi: 3.1.0
+info:
+  title: DifferentRequests SDK API
+  description: Feature request management API for mobile and web apps.
+  version: 1.0.0
+
+servers:
+  - url: https://kstb23efj8.execute-api.us-east-1.amazonaws.com
+    description: Production
+  - url: https://urvselrxwj.execute-api.us-east-1.amazonaws.com
+    description: Development
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /users:
+    post:
+      operationId: createUser
+      summary: Create or update an SDK user
+      description: Registers a user and returns a session token for authenticated operations.
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [externalUserId, displayName]
+              properties:
+                externalUserId:
+                  type: string
+                  minLength: 1
+                displayName:
+                  type: string
+                  minLength: 1
+                avatarUrl:
+                  type: string
+                  format: uri
+      responses:
+        "200":
+          description: User created or updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /requests:
+    get:
+      operationId: listRequests
+      summary: List feature requests
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: sort
+          in: query
+          schema:
+            $ref: "#/components/schemas/SortOrder"
+        - name: status
+          in: query
+          schema:
+            $ref: "#/components/schemas/RequestStatus"
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: cursor
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Paginated list of requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedRequests"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    post:
+      operationId: submitRequest
+      summary: Submit a new feature request
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title, body]
+              properties:
+                title:
+                  type: string
+                  minLength: 1
+                body:
+                  type: string
+                  minLength: 1
+      responses:
+        "201":
+          description: Request created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Request"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /requests/search:
+    get:
+      operationId: searchRequests
+      summary: Search requests by title
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+      responses:
+        "200":
+          description: Matching requests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Request"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /requests/{requestId}:
+    get:
+      operationId: getRequest
+      summary: Get a single feature request
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Request details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Request"
+        "301":
+          description: Request was merged into another
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [mergedIntoId]
+                properties:
+                  mergedIntoId:
+                    type: string
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /requests/{requestId}/vote:
+    post:
+      operationId: vote
+      summary: Vote on a feature request
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [value]
+              properties:
+                value:
+                  type: integer
+                  enum: [1, -1, 0]
+                  description: "1 = upvote, -1 = downvote, 0 = remove vote"
+      responses:
+        "200":
+          description: Vote recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Vote"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          description: Rate limited
+          headers:
+            Retry-After:
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  /decline-reasons:
+    get:
+      operationId: listDeclineReasons
+      summary: List decline reasons for the app
+      security:
+        - ApiKeyAuth: []
+      responses:
+        "200":
+          description: List of decline reasons
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DeclineReason"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-App-Key
+    BearerAuth:
+      type: http
+      scheme: bearer
+
+  responses:
+    BadRequest:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    Unauthorized:
+      description: Missing or invalid authentication
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+
+  schemas:
+    SortOrder:
+      type: string
+      enum: [recent, top]
+
+    RequestStatus:
+      type: string
+      enum: [open, planned, in_progress, shipped, declined]
+
+    RequestSource:
+      type: string
+      enum: [sdk, console]
+
+    Request:
+      type: object
+      required: [id, appId, title, body, status, source, score, authorDisplayName, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+        appId:
+          type: string
+        authorId:
+          type: ["string", "null"]
+        title:
+          type: string
+        body:
+          type: string
+        status:
+          $ref: "#/components/schemas/RequestStatus"
+        source:
+          $ref: "#/components/schemas/RequestSource"
+        score:
+          type: integer
+        mergedIntoId:
+          type: ["string", "null"]
+        declineReason:
+          type: ["string", "null"]
+        declineReasonId:
+          type: ["string", "null"]
+        declineReasonLabel:
+          type: ["string", "null"]
+        authorDisplayName:
+          type: string
+        authorExternalUserId:
+          type: ["string", "null"]
+        authorAvatarUrl:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    PaginatedRequests:
+      type: object
+      required: [data, hasMore]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Request"
+        cursor:
+          type: ["string", "null"]
+        hasMore:
+          type: boolean
+
+    User:
+      type: object
+      required: [userId, sessionToken, externalUserId, displayName]
+      properties:
+        userId:
+          type: string
+        sessionToken:
+          type: string
+        externalUserId:
+          type: string
+        displayName:
+          type: string
+        avatarUrl:
+          type: ["string", "null"]
+
+    Vote:
+      type: object
+      required: [id, requestId, userId, value, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+        requestId:
+          type: string
+        userId:
+          type: string
+        value:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    DeclineReason:
+      type: object
+      required: [id, appId, label, isDefault]
+      properties:
+        id:
+          type: string
+        appId:
+          type: string
+        label:
+          type: string
+        isDefault:
+          type: boolean
+
+    ApiError:
+      type: object
+      required: [statusCode, error, message]
+      properties:
+        statusCode:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string

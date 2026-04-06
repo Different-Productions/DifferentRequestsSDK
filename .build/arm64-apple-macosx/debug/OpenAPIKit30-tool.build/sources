@@ -1,0 +1,66 @@
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/AnyCodable+Validatable.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Callbacks.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/CodableVendorExtendable.swift
+'/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Components Object/Components+JSONReference.swift'
+'/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Components Object/Components+Locatable.swift'
+'/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Components Object/Components.swift'
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Content/Content.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Content/ContentEncoding.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Content/DereferencedContent.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Content/DereferencedContentEncoding.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Document/DereferencedDocument.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Document/Document.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Document/DocumentInfo.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Document/ResolvedDocument.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Either/Either+Convenience.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Either/Either+LocallyDereferenceable.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Either/Either+Validatable.swift
+'/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Encoding and Decoding Errors/DocumentDecodingError.swift'
+'/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Encoding and Decoding Errors/OperationDecodingError.swift'
+'/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Encoding and Decoding Errors/PathDecodingError.swift'
+'/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Encoding and Decoding Errors/ResponseDecodingError.swift'
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Example.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/ExternalDocumentation.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Header/DereferencedHeader.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Header/Header.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/JSONReference.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Link.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/OpenAPI.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Operation/DereferencedOperation.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Operation/Operation.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Operation/ResolvedEndpoint.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/OrderedDictionary+Validatable.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Parameter/DereferencedParameter.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Parameter/DereferencedSchemaContext.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Parameter/Parameter.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Parameter/ParameterContext.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Parameter/ParameterSchemaContext.swift
+'/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Path Item/DereferencedPathItem.swift'
+'/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Path Item/PathItem.swift'
+'/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Path Item/ResolvedRoute.swift'
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Request/DereferencedRequest.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Request/Request.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Response/DereferencedResponse.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Response/Response.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/RuntimeExpression.swift
+'/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Schema Conformances/SchemaProtocols.swift'
+'/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Schema Conformances/SwiftPrimitiveTypes+OpenAPI.swift'
+'/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Schema Object/DereferencedJSONSchema.swift'
+'/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Schema Object/JSONSchema+Combining.swift'
+'/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Schema Object/JSONSchema.swift'
+'/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Schema Object/JSONSchemaContext.swift'
+'/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Schema Object/SimplifiedJSONSchema.swift'
+'/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Schema Object/TypesAndFormats.swift'
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Security/DereferencedSecurityRequirement.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Security/SecurityScheme.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Server.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Tag.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/URLTemplate+Validatable.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Utility/Container+DecodeURLAsString.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Utility/OrderedDictionry+LocallyDereferenceable.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Validator/Validation+Builtins.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Validator/Validation.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Validator/Validator+Convenience.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/Validator/Validator.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/XML.swift
+/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/checkouts/OpenAPIKit/Sources/OpenAPIKit30/_CoreReExport.swift
