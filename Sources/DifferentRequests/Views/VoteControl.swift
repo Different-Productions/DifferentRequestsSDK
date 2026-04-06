@@ -2,31 +2,34 @@ import SwiftUI
 
 /// A vertical vote control with up arrow, score, and down arrow.
 ///
-/// Highlights the active vote direction and handles toggling.
+/// Shows a loading indicator while a vote is in flight. The callback
+/// returns the updated score so the UI reflects the change immediately.
 ///
 /// ```swift
-/// VoteControl(score: 42, onVote: { value in
-///   await model.vote(requestId: id, value: value)
-/// })
+/// VoteControl(score: request.score) { value in
+///   return await model.vote(requestId: id, value: value)
+/// }
 /// ```
 public struct VoteControl: View {
 
-  /// The current score to display.
-  public let score: Int
+  /// The initial score from the data source.
+  private let initialScore: Int
 
-  /// Callback when the user taps a vote button.
-  public let onVote: (VoteValue) async -> Void
+  /// Callback when the user taps a vote button. Returns the new score.
+  private let onVote: (VoteValue) async -> Int?
 
-  /// Whether the control is disabled (e.g., while a vote is in flight).
-  @State private var isDisabled = false
+  /// Local score that updates immediately after voting.
+  @State private var displayScore: Int
+  @State private var isVoting = false
 
   /// Creates a vote control.
   /// - Parameters:
   ///   - score: The current score.
-  ///   - onVote: Async callback with the vote direction.
-  public init(score: Int, onVote: @escaping (VoteValue) async -> Void) {
-    self.score = score
+  ///   - onVote: Async callback that returns the updated score, or nil on failure.
+  public init(score: Int, onVote: @escaping (VoteValue) async -> Int?) {
+    self.initialScore = score
     self.onVote = onVote
+    self._displayScore = State(initialValue: score)
   }
 
   public var body: some View {
@@ -39,12 +42,19 @@ public struct VoteControl: View {
           .frame(width: 32, height: 32)
       }
       .buttonStyle(.plain)
-      .foregroundStyle(score > 0 ? .green : .secondary)
+      .foregroundStyle(displayScore > 0 ? .green : .secondary)
 
-      Text("\(score)")
-        .font(.subheadline)
-        .fontWeight(.bold)
-        .monospacedDigit()
+      if isVoting {
+        ProgressView()
+          .scaleEffect(0.7)
+          .frame(height: 20)
+      } else {
+        Text("\(displayScore)")
+          .font(.subheadline)
+          .fontWeight(.bold)
+          .monospacedDigit()
+          .frame(height: 20)
+      }
 
       Button {
         Task { await handleVote(.downvote) }
@@ -54,11 +64,11 @@ public struct VoteControl: View {
           .frame(width: 32, height: 32)
       }
       .buttonStyle(.plain)
-      .foregroundStyle(score < 0 ? .red : .secondary)
+      .foregroundStyle(displayScore < 0 ? .red : .secondary)
     }
-    .disabled(isDisabled)
+    .disabled(isVoting)
     .accessibilityElement(children: .ignore)
-    .accessibilityLabel("Score: \(score)")
+    .accessibilityLabel("Score: \(displayScore)")
     .accessibilityAdjustableAction { direction in
       switch direction {
       case .increment:
@@ -69,12 +79,17 @@ public struct VoteControl: View {
         break
       }
     }
+    .onChange(of: initialScore) { _, newValue in
+      displayScore = newValue
+    }
   }
 
   private func handleVote(_ value: VoteValue) async {
-    isDisabled = true
-    await onVote(value)
-    isDisabled = false
+    isVoting = true
+    if let newScore = await onVote(value) {
+      displayScore = newScore
+    }
+    isVoting = false
   }
 }
 
@@ -82,9 +97,9 @@ public struct VoteControl: View {
 
 #Preview("Vote Control") {
   HStack(spacing: 40) {
-    VoteControl(score: 42, onVote: { _ in })
-    VoteControl(score: 0, onVote: { _ in })
-    VoteControl(score: -3, onVote: { _ in })
+    VoteControl(score: 42, onVote: { _ in 43 })
+    VoteControl(score: 0, onVote: { _ in 1 })
+    VoteControl(score: -3, onVote: { _ in -2 })
   }
   .padding()
 }

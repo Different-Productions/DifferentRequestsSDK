@@ -136,7 +136,7 @@ public struct DifferentRequestsView: View {
 
 private struct RequestRow: View {
   let request: Request
-  let onVote: (VoteValue) async -> Void
+  let onVote: (VoteValue) async -> Int?
 
   var body: some View {
     HStack(alignment: .top, spacing: 12) {

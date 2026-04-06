@@ -69,6 +69,14 @@ public struct User: Sendable {
   public let avatarUrl: String?
 }
 
+/// The result of a vote operation, including the updated score.
+public struct VoteResult: Sendable {
+  /// The confirmed vote record, or `nil` if the vote was removed.
+  public let vote: Vote?
+  /// The request's updated score after this vote.
+  public let newScore: Int
+}
+
 /// A recorded vote on a request.
 public struct Vote: Sendable {
   public let id: String
@@ -76,7 +84,6 @@ public struct Vote: Sendable {
   public let userId: String
   public let value: Int
   public let createdAt: Date
-  public let updatedAt: Date
 }
 
 /// A decline reason configured for an app.
