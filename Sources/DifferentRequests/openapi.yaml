@@ -349,9 +349,9 @@ components:
 
     User:
       type: object
-      required: [userId, sessionToken, externalUserId, displayName]
+      required: [id, sessionToken, externalUserId, displayName]
       properties:
-        userId:
+        id:
           type: string
         sessionToken:
           type: string

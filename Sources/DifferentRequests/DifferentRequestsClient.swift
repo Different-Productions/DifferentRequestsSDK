@@ -88,7 +88,7 @@ public actor DifferentRequestsClient {
       self.sessionToken = data.sessionToken
       rebuildClient()
       return User(
-        userId: data.userId,
+        userId: data.id,
         sessionToken: data.sessionToken,
         externalUserId: data.externalUserId,
         displayName: data.displayName,
