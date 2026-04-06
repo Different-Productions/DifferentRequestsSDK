@@ -200,7 +200,10 @@ public actor DifferentRequestsClient {
   // MARK: - Voting
 
   /// Vote on a feature request. Requires authentication.
-  public func vote(requestId: String, value: VoteValue) async throws -> Vote {
+  ///
+  /// Returns a ``VoteResult`` containing the confirmed vote (if any) and the
+  /// updated score. Use `result.newScore` for immediate UI updates.
+  public func vote(requestId: String, value: VoteValue) async throws -> VoteResult {
     guard sessionToken != nil else {
       throw DifferentRequestsError.notAuthenticated
     }
@@ -215,14 +218,19 @@ public actor DifferentRequestsClient {
     switch response {
     case .ok(let ok):
       let data = try ok.body.json
-      return Vote(
-        id: data.id,
-        requestId: data.requestId,
-        userId: data.userId,
-        value: data.value,
-        createdAt: parseDate(data.createdAt),
-        updatedAt: parseDate(data.updatedAt)
-      )
+      let vote: Vote?
+      if let v = data.vote {
+        vote = Vote(
+          id: v.id,
+          requestId: v.requestId,
+          userId: v.userId,
+          value: v.value,
+          createdAt: parseDate(v.createdAt)
+        )
+      } else {
+        vote = nil
+      }
+      return VoteResult(vote: vote, newScore: data.newScore)
     case .unauthorized(let err):
       throw try mapError(err.body.json)
     case .notFound(let err):

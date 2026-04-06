@@ -216,7 +216,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Vote"
+                $ref: "#/components/schemas/VoteResult"
         "401":
           $ref: "#/components/responses/Unauthorized"
         "404":
@@ -360,9 +360,18 @@ components:
         avatarUrl:
           type: ["string", "null"]
 
+    VoteResult:
+      type: object
+      required: [newScore]
+      properties:
+        vote:
+          $ref: "#/components/schemas/Vote"
+        newScore:
+          type: integer
+
     Vote:
       type: object
-      required: [id, requestId, userId, value, createdAt, updatedAt]
+      required: [id, requestId, userId, value, createdAt]
       properties:
         id:
           type: string
@@ -373,8 +382,6 @@ components:
         value:
           type: integer
         createdAt:
-          type: string
-        updatedAt:
           type: string
 
     DeclineReason:

@@ -60,20 +60,21 @@ public final class RequestDetailModel {
 
   // MARK: - Voting
 
-  /// Vote on the current request, then reload to reflect the updated score.
+  /// Vote on the current request. Returns the updated score for immediate UI feedback.
   /// - Parameter value: The vote direction.
-  public func vote(value: VoteValue) async {
-    guard let id = requestId else { return }
+  /// - Returns: The new score from the server, or nil on failure.
+  public func vote(value: VoteValue) async -> Int? {
+    guard let id = requestId else { return nil }
 
     do {
-      let confirmed = try await client.vote(requestId: id, value: value)
-      if confirmed.requestId == id {
-        await load(id: id)
-      }
+      let result = try await client.vote(requestId: id, value: value)
+      return result.newScore
     } catch let err as DifferentRequestsError {
       error = err
+      return nil
     } catch {
       self.error = .networkError(underlying: error)
+      return nil
     }
   }
 }

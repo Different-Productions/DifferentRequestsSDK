@@ -102,22 +102,21 @@ public final class RequestListModel {
 
   // MARK: - Voting
 
-  /// Vote on a request, then refresh to reflect the updated score.
+  /// Vote on a request. Returns the updated score for immediate UI feedback.
   /// - Parameters:
   ///   - requestId: The request to vote on.
   ///   - value: The vote direction.
-  public func vote(requestId: String, value: VoteValue) async {
+  /// - Returns: The new score from the server, or nil on failure.
+  public func vote(requestId: String, value: VoteValue) async -> Int? {
     do {
-      let confirmed = try await client.vote(requestId: requestId, value: value)
-      // Refresh the list so the score reflects the server state.
-      // The confirmed vote is used to validate the round-trip succeeded.
-      if confirmed.requestId == requestId {
-        await refresh()
-      }
+      let result = try await client.vote(requestId: requestId, value: value)
+      return result.newScore
     } catch let err as DifferentRequestsError {
       error = err
+      return nil
     } catch {
       self.error = .networkError(underlying: error)
+      return nil
     }
   }
 }
