@@ -1,3 +1,0 @@
-module OpenAPIRuntime {
-    header "/Users/michaelharrigan/Developer/DifferentRequestsSDK/.build/arm64-apple-macosx/debug/OpenAPIRuntime.build/include/OpenAPIRuntime-Swift.h"
-}
