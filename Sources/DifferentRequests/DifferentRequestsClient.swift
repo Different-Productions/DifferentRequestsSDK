@@ -23,7 +23,7 @@ public actor DifferentRequestsClient {
   private var sessionToken: String?
 
   /// The default production API URL.
-  private static let productionURL = URL(string: "https://kstb23efj8.execute-api.us-east-1.amazonaws.com")
+  private static let productionURL = URL(string: "https://urvselrxwj.execute-api.us-east-1.amazonaws.com")
 
   // MARK: - Initialization
 
