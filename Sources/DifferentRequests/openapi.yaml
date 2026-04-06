@@ -329,10 +329,8 @@ components:
           type: ["string", "null"]
         createdAt:
           type: string
-          format: date-time
         updatedAt:
           type: string
-          format: date-time
 
     PaginatedRequests:
       type: object
@@ -376,10 +374,8 @@ components:
           type: integer
         createdAt:
           type: string
-          format: date-time
         updatedAt:
           type: string
-          format: date-time
 
     DeclineReason:
       type: object
