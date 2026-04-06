@@ -220,8 +220,8 @@ public actor DifferentRequestsClient {
         requestId: data.requestId,
         userId: data.userId,
         value: data.value,
-        createdAt: data.createdAt,
-        updatedAt: data.updatedAt
+        createdAt: parseDate(data.createdAt),
+        updatedAt: parseDate(data.updatedAt)
       )
     case .unauthorized(let err):
       throw try mapError(err.body.json)
@@ -277,8 +277,8 @@ public actor DifferentRequestsClient {
       authorDisplayName: r.authorDisplayName,
       authorExternalUserId: r.authorExternalUserId,
       authorAvatarUrl: r.authorAvatarUrl,
-      createdAt: r.createdAt,
-      updatedAt: r.updatedAt
+      createdAt: parseDate(r.createdAt),
+      updatedAt: parseDate(r.updatedAt)
     )
   }
 
@@ -290,6 +290,16 @@ public actor DifferentRequestsClient {
     case .downvote: return ._n1
     case .remove: return ._0
     }
+  }
+
+  private func parseDate(_ string: String) -> Date {
+    let formatter = ISO8601DateFormatter()
+    formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+    if let date = formatter.date(from: string) {
+      return date
+    }
+    formatter.formatOptions = [.withInternetDateTime]
+    return formatter.date(from: string) ?? Date.now
   }
 
   private func mapError(_ err: Components.Schemas.ApiError) -> DifferentRequestsError {
