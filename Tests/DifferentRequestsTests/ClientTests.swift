@@ -5,20 +5,15 @@ import Foundation
 @Suite("DifferentRequestsClient")
 struct ClientTests {
 
-  @Test("init succeeds with valid URL")
-  func initWithValidURL() throws {
-    let url = try #require(URL(string: "https://api.example.com"))
-    let client = try DifferentRequestsClient(apiKey: "test-key", baseURL: url)
+  @Test("init succeeds")
+  func initSucceeds() {
+    let client = DifferentRequestsClient(apiKey: "test-key")
     #expect(client != nil)
   }
 
   @Test("submitRequest throws notAuthenticated without session")
   func submitWithoutAuth() async {
-    let url = URL(string: "https://api.example.com")!
-    guard let client = try? DifferentRequestsClient(apiKey: "test-key", baseURL: url) else {
-      Issue.record("Failed to create client")
-      return
-    }
+    let client = DifferentRequestsClient(apiKey: "test-key")
 
     await #expect(throws: DifferentRequestsError.self) {
       try await client.submitRequest(title: "Test", body: "Test body")
@@ -27,11 +22,7 @@ struct ClientTests {
 
   @Test("vote throws notAuthenticated without session")
   func voteWithoutAuth() async {
-    let url = URL(string: "https://api.example.com")!
-    guard let client = try? DifferentRequestsClient(apiKey: "test-key", baseURL: url) else {
-      Issue.record("Failed to create client")
-      return
-    }
+    let client = DifferentRequestsClient(apiKey: "test-key")
 
     await #expect(throws: DifferentRequestsError.self) {
       try await client.vote(requestId: "123", value: .upvote)

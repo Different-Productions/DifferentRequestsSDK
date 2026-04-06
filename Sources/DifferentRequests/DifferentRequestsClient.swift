@@ -22,10 +22,31 @@ public actor DifferentRequestsClient {
   private let baseURL: URL
   private var sessionToken: String?
 
+  /// The default production API URL.
+  private static let productionURL = URL(string: "https://kstb23efj8.execute-api.us-east-1.amazonaws.com")
+
   // MARK: - Initialization
 
-  /// Create a client with an API key and base URL.
-  public init(apiKey: String, baseURL: URL) {
+  /// Create a client with your API key.
+  ///
+  /// Get your API key from the DifferentRequests console.
+  /// - Parameter apiKey: Your app's API key.
+  public init(apiKey: String) {
+    guard let url = Self.productionURL else {
+      fatalError("Invalid production URL — this is a SDK bug, please report it.")
+    }
+    self.apiKey = apiKey
+    self.baseURL = url
+    self.sessionToken = nil
+    self.underlyingClient = Client(
+      serverURL: url,
+      transport: URLSessionTransport(),
+      middlewares: [AuthMiddleware(apiKey: apiKey, sessionToken: nil)]
+    )
+  }
+
+  /// Create a client with an API key and custom base URL (for testing).
+  package init(apiKey: String, baseURL: URL) {
     self.apiKey = apiKey
     self.baseURL = baseURL
     self.sessionToken = nil
