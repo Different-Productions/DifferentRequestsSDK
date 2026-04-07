@@ -1,15 +1,9 @@
 import Foundation
-import SwiftUI
 
 /// Observable state for the request list view.
 ///
 /// Manages loading, pagination, sorting, filtering, and voting.
-/// Drives ``DifferentRequestsView`` reactively via `@Observable`.
-///
-/// ```swift
-/// let model = RequestListModel(client: client)
-/// await model.load()
-/// ```
+/// All async work lives here — views only read state and call methods.
 @Observable
 @MainActor
 public final class RequestListModel {
@@ -103,10 +97,6 @@ public final class RequestListModel {
   // MARK: - Voting
 
   /// Vote on a request. Returns the updated score for immediate UI feedback.
-  /// - Parameters:
-  ///   - requestId: The request to vote on.
-  ///   - value: The vote direction.
-  /// - Returns: The new score from the server, or nil on failure.
   public func vote(requestId: String, value: VoteValue) async -> Int? {
     do {
       let result = try await client.vote(requestId: requestId, value: value)
@@ -118,5 +108,19 @@ public final class RequestListModel {
       self.error = .networkError(underlying: error)
       return nil
     }
+  }
+
+  // MARK: - Sort/Filter
+
+  /// Change sort order and reload.
+  public func changeSort(to newSort: SortOrder) async {
+    sort = newSort
+    await load()
+  }
+
+  /// Change status filter and reload.
+  public func changeFilter(to newFilter: RequestStatus?) async {
+    statusFilter = newFilter
+    await load()
   }
 }
