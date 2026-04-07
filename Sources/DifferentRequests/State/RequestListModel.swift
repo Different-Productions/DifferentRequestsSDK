@@ -13,6 +13,9 @@ public final class RequestListModel {
   /// The currently loaded requests.
   public private(set) var requests: [Request] = []
 
+  /// The request currently selected for detail view. Set to nil to dismiss.
+  public var selectedRequest: Request?
+
   /// Whether the initial load or a filter change is in progress.
   public private(set) var isLoading = false
 
@@ -96,17 +99,15 @@ public final class RequestListModel {
 
   // MARK: - Voting
 
-  /// Vote on a request. Returns the updated score for immediate UI feedback.
-  public func vote(requestId: String, value: VoteValue) async -> Int? {
+  /// Vote on a request and refresh the list to reflect the new score.
+  public func vote(requestId: String, value: VoteValue) async {
     do {
-      let result = try await client.vote(requestId: requestId, value: value)
-      return result.newScore
+      try await client.vote(requestId: requestId, value: value)
+      await refresh()
     } catch let err as DifferentRequestsError {
       error = err
-      return nil
     } catch {
       self.error = .networkError(underlying: error)
-      return nil
     }
   }
 

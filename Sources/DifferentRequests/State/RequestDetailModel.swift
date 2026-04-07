@@ -46,7 +46,7 @@ public final class RequestDetailModel {
     } catch let err as DifferentRequestsError {
       error = err
     } catch {
-      self.error = .serverError(statusCode: 0, message: String(describing: error))
+      self.error = .networkError(underlying: error)
     }
 
     isLoading = false
@@ -54,16 +54,17 @@ public final class RequestDetailModel {
 
   // MARK: - Voting
 
-  /// Vote on the current request. Returns the updated score.
-  public func vote(value: VoteValue) async -> Int? {
-    guard let id = requestId else { return nil }
+  /// Vote on the current request and reload to reflect the new score.
+  public func vote(value: VoteValue) async {
+    guard let id = requestId else { return }
 
     do {
-      let result = try await client.vote(requestId: id, value: value)
-      return result.newScore
+      try await client.vote(requestId: id, value: value)
+      await load(id: id)
+    } catch let err as DifferentRequestsError {
+      error = err
     } catch {
-      // Vote errors don't replace the loaded request — just return nil
-      return nil
+      self.error = .networkError(underlying: error)
     }
   }
 }

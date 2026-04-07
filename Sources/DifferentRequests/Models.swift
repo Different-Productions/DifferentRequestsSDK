@@ -33,7 +33,7 @@ public enum VoteValue: Int, Sendable {
 // MARK: - Models
 
 /// A feature request.
-public struct Request: Sendable, Identifiable {
+public struct Request: Sendable, Identifiable, Hashable {
   public let id: String
   public let appId: String
   public let authorId: String?
