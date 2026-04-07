@@ -1,15 +1,9 @@
 import Foundation
-import SwiftUI
 
 /// Observable state for the request detail view.
 ///
 /// Manages loading a single request and voting on it.
-/// Drives ``RequestDetailView`` reactively via `@Observable`.
-///
-/// ```swift
-/// let model = RequestDetailModel(client: client)
-/// await model.load(id: "request-123")
-/// ```
+/// All async work lives here — views only read state and call methods.
 @Observable
 @MainActor
 public final class RequestDetailModel {
@@ -22,7 +16,7 @@ public final class RequestDetailModel {
   /// Whether the request is currently loading.
   public private(set) var isLoading = false
 
-  /// The most recent error, if any.
+  /// Error from loading the request.
   public private(set) var error: DifferentRequestsError?
 
   // MARK: - Private State
@@ -60,20 +54,15 @@ public final class RequestDetailModel {
 
   // MARK: - Voting
 
-  /// Vote on the current request. Returns the updated score for immediate UI feedback.
-  /// - Parameter value: The vote direction.
-  /// - Returns: The new score from the server, or nil on failure.
+  /// Vote on the current request. Returns the updated score.
   public func vote(value: VoteValue) async -> Int? {
     guard let id = requestId else { return nil }
 
     do {
       let result = try await client.vote(requestId: id, value: value)
       return result.newScore
-    } catch let err as DifferentRequestsError {
-      error = err
-      return nil
     } catch {
-      self.error = .serverError(statusCode: 0, message: String(describing: error))
+      // Vote errors don't replace the loaded request — just return nil
       return nil
     }
   }
