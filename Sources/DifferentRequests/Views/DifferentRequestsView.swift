@@ -47,15 +47,17 @@ public struct DifferentRequestsView: View {
       .navigationTitle("Requests")
       .toolbar {
         ToolbarItem(placement: .navigation) {
-          sortPicker
+          Picker("Sort", selection: $model.sort) {
+            Text("Recent").tag(SortOrder.recent)
+            Text("Top").tag(SortOrder.top)
+          }
+          .pickerStyle(.segmented)
+          .frame(width: 160)
         }
         ToolbarItem(placement: .primaryAction) {
-          Button {
+          Button("Submit request", systemImage: "plus") {
             showSubmit = true
-          } label: {
-            Image(systemName: "plus")
           }
-          .accessibilityLabel("Submit request")
         }
       }
       .sheet(isPresented: $showSubmit) {
@@ -63,39 +65,33 @@ public struct DifferentRequestsView: View {
           await model.refresh()
         }
       }
+      .sheet(item: $model.selectedRequest) { request in
+        NavigationStack {
+          RequestDetailView(client: client, requestId: request.id)
+        }
+      }
       .task {
         await model.load()
+      }
+      .onChange(of: model.sort) {
+        Task { await model.load() }
       }
     }
   }
 
   // MARK: - Subviews
 
-  private var sortPicker: some View {
-    Picker("Sort", selection: Binding(
-      get: { model.sort },
-      set: { newValue in
-        model.sort = newValue
-        Task { await model.load() }
-      }
-    )) {
-      Text("Recent").tag(SortOrder.recent)
-      Text("Top").tag(SortOrder.top)
-    }
-    .pickerStyle(.segmented)
-    .frame(width: 160)
-  }
-
   private var requestList: some View {
     List {
       statusFilterSection
 
       ForEach(model.requests) { request in
-        NavigationLink(value: request.id) {
-          RequestRow(request: request) { value in
-            await model.vote(requestId: request.id, value: value)
-          }
-        }
+        RequestRow(
+          request: request,
+          onUpvote: { Task { await model.vote(requestId: request.id, value: .upvote) } },
+          onDownvote: { Task { await model.vote(requestId: request.id, value: .downvote) } },
+          onTap: { model.selectedRequest = request }
+        )
       }
 
       if model.hasMore {
@@ -106,9 +102,6 @@ public struct DifferentRequestsView: View {
     }
     .listStyle(.plain)
     .refreshable { await model.refresh() }
-    .navigationDestination(for: String.self) { requestId in
-      RequestDetailView(client: client, requestId: requestId)
-    }
   }
 
   private var statusFilterSection: some View {
@@ -136,38 +129,43 @@ public struct DifferentRequestsView: View {
 
 private struct RequestRow: View {
   let request: Request
-  let onVote: (VoteValue) async -> Int?
+  let onUpvote: () -> Void
+  let onDownvote: () -> Void
+  let onTap: () -> Void
 
   var body: some View {
-    HStack(alignment: .top, spacing: 12) {
-      VoteControl(score: request.score, onVote: onVote)
+    Button(action: onTap) {
+      HStack(alignment: .top, spacing: 12) {
+        VoteControl(score: request.score, onUpvote: onUpvote, onDownvote: onDownvote)
 
-      VStack(alignment: .leading, spacing: 4) {
-        Text(request.title)
-          .font(.headline)
-          .lineLimit(1)
+        VStack(alignment: .leading, spacing: 4) {
+          Text(request.title)
+            .font(.headline)
+            .lineLimit(1)
 
-        Text(request.body)
-          .font(.subheadline)
-          .foregroundStyle(.secondary)
-          .lineLimit(1)
+          Text(request.body)
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+            .lineLimit(1)
 
-        HStack(spacing: 8) {
-          Text(request.authorDisplayName)
-            .font(.caption)
-            .foregroundStyle(.tertiary)
+          HStack(spacing: 8) {
+            Text(request.authorDisplayName)
+              .font(.caption)
+              .foregroundStyle(.tertiary)
 
-          StatusBadge(status: request.status)
+            StatusBadge(status: request.status)
 
-          Spacer()
+            Spacer()
 
-          Text(DateFormatting.formatted(request.createdAt))
-            .font(.caption2)
-            .foregroundStyle(.tertiary)
+            Text(DateFormatting.formatted(request.createdAt))
+              .font(.caption2)
+              .foregroundStyle(.tertiary)
+          }
         }
       }
+      .padding(.vertical, 4)
     }
-    .padding(.vertical, 4)
+    .buttonStyle(.plain)
   }
 }
 

@@ -6,17 +6,21 @@ public struct VoteControl: View {
   /// The score to display.
   public let score: Int
 
-  /// Called when the user taps a vote button. Returns the updated score.
-  public let onVote: (VoteValue) async -> Int?
+  /// Called when the user taps upvote.
+  public let onUpvote: () -> Void
 
-  public init(score: Int, onVote: @escaping (VoteValue) async -> Int?) {
+  /// Called when the user taps downvote.
+  public let onDownvote: () -> Void
+
+  public init(score: Int, onUpvote: @escaping () -> Void, onDownvote: @escaping () -> Void) {
     self.score = score
-    self.onVote = onVote
+    self.onUpvote = onUpvote
+    self.onDownvote = onDownvote
   }
 
   public var body: some View {
     VStack(spacing: 2) {
-      Button("Upvote", systemImage: "chevron.up", action: upvote)
+      Button("Upvote", systemImage: "chevron.up", action: onUpvote)
         .labelStyle(.iconOnly)
         .fontWeight(.semibold)
         .frame(width: 32, height: 32)
@@ -27,20 +31,12 @@ public struct VoteControl: View {
         .fontWeight(.bold)
         .monospacedDigit()
 
-      Button("Downvote", systemImage: "chevron.down", action: downvote)
+      Button("Downvote", systemImage: "chevron.down", action: onDownvote)
         .labelStyle(.iconOnly)
         .fontWeight(.semibold)
         .frame(width: 32, height: 32)
         .foregroundStyle(score < 0 ? .red : .secondary)
     }
     .buttonStyle(.borderless)
-  }
-
-  private func upvote() {
-    Task { await onVote(.upvote) }
-  }
-
-  private func downvote() {
-    Task { await onVote(.downvote) }
   }
 }

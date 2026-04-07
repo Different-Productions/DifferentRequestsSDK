@@ -82,9 +82,11 @@ public struct RequestDetailView: View {
 
         // Vote
         HStack {
-          VoteControl(score: request.score) { value in
-            await model.vote(value: value)
-          }
+          VoteControl(
+            score: request.score,
+            onUpvote: { Task { await model.vote(value: .upvote) } },
+            onDownvote: { Task { await model.vote(value: .downvote) } }
+          )
           Text(request.score == 1 ? "1 vote" : "\(request.score) votes")
             .font(.subheadline)
             .foregroundStyle(.secondary)
