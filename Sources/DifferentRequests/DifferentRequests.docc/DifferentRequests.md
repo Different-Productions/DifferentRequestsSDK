@@ -13,18 +13,13 @@ control and drop-in SwiftUI views for quick integration.
 ```swift
 import DifferentRequests
 
-let client = DifferentRequestsClient(
-  apiKey: "your-api-key",
-  baseURL: URL(string: "https://api.example.com")!
-)
+let client = DifferentRequestsClient(apiKey: "your-api-key")
 
-// Authenticate a user
 try await client.authenticate(
   externalUserId: "user-123",
   displayName: "Jane"
 )
 
-// Present the request board
 DifferentRequestsView(client: client)
 ```
 
@@ -34,6 +29,7 @@ DifferentRequestsView(client: client)
 
 - <doc:GettingStarted>
 - ``DifferentRequestsClient``
+- ``DifferentRequestsError``
 
 ### Views
 
@@ -48,6 +44,7 @@ DifferentRequestsView(client: client)
 - ``Request``
 - ``PaginatedRequests``
 - ``User``
+- ``VoteResult``
 - ``Vote``
 - ``DeclineReason``
 
@@ -63,7 +60,3 @@ DifferentRequestsView(client: client)
 - ``RequestListModel``
 - ``RequestDetailModel``
 - ``SubmitRequestModel``
-
-### Errors
-
-- ``DifferentRequestsError``

@@ -1,7 +1,4 @@
 import SwiftUI
-import os
-
-private let logger = Logger(subsystem: "com.different.requests", category: "VoteControl")
 
 /// A vertical vote control with up arrow, score, and down arrow.
 ///
@@ -75,10 +72,8 @@ public struct VoteControl: View {
   }
 
   private func handleVote(_ value: VoteValue) async {
-    logger.debug("handleVote called: value=\(String(describing: value)), isDisabled=\(isDisabled)")
     isDisabled = true
     await onVote(value)
-    logger.debug("handleVote completed: value=\(String(describing: value))")
     isDisabled = false
   }
 }
