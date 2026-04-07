@@ -23,7 +23,9 @@ public struct RequestDetailView: View {
 
   public var body: some View {
     Group {
-      if model.isLoading {
+      if let request = model.request {
+        requestContent(request)
+      } else if model.isLoading {
         ProgressView("Loading...")
       } else if let error = model.error {
         ContentUnavailableView {
@@ -33,8 +35,6 @@ public struct RequestDetailView: View {
         } actions: {
           Button("Retry") { Task { await model.load(id: requestId) } }
         }
-      } else if let request = model.request {
-        requestContent(request)
       }
     }
     .navigationTitle("Request")
