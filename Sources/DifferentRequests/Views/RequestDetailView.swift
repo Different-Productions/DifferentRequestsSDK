@@ -23,18 +23,18 @@ public struct RequestDetailView: View {
 
   public var body: some View {
     Group {
-      if let request = model.request {
-        requestContent(request)
-      } else if model.isLoading {
+      if model.isLoading {
         ProgressView("Loading...")
       } else if let error = model.error {
         ContentUnavailableView {
           Label("Failed to load", systemImage: "exclamationmark.triangle")
         } description: {
-          Text(error.errorDescription ?? "Unknown error")
+          Text(error.localizedDescription)
         } actions: {
           Button("Retry") { Task { await model.load(id: requestId) } }
         }
+      } else if let request = model.request {
+        requestContent(request)
       }
     }
     .navigationTitle("Request")
@@ -82,11 +82,9 @@ public struct RequestDetailView: View {
 
         // Vote
         HStack {
-          VoteControl(
-            score: request.score,
-            onUpvote: { Task { await model.vote(value: .upvote) } },
-            onDownvote: { Task { await model.vote(value: .downvote) } }
-          )
+          VoteControl(score: request.score) { value in
+            await model.vote(value: value)
+          }
           Text(request.score == 1 ? "1 vote" : "\(request.score) votes")
             .font(.subheadline)
             .foregroundStyle(.secondary)

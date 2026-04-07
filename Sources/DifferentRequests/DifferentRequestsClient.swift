@@ -200,9 +200,6 @@ public actor DifferentRequestsClient {
   // MARK: - Voting
 
   /// Vote on a feature request. Requires authentication.
-  ///
-  /// Returns a ``VoteResult`` containing the confirmed vote (if any) and the
-  /// updated score. Use `result.newScore` for immediate UI updates.
   public func vote(requestId: String, value: VoteValue) async throws -> VoteResult {
     guard sessionToken != nil else {
       throw DifferentRequestsError.notAuthenticated

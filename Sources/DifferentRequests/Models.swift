@@ -33,7 +33,7 @@ public enum VoteValue: Int, Sendable {
 // MARK: - Models
 
 /// A feature request.
-public struct Request: Sendable, Identifiable, Hashable {
+public struct Request: Sendable, Identifiable {
   public let id: String
   public let appId: String
   public let authorId: String?
@@ -69,11 +69,9 @@ public struct User: Sendable {
   public let avatarUrl: String?
 }
 
-/// The result of a vote operation, including the updated score.
+/// The result of a vote operation.
 public struct VoteResult: Sendable {
-  /// The confirmed vote record, or `nil` if the vote was removed.
   public let vote: Vote?
-  /// The request's updated score after this vote.
   public let newScore: Int
 }
 

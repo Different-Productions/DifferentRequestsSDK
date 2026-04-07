@@ -38,7 +38,7 @@ public struct SubmitRequestView: View {
 
         if let error = model.error {
           Section {
-            Text(error.errorDescription ?? "Unknown error")
+            Text(error.localizedDescription)
               .foregroundStyle(.red)
               .font(.callout)
           }
