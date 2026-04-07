@@ -52,7 +52,7 @@ public final class RequestDetailModel {
     } catch let err as DifferentRequestsError {
       error = err
     } catch {
-      self.error = .networkError(underlying: error)
+      self.error = .serverError(statusCode: 0, message: String(describing: error))
     }
 
     isLoading = false
@@ -73,7 +73,7 @@ public final class RequestDetailModel {
       error = err
       return nil
     } catch {
-      self.error = .networkError(underlying: error)
+      self.error = .serverError(statusCode: 0, message: String(describing: error))
       return nil
     }
   }

@@ -29,7 +29,7 @@ public struct RequestDetailView: View {
         ContentUnavailableView {
           Label("Failed to load", systemImage: "exclamationmark.triangle")
         } description: {
-          Text(error.localizedDescription)
+          Text(error.errorDescription ?? "Unknown error")
         } actions: {
           Button("Retry") { Task { await model.load(id: requestId) } }
         }
