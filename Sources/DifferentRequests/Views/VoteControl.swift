@@ -2,8 +2,7 @@ import SwiftUI
 
 /// A vertical vote control with up arrow, score, and down arrow.
 ///
-/// Shows a loading indicator while a vote is in flight. The callback
-/// returns the updated score so the UI reflects the change immediately.
+/// Updates the displayed score immediately from the callback result.
 ///
 /// ```swift
 /// VoteControl(score: request.score) { value in
@@ -12,15 +11,10 @@ import SwiftUI
 /// ```
 public struct VoteControl: View {
 
-  /// The initial score from the data source.
   private let initialScore: Int
-
-  /// Callback when the user taps a vote button. Returns the new score.
   private let onVote: (VoteValue) async -> Int?
 
-  /// Local score that updates immediately after voting.
   @State private var displayScore: Int
-  @State private var isVoting = false
 
   /// Creates a vote control.
   /// - Parameters:
@@ -35,7 +29,7 @@ public struct VoteControl: View {
   public var body: some View {
     VStack(spacing: 2) {
       Button {
-        Task { await handleVote(.upvote) }
+        vote(.upvote)
       } label: {
         Image(systemName: "chevron.up")
           .fontWeight(.semibold)
@@ -44,20 +38,13 @@ public struct VoteControl: View {
       .buttonStyle(.plain)
       .foregroundStyle(displayScore > 0 ? .green : .secondary)
 
-      if isVoting {
-        ProgressView()
-          .scaleEffect(0.7)
-          .frame(height: 20)
-      } else {
-        Text("\(displayScore)")
-          .font(.subheadline)
-          .fontWeight(.bold)
-          .monospacedDigit()
-          .frame(height: 20)
-      }
+      Text("\(displayScore)")
+        .font(.subheadline)
+        .fontWeight(.bold)
+        .monospacedDigit()
 
       Button {
-        Task { await handleVote(.downvote) }
+        vote(.downvote)
       } label: {
         Image(systemName: "chevron.down")
           .fontWeight(.semibold)
@@ -66,15 +53,14 @@ public struct VoteControl: View {
       .buttonStyle(.plain)
       .foregroundStyle(displayScore < 0 ? .red : .secondary)
     }
-    .disabled(isVoting)
     .accessibilityElement(children: .ignore)
     .accessibilityLabel("Score: \(displayScore)")
     .accessibilityAdjustableAction { direction in
       switch direction {
       case .increment:
-        Task { await handleVote(.upvote) }
+        vote(.upvote)
       case .decrement:
-        Task { await handleVote(.downvote) }
+        vote(.downvote)
       @unknown default:
         break
       }
@@ -84,12 +70,12 @@ public struct VoteControl: View {
     }
   }
 
-  private func handleVote(_ value: VoteValue) async {
-    isVoting = true
-    if let newScore = await onVote(value) {
-      displayScore = newScore
+  private func vote(_ value: VoteValue) {
+    Task {
+      if let newScore = await onVote(value) {
+        displayScore = newScore
+      }
     }
-    isVoting = false
   }
 }
 
