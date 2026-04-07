@@ -1,9 +1,15 @@
 import Foundation
+import SwiftUI
 
 /// Observable state for the request list view.
 ///
 /// Manages loading, pagination, sorting, filtering, and voting.
-/// All async work lives here — views only read state and call methods.
+/// Drives ``DifferentRequestsView`` reactively via `@Observable`.
+///
+/// ```swift
+/// let model = RequestListModel(client: client)
+/// await model.load()
+/// ```
 @Observable
 @MainActor
 public final class RequestListModel {
@@ -12,9 +18,6 @@ public final class RequestListModel {
 
   /// The currently loaded requests.
   public private(set) var requests: [Request] = []
-
-  /// The request currently selected for detail view. Set to nil to dismiss.
-  public var selectedRequest: Request?
 
   /// Whether the initial load or a filter change is in progress.
   public private(set) var isLoading = false
@@ -99,7 +102,10 @@ public final class RequestListModel {
 
   // MARK: - Voting
 
-  /// Vote on a request and refresh the list to reflect the new score.
+  /// Vote on a request, then refresh to reflect the updated score.
+  /// - Parameters:
+  ///   - requestId: The request to vote on.
+  ///   - value: The vote direction.
   public func vote(requestId: String, value: VoteValue) async {
     do {
       try await client.vote(requestId: requestId, value: value)
@@ -109,19 +115,5 @@ public final class RequestListModel {
     } catch {
       self.error = .networkError(underlying: error)
     }
-  }
-
-  // MARK: - Sort/Filter
-
-  /// Change sort order and reload.
-  public func changeSort(to newSort: SortOrder) async {
-    sort = newSort
-    await load()
-  }
-
-  /// Change status filter and reload.
-  public func changeFilter(to newFilter: RequestStatus?) async {
-    statusFilter = newFilter
-    await load()
   }
 }
