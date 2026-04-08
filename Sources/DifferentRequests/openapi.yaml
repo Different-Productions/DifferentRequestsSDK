@@ -484,7 +484,6 @@ components:
           type: ["string", "null"]
         createdAt:
           type: string
-          format: date-time
 
     Vote:
       type: object
