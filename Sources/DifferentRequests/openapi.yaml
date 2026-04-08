@@ -14,6 +14,57 @@ security:
   - ApiKeyAuth: []
 
 paths:
+  /apps:
+    post:
+      operationId: registerApp
+      summary: Register a new app
+      description: Creates a new app and returns the API key. The key is shown once and must be stored by the caller.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+      responses:
+        "201":
+          description: App registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppRegistration"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /apps/{appId}:
+    get:
+      operationId: getApp
+      summary: Get app metadata
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: appId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: App details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/App"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
   /users:
     post:
       operationId: createUser
@@ -221,16 +272,6 @@ paths:
           $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
-        "429":
-          description: Rate limited
-          headers:
-            Retry-After:
-              schema:
-                type: integer
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ApiError"
 
   /decline-reasons:
     get:
@@ -249,6 +290,59 @@ paths:
                   $ref: "#/components/schemas/DeclineReason"
         "401":
           $ref: "#/components/responses/Unauthorized"
+
+    post:
+      operationId: createDeclineReason
+      summary: Create a custom decline reason
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [label]
+              properties:
+                label:
+                  type: string
+                  minLength: 1
+      responses:
+        "201":
+          description: Decline reason created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeclineReason"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /decline-reasons/{reasonId}:
+    delete:
+      operationId: deleteDeclineReason
+      summary: Delete a custom decline reason
+      description: Only non-default decline reasons can be deleted.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: reasonId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Decline reason deleted
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          description: Cannot delete a default decline reason
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
 
 components:
   securitySchemes:
@@ -293,6 +387,33 @@ components:
       type: string
       enum: [sdk, console]
 
+    AppRegistration:
+      type: object
+      required: [id, name, apiKey, createdAt]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        apiKey:
+          type: string
+          description: Plaintext API key, shown once only.
+        createdAt:
+          type: string
+          format: date-time
+
+    App:
+      type: object
+      required: [id, name, createdAt]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
     Request:
       type: object
       required: [id, appId, title, body, status, source, score, authorDisplayName, createdAt, updatedAt]
@@ -329,8 +450,10 @@ components:
           type: ["string", "null"]
         createdAt:
           type: string
+          format: date-time
         updatedAt:
           type: string
+          format: date-time
 
     PaginatedRequests:
       type: object
@@ -347,7 +470,7 @@ components:
 
     User:
       type: object
-      required: [id, sessionToken, externalUserId, displayName]
+      required: [id, sessionToken, externalUserId, displayName, createdAt]
       properties:
         id:
           type: string
@@ -359,15 +482,9 @@ components:
           type: string
         avatarUrl:
           type: ["string", "null"]
-
-    VoteResult:
-      type: object
-      required: [newScore]
-      properties:
-        vote:
-          $ref: "#/components/schemas/Vote"
-        newScore:
-          type: integer
+        createdAt:
+          type: string
+          format: date-time
 
     Vote:
       type: object
@@ -383,10 +500,22 @@ components:
           type: integer
         createdAt:
           type: string
+          format: date-time
+
+    VoteResult:
+      type: object
+      required: [newScore]
+      properties:
+        vote:
+          description: The vote record, or null if the vote was removed.
+          $ref: "#/components/schemas/Vote"
+        newScore:
+          type: integer
+          description: Updated total score for the request.
 
     DeclineReason:
       type: object
-      required: [id, appId, label, isDefault]
+      required: [id, appId, label, isDefault, createdAt]
       properties:
         id:
           type: string
@@ -396,6 +525,9 @@ components:
           type: string
         isDefault:
           type: boolean
+        createdAt:
+          type: string
+          format: date-time
 
     ApiError:
       type: object

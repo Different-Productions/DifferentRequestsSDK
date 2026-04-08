@@ -12,4 +12,6 @@ public struct DeclineReason: Sendable, Identifiable {
   public let label: String
   /// Whether this is a built-in default reason.
   public let isDefault: Bool
+  /// When this reason was created.
+  public let createdAt: Date
 }
