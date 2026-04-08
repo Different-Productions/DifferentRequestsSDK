@@ -400,7 +400,6 @@ components:
           description: Plaintext API key, shown once only.
         createdAt:
           type: string
-          format: date-time
 
     App:
       type: object
@@ -412,7 +411,6 @@ components:
           type: string
         createdAt:
           type: string
-          format: date-time
 
     Request:
       type: object
@@ -450,10 +448,8 @@ components:
           type: ["string", "null"]
         createdAt:
           type: string
-          format: date-time
         updatedAt:
           type: string
-          format: date-time
 
     PaginatedRequests:
       type: object
@@ -499,7 +495,6 @@ components:
           type: integer
         createdAt:
           type: string
-          format: date-time
 
     VoteResult:
       type: object
@@ -526,7 +521,6 @@ components:
           type: boolean
         createdAt:
           type: string
-          format: date-time
 
     ApiError:
       type: object
