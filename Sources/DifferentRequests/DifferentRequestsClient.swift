@@ -222,7 +222,7 @@ public actor DifferentRequestsClient {
           requestId: v.requestId,
           userId: v.userId,
           value: v.value,
-          createdAt: parseDate(v.createdAt)
+          createdAt: v.createdAt
         )
       } else {
         vote = nil
@@ -232,9 +232,6 @@ public actor DifferentRequestsClient {
       throw try mapError(err.body.json)
     case .notFound(let err):
       throw try mapError(err.body.json)
-    case .tooManyRequests(let err):
-      let retryAfter = err.headers.Retry_hyphen_After ?? 60
-      throw DifferentRequestsError.rateLimited(retryAfter: retryAfter)
     case .undocumented(let statusCode, _):
       throw DifferentRequestsError.serverError(statusCode: statusCode, message: "Unexpected response")
     }
@@ -253,7 +250,8 @@ public actor DifferentRequestsClient {
           id: reason.id,
           appId: reason.appId,
           label: reason.label,
-          isDefault: reason.isDefault
+          isDefault: reason.isDefault,
+          createdAt: reason.createdAt
         )
       }
     case .unauthorized(let err):
@@ -282,8 +280,8 @@ public actor DifferentRequestsClient {
       authorDisplayName: r.authorDisplayName,
       authorExternalUserId: r.authorExternalUserId,
       authorAvatarUrl: r.authorAvatarUrl,
-      createdAt: parseDate(r.createdAt),
-      updatedAt: parseDate(r.updatedAt)
+      createdAt: r.createdAt,
+      updatedAt: r.updatedAt
     )
   }
 
@@ -295,16 +293,6 @@ public actor DifferentRequestsClient {
     case .downvote: return ._n1
     case .remove: return ._0
     }
-  }
-
-  private func parseDate(_ string: String) -> Date {
-    let formatter = ISO8601DateFormatter()
-    formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-    if let date = formatter.date(from: string) {
-      return date
-    }
-    formatter.formatOptions = [.withInternetDateTime]
-    return formatter.date(from: string) ?? Date.now
   }
 
   private func mapError(_ err: Components.Schemas.ApiError) -> DifferentRequestsError {
