@@ -14,33 +14,6 @@ security:
   - ApiKeyAuth: []
 
 paths:
-  /apps:
-    post:
-      operationId: registerApp
-      summary: Register a new app
-      description: Creates a new app and returns the API key. The key is shown once and must be stored by the caller.
-      security: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [name]
-              properties:
-                name:
-                  type: string
-                  minLength: 1
-      responses:
-        "201":
-          description: App registered
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AppRegistration"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-
   /apps/{appId}:
     get:
       operationId: getApp
@@ -386,20 +359,6 @@ components:
     RequestSource:
       type: string
       enum: [sdk, console]
-
-    AppRegistration:
-      type: object
-      required: [id, name, apiKey, createdAt]
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        apiKey:
-          type: string
-          description: Plaintext API key, shown once only.
-        createdAt:
-          type: string
 
     App:
       type: object
