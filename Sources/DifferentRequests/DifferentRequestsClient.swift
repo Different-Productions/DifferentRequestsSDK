@@ -22,31 +22,36 @@ public actor DifferentRequestsClient {
   private let baseURL: URL
   private var sessionToken: String?
 
-  /// The default production API URL.
-  private static let productionURL = URL(string: "https://kstb23efj8.execute-api.us-east-1.amazonaws.com")
+  /// The default production API base URL.
+  ///
+  /// This host is baked into every app that uses `init(apiKey:)`, so it cannot
+  /// change without a coordinated SDK release. It moves to
+  /// `https://api.different.productions` once that custom domain is live and
+  /// validated (the API supports both during cutover).
+  private static let defaultBaseURL: URL = {
+    guard let url = URL(string: "https://kstb23efj8.execute-api.us-east-1.amazonaws.com") else {
+      preconditionFailure("DifferentRequests: built-in default base URL is invalid — SDK bug.")
+    }
+    return url
+  }()
 
   // MARK: - Initialization
 
-  /// Create a client with your API key.
+  /// Create a client with your API key, pointed at the production API.
   ///
   /// Get your API key from the DifferentRequests console.
   /// - Parameter apiKey: Your app's API key.
   public init(apiKey: String) {
-    guard let url = Self.productionURL else {
-      fatalError("Invalid production URL — this is a SDK bug, please report it.")
-    }
-    self.apiKey = apiKey
-    self.baseURL = url
-    self.sessionToken = nil
-    self.underlyingClient = Client(
-      serverURL: url,
-      transport: URLSessionTransport(),
-      middlewares: [AuthMiddleware(apiKey: apiKey, sessionToken: nil)]
-    )
+    self.init(apiKey: apiKey, baseURL: DifferentRequestsClient.defaultBaseURL)
   }
 
-  /// Create a client with an API key and custom base URL (for testing).
-  package init(apiKey: String, baseURL: URL) {
+  /// Create a client with your API key and a custom base URL.
+  ///
+  /// Use this to point at a staging or self-hosted DifferentRequests backend.
+  /// - Parameters:
+  ///   - apiKey: Your app's API key.
+  ///   - baseURL: The API base URL to use instead of production.
+  public init(apiKey: String, baseURL: URL) {
     self.apiKey = apiKey
     self.baseURL = baseURL
     self.sessionToken = nil
