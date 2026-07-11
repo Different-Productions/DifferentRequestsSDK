@@ -295,15 +295,30 @@ public actor DifferentRequestsClient {
   // MARK: - Private Helpers
 
   private func mapRequest(_ r: Components.Schemas.Request) -> Request {
-    Request(
+    let status: RequestStatus
+    if let parsed = RequestStatus(rawValue: r.status.rawValue) {
+      status = parsed
+    } else {
+      status = .open
+    }
+
+    let source: RequestSource
+    if let parsed = RequestSource(rawValue: r.source.rawValue) {
+      source = parsed
+    } else {
+      source = .sdk
+    }
+
+    return Request(
       id: r.id,
       appId: r.appId,
       authorId: r.authorId,
       title: r.title,
       body: r.body,
-      status: RequestStatus(rawValue: r.status.rawValue) ?? .open,
-      source: RequestSource(rawValue: r.source.rawValue) ?? .sdk,
+      status: status,
+      source: source,
       score: r.score,
+      myVote: r.myVote,
       mergedIntoId: r.mergedIntoId,
       declineReason: r.declineReason,
       declineReasonId: r.declineReasonId,

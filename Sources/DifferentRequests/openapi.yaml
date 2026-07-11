@@ -398,6 +398,8 @@ components:
           $ref: "#/components/schemas/RequestSource"
         score:
           type: integer
+        myVote:
+          type: ["integer", "null"]
         mergedIntoId:
           type: ["string", "null"]
         declineReason:
