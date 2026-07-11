@@ -34,6 +34,12 @@ public final class RequestListModel {
   /// Whether more pages are available.
   public private(set) var hasMore = false
 
+  /// Requests matching the active search query. Empty when not searching.
+  public private(set) var searchResults: [Request] = []
+
+  /// Whether a search request is in flight.
+  public private(set) var isSearching = false
+
   // MARK: - Private State
 
   private let client: DifferentRequestsClient
@@ -100,16 +106,42 @@ public final class RequestListModel {
     await load()
   }
 
+  // MARK: - Search
+
+  /// Search requests by title. A blank query clears any prior results.
+  /// - Parameter query: The search text.
+  public func search(query: String) async {
+    let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+    if trimmed.isEmpty {
+      searchResults = []
+      isSearching = false
+      return
+    }
+
+    isSearching = true
+    do {
+      searchResults = try await client.searchRequests(query: trimmed, limit: 20)
+    } catch let err as DifferentRequestsError {
+      error = err
+    } catch {
+      self.error = .networkError(underlying: error)
+    }
+    isSearching = false
+  }
+
   // MARK: - Voting
 
-  /// Vote on a request, then refresh to reflect the updated score.
+  /// Vote on a request and reconcile its score in place from the server's
+  /// response — no full-list refetch.
   /// - Parameters:
   ///   - requestId: The request to vote on.
   ///   - value: The vote direction.
   public func vote(requestId: String, value: VoteValue) async {
     do {
-      try await client.vote(requestId: requestId, value: value)
-      await refresh()
+      let result = try await client.vote(requestId: requestId, value: value)
+      if let index = requests.firstIndex(where: { $0.id == requestId }) {
+        requests[index].score = result.newScore
+      }
     } catch let err as DifferentRequestsError {
       error = err
     } catch {
