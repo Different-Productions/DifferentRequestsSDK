@@ -82,7 +82,7 @@ public struct RequestDetailView: View {
 
         // Vote
         HStack {
-          VoteControl(score: request.score) { value in
+          VoteControl(score: request.score, myVote: request.myVote) { value in
             await model.vote(value: value)
           }
           Text(request.score == 1 ? "1 vote" : "\(request.score) votes")

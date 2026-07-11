@@ -70,6 +70,7 @@ public final class RequestDetailModel {
       let result = try await client.vote(requestId: id, value: value)
       if var current = request, current.id == id {
         current.score = result.newScore
+        current.myVote = result.vote?.value
         request = current
       }
     } catch let err as DifferentRequestsError {

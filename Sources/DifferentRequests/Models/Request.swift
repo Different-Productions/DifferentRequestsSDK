@@ -24,6 +24,11 @@ public struct Request: Sendable, Identifiable {
   /// Mutable so a vote can be reconciled in place from the server's returned
   /// score without refetching the whole list.
   public var score: Int
+
+  /// The current user's own vote on this request (1, -1), or `nil` if they
+  /// haven't voted or the client isn't authenticated. Mutable for the same
+  /// in-place reconciliation as `score`.
+  public var myVote: Int?
   /// If merged, the ID of the request this was merged into.
   public let mergedIntoId: String?
   /// Legacy decline reason text.
