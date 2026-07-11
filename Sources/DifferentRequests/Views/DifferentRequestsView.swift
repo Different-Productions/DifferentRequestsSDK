@@ -169,7 +169,7 @@ private struct RequestRow: View {
 
   var body: some View {
     HStack(alignment: .top, spacing: 12) {
-      VoteControl(score: request.score, onVote: onVote)
+      VoteControl(score: request.score, myVote: request.myVote, onVote: onVote)
 
       VStack(alignment: .leading, spacing: 4) {
         Text(request.title)

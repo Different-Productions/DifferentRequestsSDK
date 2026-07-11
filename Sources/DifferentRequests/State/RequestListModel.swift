@@ -141,6 +141,7 @@ public final class RequestListModel {
       let result = try await client.vote(requestId: requestId, value: value)
       if let index = requests.firstIndex(where: { $0.id == requestId }) {
         requests[index].score = result.newScore
+        requests[index].myVote = result.vote?.value
       }
     } catch let err as DifferentRequestsError {
       error = err
