@@ -12,6 +12,7 @@ public struct DifferentRequestsView: View {
 
   @State private var model: RequestListModel
   @State private var showSubmit = false
+  @State private var searchText = ""
   private let client: DifferentRequestsClient
 
   /// Creates the main request list view.
@@ -24,7 +25,9 @@ public struct DifferentRequestsView: View {
   public var body: some View {
     NavigationStack {
       Group {
-        if model.isLoading && model.requests.isEmpty {
+        if !searchText.isEmpty {
+          searchList
+        } else if model.isLoading && model.requests.isEmpty {
           ProgressView("Loading requests...")
         } else if let error = model.error, model.requests.isEmpty {
           ContentUnavailableView {
@@ -45,6 +48,14 @@ public struct DifferentRequestsView: View {
         }
       }
       .navigationTitle("Requests")
+      .searchable(text: $searchText, prompt: "Search requests")
+      .task(id: searchText) {
+        try? await Task.sleep(for: .milliseconds(300))
+        await model.search(query: searchText)
+      }
+      .navigationDestination(for: String.self) { requestId in
+        RequestDetailView(client: client, requestId: requestId)
+      }
       .toolbar {
         ToolbarItem(placement: .navigation) {
           sortPicker
@@ -106,8 +117,26 @@ public struct DifferentRequestsView: View {
     }
     .listStyle(.plain)
     .refreshable { await model.refresh() }
-    .navigationDestination(for: String.self) { requestId in
-      RequestDetailView(client: client, requestId: requestId)
+  }
+
+  private var searchList: some View {
+    Group {
+      if model.isSearching && model.searchResults.isEmpty {
+        ProgressView("Searching...")
+      } else if model.searchResults.isEmpty {
+        ContentUnavailableView.search(text: searchText)
+      } else {
+        List {
+          ForEach(model.searchResults) { request in
+            NavigationLink(value: request.id) {
+              RequestRow(request: request) { value in
+                await model.vote(requestId: request.id, value: value)
+              }
+            }
+          }
+        }
+        .listStyle(.plain)
+      }
     }
   }
 

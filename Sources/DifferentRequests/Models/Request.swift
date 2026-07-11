@@ -20,7 +20,10 @@ public struct Request: Sendable, Identifiable {
   /// Whether this was submitted via SDK or created in the console.
   public let source: RequestSource
   /// Net vote score (upvotes minus downvotes).
-  public let score: Int
+  ///
+  /// Mutable so a vote can be reconciled in place from the server's returned
+  /// score without refetching the whole list.
+  public var score: Int
   /// If merged, the ID of the request this was merged into.
   public let mergedIntoId: String?
   /// Legacy decline reason text.

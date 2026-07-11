@@ -60,14 +60,18 @@ public final class RequestDetailModel {
 
   // MARK: - Voting
 
-  /// Vote on the current request, then reload to reflect the updated score.
+  /// Vote on the current request and reconcile its score in place from the
+  /// server's response — no reload.
   /// - Parameter value: The vote direction.
   public func vote(value: VoteValue) async {
     guard let id = requestId else { return }
 
     do {
-      try await client.vote(requestId: id, value: value)
-      await load(id: id)
+      let result = try await client.vote(requestId: id, value: value)
+      if var current = request, current.id == id {
+        current.score = result.newScore
+        request = current
+      }
     } catch let err as DifferentRequestsError {
       error = err
     } catch {
