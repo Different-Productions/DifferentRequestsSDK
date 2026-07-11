@@ -103,8 +103,8 @@ public actor DifferentRequestsClient {
       throw try mapError(err.body.json)
     case .unauthorized(let err):
       throw try mapError(err.body.json)
-    case .undocumented(let statusCode, _):
-      throw DifferentRequestsError.serverError(statusCode: statusCode, message: "Unexpected response")
+    case .undocumented(let statusCode, let payload):
+      throw mapUndocumented(statusCode: statusCode, payload)
     }
   }
 
@@ -136,8 +136,8 @@ public actor DifferentRequestsClient {
       )
     case .unauthorized(let err):
       throw try mapError(err.body.json)
-    case .undocumented(let statusCode, _):
-      throw DifferentRequestsError.serverError(statusCode: statusCode, message: "Unexpected response")
+    case .undocumented(let statusCode, let payload):
+      throw mapUndocumented(statusCode: statusCode, payload)
     }
   }
 
@@ -157,8 +157,8 @@ public actor DifferentRequestsClient {
       throw try mapError(err.body.json)
     case .notFound(let err):
       throw try mapError(err.body.json)
-    case .undocumented(let statusCode, _):
-      throw DifferentRequestsError.serverError(statusCode: statusCode, message: "Unexpected response")
+    case .undocumented(let statusCode, let payload):
+      throw mapUndocumented(statusCode: statusCode, payload)
     }
   }
 
@@ -179,8 +179,8 @@ public actor DifferentRequestsClient {
       throw try mapError(err.body.json)
     case .unauthorized(let err):
       throw try mapError(err.body.json)
-    case .undocumented(let statusCode, _):
-      throw DifferentRequestsError.serverError(statusCode: statusCode, message: "Unexpected response")
+    case .undocumented(let statusCode, let payload):
+      throw mapUndocumented(statusCode: statusCode, payload)
     }
   }
 
@@ -197,8 +197,8 @@ public actor DifferentRequestsClient {
       throw try mapError(err.body.json)
     case .unauthorized(let err):
       throw try mapError(err.body.json)
-    case .undocumented(let statusCode, _):
-      throw DifferentRequestsError.serverError(statusCode: statusCode, message: "Unexpected response")
+    case .undocumented(let statusCode, let payload):
+      throw mapUndocumented(statusCode: statusCode, payload)
     }
   }
 
@@ -237,8 +237,8 @@ public actor DifferentRequestsClient {
       throw try mapError(err.body.json)
     case .notFound(let err):
       throw try mapError(err.body.json)
-    case .undocumented(let statusCode, _):
-      throw DifferentRequestsError.serverError(statusCode: statusCode, message: "Unexpected response")
+    case .undocumented(let statusCode, let payload):
+      throw mapUndocumented(statusCode: statusCode, payload)
     }
   }
 
@@ -261,8 +261,8 @@ public actor DifferentRequestsClient {
       }
     case .unauthorized(let err):
       throw try mapError(err.body.json)
-    case .undocumented(let statusCode, _):
-      throw DifferentRequestsError.serverError(statusCode: statusCode, message: "Unexpected response")
+    case .undocumented(let statusCode, let payload):
+      throw mapUndocumented(statusCode: statusCode, payload)
     }
   }
 
@@ -321,6 +321,28 @@ public actor DifferentRequestsClient {
     default:
       return .serverError(statusCode: err.statusCode, message: err.message)
     }
+  }
+
+  /// Map a response the API contract doesn't document to a typed error. A 429
+  /// becomes `.rateLimited` (reading `Retry-After` when the server sends it) so
+  /// callers can back off; anything else is a generic server error.
+  private func mapUndocumented(
+    statusCode: Int,
+    _ payload: UndocumentedPayload
+  ) -> DifferentRequestsError {
+    if statusCode == 429 {
+      return .rateLimited(retryAfter: retryAfterSeconds(payload))
+    }
+    return .serverError(statusCode: statusCode, message: "Unexpected response")
+  }
+
+  private func retryAfterSeconds(_ payload: UndocumentedPayload) -> Int {
+    guard let name = HTTPField.Name("Retry-After"),
+          let raw = payload.headerFields[name],
+          let seconds = Int(raw) else {
+      return 0
+    }
+    return seconds
   }
 
 }
