@@ -5,7 +5,7 @@ import SwiftUI
 /// Highlights the active vote direction and handles toggling.
 ///
 /// ```swift
-/// VoteControl(score: 42, onVote: { value in
+/// VoteControl(score: 42, myVote: 1, onVote: { value in
 ///   await model.vote(requestId: id, value: value)
 /// })
 /// ```
@@ -13,6 +13,9 @@ public struct VoteControl: View {
 
   /// The current score to display.
   public let score: Int
+
+  /// The current user's own vote (1, -1), or `nil` if they haven't voted.
+  public let myVote: Int?
 
   /// Callback when the user taps a vote button.
   public let onVote: (VoteValue) async -> Void
@@ -23,9 +26,11 @@ public struct VoteControl: View {
   /// Creates a vote control.
   /// - Parameters:
   ///   - score: The current score.
+  ///   - myVote: The current user's own vote (1, -1) or nil.
   ///   - onVote: Async callback with the vote direction.
-  public init(score: Int, onVote: @escaping (VoteValue) async -> Void) {
+  public init(score: Int, myVote: Int?, onVote: @escaping (VoteValue) async -> Void) {
     self.score = score
+    self.myVote = myVote
     self.onVote = onVote
   }
 
@@ -39,7 +44,7 @@ public struct VoteControl: View {
           .frame(width: 32, height: 32)
       }
       .buttonStyle(.plain)
-      .foregroundStyle(score > 0 ? .green : .secondary)
+      .foregroundStyle(myVote == 1 ? .green : .secondary)
 
       Text("\(score)")
         .font(.subheadline)
@@ -54,7 +59,7 @@ public struct VoteControl: View {
           .frame(width: 32, height: 32)
       }
       .buttonStyle(.plain)
-      .foregroundStyle(score < 0 ? .red : .secondary)
+      .foregroundStyle(myVote == -1 ? .red : .secondary)
     }
     .disabled(isDisabled)
     .accessibilityElement(children: .ignore)
@@ -82,9 +87,9 @@ public struct VoteControl: View {
 
 #Preview("Vote Control") {
   HStack(spacing: 40) {
-    VoteControl(score: 42, onVote: { _ in })
-    VoteControl(score: 0, onVote: { _ in })
-    VoteControl(score: -3, onVote: { _ in })
+    VoteControl(score: 42, myVote: 1, onVote: { _ in })
+    VoteControl(score: 0, myVote: nil, onVote: { _ in })
+    VoteControl(score: -3, myVote: -1, onVote: { _ in })
   }
   .padding()
 }
