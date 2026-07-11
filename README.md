@@ -14,7 +14,7 @@ Or in `Package.swift`:
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/Different-Productions/DifferentRequestsSDK", from: "0.1.0"),
+  .package(url: "https://github.com/Different-Productions/DifferentRequestsSDK", from: "0.6.0"),
 ]
 ```
 
@@ -40,7 +40,7 @@ That's it. Your users can now browse, submit, and vote on feature requests.
 
 ## Get Your API Key
 
-Sign up at [requests.different.productions](https://requests.different.productions), create an organization, and copy your API key.
+Sign up at [app.differentrequests.com](https://app.differentrequests.com), create an organization, and copy your API key.
 
 ## Drop-in Views
 
