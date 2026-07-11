@@ -62,6 +62,13 @@ paths:
                 avatarUrl:
                   type: string
                   format: uri
+                email:
+                  type: string
+                  format: email
+                traits:
+                  type: object
+                  additionalProperties:
+                    type: string
       responses:
         "200":
           description: User created or updated
@@ -437,6 +444,12 @@ components:
           type: string
         avatarUrl:
           type: ["string", "null"]
+        email:
+          type: ["string", "null"]
+        traits:
+          type: object
+          additionalProperties:
+            type: string
         createdAt:
           type: string
 
