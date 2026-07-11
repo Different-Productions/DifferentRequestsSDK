@@ -45,13 +45,17 @@ let client = DifferentRequestsClient(
 
 ## Authenticate a User
 
-Before a user can submit requests or vote, call ``DifferentRequestsClient/authenticate(externalUserId:displayName:avatarUrl:)``:
+Before a user can submit requests or vote, call ``DifferentRequestsClient/authenticate(externalUserId:displayName:avatarUrl:email:traits:)``:
 
 ```swift
-try await client.authenticate(
+let user = try await client.authenticate(
   externalUserId: currentUser.id,
-  displayName: currentUser.name
+  displayName: currentUser.name,
+  avatarUrl: nil,
+  email: currentUser.email,
+  traits: ["plan": currentUser.plan]
 )
+print("Signed in as \(user.displayName)")
 ```
 
 The session token is stored internally and injected into subsequent requests

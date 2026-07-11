@@ -2,7 +2,7 @@ import Foundation
 
 /// An authenticated SDK user.
 ///
-/// Returned by ``DifferentRequestsClient/authenticate(externalUserId:displayName:avatarUrl:)``.
+/// Returned by ``DifferentRequestsClient/authenticate(externalUserId:displayName:avatarUrl:email:traits:)``.
 /// The session token is stored internally by the client and injected automatically.
 public struct User: Sendable {
   /// The user's internal ID.
@@ -15,4 +15,8 @@ public struct User: Sendable {
   public let displayName: String
   /// URL to the user's avatar, if provided.
   public let avatarUrl: String?
+  /// The user's contact email, if provided.
+  public let email: String?
+  /// Host-supplied key/value attributes for segmentation.
+  public let traits: [String: String]
 }

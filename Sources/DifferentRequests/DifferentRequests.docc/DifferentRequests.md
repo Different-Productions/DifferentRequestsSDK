@@ -15,10 +15,14 @@ import DifferentRequests
 
 let client = DifferentRequestsClient(apiKey: "your-api-key")
 
-try await client.authenticate(
+let user = try await client.authenticate(
   externalUserId: "user-123",
-  displayName: "Jane"
+  displayName: "Jane",
+  avatarUrl: nil,
+  email: nil,
+  traits: nil
 )
+print("Signed in as \(user.displayName)")
 
 DifferentRequestsView(client: client)
 ```
