@@ -23,7 +23,7 @@ Or in `Package.swift`:
 dependencies: [
   .package(
     url: "https://github.com/Different-Productions/DifferentRequestsSDK",
-    from: "0.0.1"
+    from: "0.6.0"
   ),
 ]
 ```
@@ -32,7 +32,7 @@ dependencies: [
 
 Initialize the client with your API key and server URL. You can find both
 in the DifferentRequests console at
-[requests.different.productions](https://requests.different.productions).
+[app.differentrequests.com](https://app.differentrequests.com).
 
 ```swift
 import DifferentRequests

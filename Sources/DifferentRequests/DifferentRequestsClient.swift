@@ -25,11 +25,12 @@ public actor DifferentRequestsClient {
   /// The default production API base URL.
   ///
   /// This host is baked into every app that uses `init(apiKey:)`, so it cannot
-  /// change without a coordinated SDK release. The raw API Gateway endpoint it
-  /// replaced (`kstb23efj8.execute-api.us-east-1.amazonaws.com`) stays served by
-  /// the API indefinitely, so apps built against older SDK versions keep working.
+  /// change without a coordinated SDK release. Both `api.different.productions`
+  /// (the previous default) and the raw API Gateway endpoint it replaced
+  /// (`kstb23efj8.execute-api.us-east-1.amazonaws.com`) stay served by the API
+  /// indefinitely, so apps built against older SDK versions keep working.
   private static let defaultBaseURL: URL = {
-    guard let url = URL(string: "https://api.different.productions") else {
+    guard let url = URL(string: "https://api.differentrequests.com") else {
       preconditionFailure("DifferentRequests: built-in default base URL is invalid — SDK bug.")
     }
     return url
