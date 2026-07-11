@@ -73,17 +73,35 @@ public actor DifferentRequestsClient {
   // MARK: - Authentication
 
   /// Authenticate a user and store the session token.
-  @discardableResult
+  ///
+  /// - Parameters:
+  ///   - externalUserId: Your app's stable identifier for this user.
+  ///   - displayName: The user's display name.
+  ///   - avatarUrl: Optional avatar URL.
+  ///   - email: Optional contact email.
+  ///   - traits: Optional key/value attributes (plan tier, MRR, cohort, …) used
+  ///     for segmentation. Passing this replaces the user's stored traits.
   public func authenticate(
     externalUserId: String,
     displayName: String,
-    avatarUrl: URL? = nil
+    avatarUrl: URL?,
+    email: String?,
+    traits: [String: String]?
   ) async throws -> User {
+    let traitsPayload: Operations.createUser.Input.Body.jsonPayload.traitsPayload?
+    if let traits {
+      traitsPayload = .init(additionalProperties: traits)
+    } else {
+      traitsPayload = nil
+    }
+
     let response = try await underlyingClient.createUser(
       .init(body: .json(.init(
         externalUserId: externalUserId,
         displayName: displayName,
-        avatarUrl: avatarUrl?.absoluteString
+        avatarUrl: avatarUrl?.absoluteString,
+        email: email,
+        traits: traitsPayload
       )))
     )
 
@@ -92,12 +110,20 @@ public actor DifferentRequestsClient {
       let data = try ok.body.json
       self.sessionToken = data.sessionToken
       rebuildClient()
+      let traitsDict: [String: String]
+      if let additional = data.traits?.additionalProperties {
+        traitsDict = additional
+      } else {
+        traitsDict = [:]
+      }
       return User(
         userId: data.id,
         sessionToken: data.sessionToken,
         externalUserId: data.externalUserId,
         displayName: data.displayName,
-        avatarUrl: data.avatarUrl
+        avatarUrl: data.avatarUrl,
+        email: data.email,
+        traits: traitsDict
       )
     case .badRequest(let err):
       throw try mapError(err.body.json)
