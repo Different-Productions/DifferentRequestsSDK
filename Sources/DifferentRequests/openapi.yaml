@@ -271,59 +271,6 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
-    post:
-      operationId: createDeclineReason
-      summary: Create a custom decline reason
-      security:
-        - ApiKeyAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [label]
-              properties:
-                label:
-                  type: string
-                  minLength: 1
-      responses:
-        "201":
-          description: Decline reason created
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/DeclineReason"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-
-  /decline-reasons/{reasonId}:
-    delete:
-      operationId: deleteDeclineReason
-      summary: Delete a custom decline reason
-      description: Only non-default decline reasons can be deleted.
-      security:
-        - ApiKeyAuth: []
-      parameters:
-        - name: reasonId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        "204":
-          description: Decline reason deleted
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "409":
-          description: Cannot delete a default decline reason
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ApiError"
-
 components:
   securitySchemes:
     ApiKeyAuth:
