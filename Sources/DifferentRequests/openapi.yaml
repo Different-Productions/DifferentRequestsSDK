@@ -253,6 +253,107 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
+  /requests/{requestId}/comments:
+    get:
+      operationId: listComments
+      summary: List comments on a feature request
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: cursor
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Paginated list of comments, oldest first
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedComments"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    post:
+      operationId: postComment
+      summary: Post a comment on a feature request
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [body]
+              properties:
+                body:
+                  type: string
+                  minLength: 1
+                  maxLength: 2000
+      responses:
+        "201":
+          description: Comment created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Comment"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /requests/{requestId}/comments/{commentId}:
+    delete:
+      operationId: deleteComment
+      summary: Delete a comment. Own comments only — no admin delete from the SDK.
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Comment deleted
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
   /decline-reasons:
     get:
       operationId: listDeclineReasons
@@ -296,6 +397,12 @@ components:
             $ref: "#/components/schemas/ApiError"
     NotFound:
       description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    Forbidden:
+      description: Caller is not permitted to perform this action
       content:
         application/json:
           schema:
@@ -442,6 +549,42 @@ components:
           type: boolean
         createdAt:
           type: string
+
+    Comment:
+      type: object
+      required: [id, requestId, appId, authorId, authorDisplayName, isOfficial, body, hidden, createdAt]
+      properties:
+        id:
+          type: string
+        requestId:
+          type: string
+        appId:
+          type: string
+        authorId:
+          type: string
+        authorDisplayName:
+          type: string
+        isOfficial:
+          type: boolean
+        body:
+          type: string
+        hidden:
+          type: boolean
+        createdAt:
+          type: string
+
+    PaginatedComments:
+      type: object
+      required: [data, hasMore]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Comment"
+        cursor:
+          type: ["string", "null"]
+        hasMore:
+          type: boolean
 
     ApiError:
       type: object

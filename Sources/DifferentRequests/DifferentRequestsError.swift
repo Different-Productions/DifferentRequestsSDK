@@ -9,6 +9,10 @@ public enum DifferentRequestsError: Error, Sendable, LocalizedError {
   /// The requested resource was not found.
   case notFound(message: String)
 
+  /// The caller is authenticated but not permitted to perform this action
+  /// (e.g. deleting another user's comment).
+  case forbidden(message: String)
+
   /// The request failed validation.
   case validationError(message: String)
 
@@ -29,6 +33,8 @@ public enum DifferentRequestsError: Error, Sendable, LocalizedError {
     case .notAuthenticated:
       return "Not authenticated. Call authenticate() first."
     case .notFound(let message):
+      return message
+    case .forbidden(let message):
       return message
     case .validationError(let message):
       return message
