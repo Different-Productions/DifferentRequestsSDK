@@ -118,6 +118,8 @@ private struct NotificationRow: View {
       return "New comment"
     case .officialReply:
       return "Team replied"
+    case .changelogPublished:
+      return "What's New"
     }
   }
 }
