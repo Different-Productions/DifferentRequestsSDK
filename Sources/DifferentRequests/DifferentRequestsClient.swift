@@ -370,6 +370,103 @@ public actor DifferentRequestsClient {
     }
   }
 
+  // MARK: - Following
+
+  /// Explicitly follow a feature request. Requires authentication.
+  ///
+  /// Following also happens automatically when you submit, vote (value != 0),
+  /// or comment on a request — call this only for an explicit follow toggle
+  /// the user requests independent of those actions.
+  public func follow(requestId: String) async throws {
+    guard sessionToken != nil else {
+      throw DifferentRequestsError.notAuthenticated
+    }
+
+    let response = try await underlyingClient.followRequest(
+      .init(path: .init(requestId: requestId))
+    )
+
+    switch response {
+    case .noContent:
+      return
+    case .unauthorized(let err):
+      throw try mapError(err.body.json)
+    case .notFound(let err):
+      throw try mapError(err.body.json)
+    case .undocumented(let statusCode, let payload):
+      throw mapUndocumented(statusCode: statusCode, payload)
+    }
+  }
+
+  /// Explicitly unfollow a feature request. Requires authentication.
+  public func unfollow(requestId: String) async throws {
+    guard sessionToken != nil else {
+      throw DifferentRequestsError.notAuthenticated
+    }
+
+    let response = try await underlyingClient.unfollowRequest(
+      .init(path: .init(requestId: requestId))
+    )
+
+    switch response {
+    case .noContent:
+      return
+    case .unauthorized(let err):
+      throw try mapError(err.body.json)
+    case .notFound(let err):
+      throw try mapError(err.body.json)
+    case .undocumented(let statusCode, let payload):
+      throw mapUndocumented(statusCode: statusCode, payload)
+    }
+  }
+
+  /// Get a feature request's follower count.
+  ///
+  /// Only the count is available — the SDK never exposes the raw list of
+  /// who follows a request.
+  public func followerCount(requestId: String) async throws -> Int {
+    let response = try await underlyingClient.getFollowerCount(
+      .init(path: .init(requestId: requestId))
+    )
+
+    switch response {
+    case .ok(let ok):
+      return try ok.body.json.count
+    case .notFound(let err):
+      throw try mapError(err.body.json)
+    case .undocumented(let statusCode, let payload):
+      throw mapUndocumented(statusCode: statusCode, payload)
+    }
+  }
+
+  /// List the current user's followed requests, most recently followed first. Requires authentication.
+  public func listFollowedRequests(
+    limit: Int = 20,
+    cursor: String? = nil
+  ) async throws -> PaginatedFollows {
+    guard sessionToken != nil else {
+      throw DifferentRequestsError.notAuthenticated
+    }
+
+    let response = try await underlyingClient.listMyFollows(
+      .init(query: .init(limit: limit, cursor: cursor))
+    )
+
+    switch response {
+    case .ok(let ok):
+      let data = try ok.body.json
+      return PaginatedFollows(
+        follows: data.data.map { mapFollow($0) },
+        cursor: data.cursor,
+        hasMore: data.hasMore
+      )
+    case .unauthorized(let err):
+      throw try mapError(err.body.json)
+    case .undocumented(let statusCode, let payload):
+      throw mapUndocumented(statusCode: statusCode, payload)
+    }
+  }
+
   // MARK: - Decline Reasons
 
   /// List decline reasons configured for this app.
@@ -444,6 +541,15 @@ public actor DifferentRequestsClient {
       body: c.body,
       hidden: c.hidden,
       createdAt: parseDate(c.createdAt)
+    )
+  }
+
+  private func mapFollow(_ f: Components.Schemas.Follow) -> Follow {
+    Follow(
+      requestId: f.requestId,
+      userId: f.userId,
+      appId: f.appId,
+      createdAt: parseDate(f.createdAt)
     )
   }
 

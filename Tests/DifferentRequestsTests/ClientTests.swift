@@ -47,6 +47,33 @@ struct ClientTests {
     }
   }
 
+  @Test("follow throws notAuthenticated without session")
+  func followWithoutAuth() async {
+    let client = DifferentRequestsClient(apiKey: "test-key")
+
+    await #expect(throws: DifferentRequestsError.self) {
+      try await client.follow(requestId: "123")
+    }
+  }
+
+  @Test("unfollow throws notAuthenticated without session")
+  func unfollowWithoutAuth() async {
+    let client = DifferentRequestsClient(apiKey: "test-key")
+
+    await #expect(throws: DifferentRequestsError.self) {
+      try await client.unfollow(requestId: "123")
+    }
+  }
+
+  @Test("listFollowedRequests throws notAuthenticated without session")
+  func listFollowedRequestsWithoutAuth() async {
+    let client = DifferentRequestsClient(apiKey: "test-key")
+
+    await #expect(throws: DifferentRequestsError.self) {
+      try await client.listFollowedRequests()
+    }
+  }
+
   @Test("currentUserId is nil before authenticating")
   func currentUserIdBeforeAuth() async {
     let client = DifferentRequestsClient(apiKey: "test-key")
@@ -122,6 +149,33 @@ struct CommentsThreadModelTests {
       createdAt: .now
     )
     #expect(!model.isMine(comment))
+  }
+}
+
+@Suite("FollowModel")
+@MainActor
+struct FollowModelTests {
+
+  @Test("starts with the given initial follow state and no known follower count")
+  func initialState() {
+    let model = FollowModel(client: DifferentRequestsClient(apiKey: "test-key"), requestId: "req-1", isFollowing: true)
+    #expect(model.isFollowing)
+    #expect(model.followerCount == nil)
+    #expect(model.error == nil)
+  }
+
+  @Test("defaults to not following")
+  func defaultsToNotFollowing() {
+    let model = FollowModel(client: DifferentRequestsClient(apiKey: "test-key"), requestId: "req-1")
+    #expect(!model.isFollowing)
+  }
+
+  @Test("toggle without a session rolls back and surfaces notAuthenticated")
+  func toggleWithoutAuthRollsBack() async {
+    let model = FollowModel(client: DifferentRequestsClient(apiKey: "test-key"), requestId: "req-1", isFollowing: false)
+    await model.toggle()
+    #expect(!model.isFollowing)
+    #expect(model.error != nil)
   }
 }
 
