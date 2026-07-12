@@ -47,6 +47,26 @@ struct ClientTests {
     }
   }
 
+  @Test("registerDevice throws notAuthenticated without session")
+  func registerDeviceWithoutAuth() async {
+    let client = DifferentRequestsClient(apiKey: "test-key")
+    let tokenData = Data(repeating: 0xAB, count: 32)
+
+    await #expect(throws: DifferentRequestsError.self) {
+      try await client.registerDevice(tokenData: tokenData)
+    }
+  }
+
+  @Test("unregisterDevice throws notAuthenticated without session")
+  func unregisterDeviceWithoutAuth() async {
+    let client = DifferentRequestsClient(apiKey: "test-key")
+    let tokenData = Data(repeating: 0xAB, count: 32)
+
+    await #expect(throws: DifferentRequestsError.self) {
+      try await client.unregisterDevice(tokenData: tokenData)
+    }
+  }
+
   @Test("follow throws notAuthenticated without session")
   func followWithoutAuth() async {
     let client = DifferentRequestsClient(apiKey: "test-key")
