@@ -28,6 +28,10 @@ public enum DifferentRequestsError: Error, Sendable, LocalizedError {
   /// The request was merged into another request.
   case merged(targetId: String)
 
+  /// The server returned a value in a shape the SDK could not decode (e.g. an
+  /// unparseable timestamp).
+  case decodingError(message: String)
+
   public var errorDescription: String? {
     switch self {
     case .notAuthenticated:
@@ -46,6 +50,8 @@ public enum DifferentRequestsError: Error, Sendable, LocalizedError {
       return "Network error: \(underlying.localizedDescription)"
     case .merged(let targetId):
       return "This request was merged into \(targetId)."
+    case .decodingError(let message):
+      return message
     }
   }
 }
