@@ -354,6 +354,60 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
+  /devices:
+    post:
+      operationId: registerDevice
+      summary: Register or refresh an APNs device token for the authenticated user
+      description: >
+        Idempotent — registering the same token again does not create a
+        duplicate. Send the lowercase-hex representation of the raw token
+        handed back by `application(_:didRegisterForRemoteNotificationsWithDeviceToken:)`.
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token]
+              properties:
+                token:
+                  type: string
+                  minLength: 1
+      responses:
+        "201":
+          description: Device registered or refreshed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceRegistration"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /devices/{token}:
+    delete:
+      operationId: unregisterDevice
+      summary: Unregister a device token
+      description: A no-op (still 204) if the token was never registered or was already removed.
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Device unregistered (or was already absent)
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
   /decline-reasons:
     get:
       operationId: listDeclineReasons
@@ -548,6 +602,17 @@ components:
         isDefault:
           type: boolean
         createdAt:
+          type: string
+
+    DeviceRegistration:
+      type: object
+      required: [tokenHash, createdAt, updatedAt]
+      properties:
+        tokenHash:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
           type: string
 
     Comment:

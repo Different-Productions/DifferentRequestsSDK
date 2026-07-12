@@ -370,6 +370,78 @@ public actor DifferentRequestsClient {
     }
   }
 
+  // MARK: - Devices
+
+  /// Register (or refresh) an APNs device token for the authenticated user. Requires authentication.
+  ///
+  /// Idempotent — calling this again with the same token is safe and will
+  /// not create a duplicate registration; a stale token is simply overwritten
+  /// on the next call with the current one.
+  ///
+  /// This method only submits the token to the DifferentRequests backend. It
+  /// does not request notification permission or trigger APNs registration —
+  /// call ``PushNotifications/requestPushAuthorization()`` first, then pass
+  /// this method the `Data` your app receives in its own
+  /// `application(_:didRegisterForRemoteNotificationsWithDeviceToken:)`
+  /// delegate callback. The raw `Data` is converted to the lowercase-hex
+  /// string form APNs tokens are conventionally represented as before being
+  /// sent — callers do not need to do this conversion themselves.
+  ///
+  /// - Parameter tokenData: The raw device token `Data` handed to
+  ///   `application(_:didRegisterForRemoteNotificationsWithDeviceToken:)`.
+  /// - Returns: The stored registration record (token hash, not the raw token).
+  public func registerDevice(tokenData: Data) async throws -> Device {
+    guard sessionToken != nil else {
+      throw DifferentRequestsError.notAuthenticated
+    }
+
+    let response = try await underlyingClient.registerDevice(
+      .init(body: .json(.init(token: hexString(from: tokenData))))
+    )
+
+    switch response {
+    case .created(let created):
+      let data = try created.body.json
+      return Device(
+        tokenHash: data.tokenHash,
+        createdAt: parseDate(data.createdAt),
+        updatedAt: parseDate(data.updatedAt)
+      )
+    case .badRequest(let err):
+      throw try mapError(err.body.json)
+    case .unauthorized(let err):
+      throw try mapError(err.body.json)
+    case .undocumented(let statusCode, let payload):
+      throw mapUndocumented(statusCode: statusCode, payload)
+    }
+  }
+
+  /// Unregister a device token for the authenticated user (e.g. on sign-out). Requires authentication.
+  ///
+  /// A no-op if the token was never registered or was already unregistered —
+  /// this never throws `.notFound`.
+  ///
+  /// - Parameter tokenData: The same raw device token `Data` previously
+  ///   passed to ``registerDevice(tokenData:)``.
+  public func unregisterDevice(tokenData: Data) async throws {
+    guard sessionToken != nil else {
+      throw DifferentRequestsError.notAuthenticated
+    }
+
+    let response = try await underlyingClient.unregisterDevice(
+      .init(path: .init(token: hexString(from: tokenData)))
+    )
+
+    switch response {
+    case .noContent:
+      return
+    case .unauthorized(let err):
+      throw try mapError(err.body.json)
+    case .undocumented(let statusCode, let payload):
+      throw mapUndocumented(statusCode: statusCode, payload)
+    }
+  }
+
   // MARK: - Decline Reasons
 
   /// List decline reasons configured for this app.
@@ -455,6 +527,11 @@ public actor DifferentRequestsClient {
     case .downvote: return ._n1
     case .remove: return ._0
     }
+  }
+
+  /// Convert a raw APNs device token to its conventional lowercase-hex string representation.
+  private func hexString(from data: Data) -> String {
+    data.map { byte in String(format: "%02x", byte) }.joined()
   }
 
   private func parseDate(_ string: String) -> Date {
