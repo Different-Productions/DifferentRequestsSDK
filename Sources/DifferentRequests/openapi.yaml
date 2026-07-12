@@ -500,6 +500,82 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
+  /me/notifications:
+    get:
+      operationId: listMyNotifications
+      summary: List the authenticated user's in-app inbox, most recent first
+      description: >
+        Populated by the async notification fan-out worker off status
+        changes and new comments on requests the user follows — never
+        written synchronously by the request that triggered it.
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: cursor
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Paginated in-app inbox
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedNotifications"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /me/notifications/unread-count:
+    get:
+      operationId: getUnreadNotificationCount
+      summary: Get the authenticated user's unread in-app notification count
+      description: For driving a badge — call this rather than paginating the full inbox just to count unread rows.
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Unread notification count
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnreadNotificationCount"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /me/notifications/{notificationId}/read:
+    patch:
+      operationId: markNotificationRead
+      summary: Mark one in-app notification read
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - name: notificationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Marked read
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Notification"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
   /decline-reasons:
     get:
       operationId: listDeclineReasons
@@ -770,6 +846,49 @@ components:
           type: boolean
 
     FollowerCount:
+      type: object
+      required: [count]
+      properties:
+        count:
+          type: integer
+
+    Notification:
+      type: object
+      required: [id, requestId, type, status, commentId, read, createdAt]
+      properties:
+        id:
+          type: string
+        requestId:
+          type: string
+        type:
+          type: string
+          enum: [status_change, comment, official_reply]
+        status:
+          type: ["string", "null"]
+          description: New status — present only for a status_change notification.
+        commentId:
+          type: ["string", "null"]
+          description: Source comment — present only for a comment/official_reply notification.
+        read:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    PaginatedNotifications:
+      type: object
+      required: [data, hasMore]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Notification"
+        cursor:
+          type: ["string", "null"]
+        hasMore:
+          type: boolean
+
+    UnreadNotificationCount:
       type: object
       required: [count]
       properties:

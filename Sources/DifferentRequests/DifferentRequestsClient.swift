@@ -541,6 +541,82 @@ public actor DifferentRequestsClient {
   }
 
 
+  // MARK: - Notifications
+
+  /// List the authenticated user's in-app inbox, most recent first. Requires authentication.
+  ///
+  /// Populated by an async fan-out worker off status changes and new
+  /// comments on requests you follow — never written synchronously by
+  /// whatever triggered it, so expect a short, unspecified delay.
+  public func listNotifications(
+    limit: Int = 20,
+    cursor: String? = nil
+  ) async throws -> PaginatedNotifications {
+    guard sessionToken != nil else {
+      throw DifferentRequestsError.notAuthenticated
+    }
+
+    let response = try await underlyingClient.listMyNotifications(
+      .init(query: .init(limit: limit, cursor: cursor))
+    )
+
+    switch response {
+    case .ok(let ok):
+      let data = try ok.body.json
+      return PaginatedNotifications(
+        notifications: data.data.map { mapNotification($0) },
+        cursor: data.cursor,
+        hasMore: data.hasMore
+      )
+    case .unauthorized(let err):
+      throw try mapError(err.body.json)
+    case .undocumented(let statusCode, let payload):
+      throw mapUndocumented(statusCode: statusCode, payload)
+    }
+  }
+
+  /// Get the authenticated user's unread notification count, for a badge. Requires authentication.
+  ///
+  /// Prefer this over paginating ``listNotifications(limit:cursor:)`` just to count unread rows.
+  public func unreadNotificationCount() async throws -> Int {
+    guard sessionToken != nil else {
+      throw DifferentRequestsError.notAuthenticated
+    }
+
+    let response = try await underlyingClient.getUnreadNotificationCount(.init())
+
+    switch response {
+    case .ok(let ok):
+      return try ok.body.json.count
+    case .unauthorized(let err):
+      throw try mapError(err.body.json)
+    case .undocumented(let statusCode, let payload):
+      throw mapUndocumented(statusCode: statusCode, payload)
+    }
+  }
+
+  /// Mark one notification read. Requires authentication.
+  public func markNotificationRead(id: String) async throws -> AppNotification {
+    guard sessionToken != nil else {
+      throw DifferentRequestsError.notAuthenticated
+    }
+
+    let response = try await underlyingClient.markNotificationRead(
+      .init(path: .init(notificationId: id))
+    )
+
+    switch response {
+    case .ok(let ok):
+      return mapNotification(try ok.body.json)
+    case .unauthorized(let err):
+      throw try mapError(err.body.json)
+    case .notFound(let err):
+      throw try mapError(err.body.json)
+    case .undocumented(let statusCode, let payload):
+      throw mapUndocumented(statusCode: statusCode, payload)
+    }
+  }
+
   // MARK: - Decline Reasons
 
   /// List decline reasons configured for this app.
@@ -624,6 +700,25 @@ public actor DifferentRequestsClient {
       userId: f.userId,
       appId: f.appId,
       createdAt: parseDate(f.createdAt)
+    )
+  }
+
+  private func mapNotification(_ n: Components.Schemas.Notification) -> AppNotification {
+    let type: NotificationType
+    switch n._type {
+    case .status_change: type = .statusChange
+    case .comment: type = .comment
+    case .official_reply: type = .officialReply
+    }
+
+    return AppNotification(
+      id: n.id,
+      requestId: n.requestId,
+      type: type,
+      status: n.status,
+      commentId: n.commentId,
+      read: n.read,
+      createdAt: n.createdAt
     )
   }
 

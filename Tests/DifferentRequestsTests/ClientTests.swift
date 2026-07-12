@@ -100,6 +100,33 @@ struct ClientTests {
     let userId = await client.currentUserId
     #expect(userId == nil)
   }
+
+  @Test("listNotifications throws notAuthenticated without session")
+  func listNotificationsWithoutAuth() async {
+    let client = DifferentRequestsClient(apiKey: "test-key")
+
+    await #expect(throws: DifferentRequestsError.self) {
+      try await client.listNotifications()
+    }
+  }
+
+  @Test("unreadNotificationCount throws notAuthenticated without session")
+  func unreadNotificationCountWithoutAuth() async {
+    let client = DifferentRequestsClient(apiKey: "test-key")
+
+    await #expect(throws: DifferentRequestsError.self) {
+      try await client.unreadNotificationCount()
+    }
+  }
+
+  @Test("markNotificationRead throws notAuthenticated without session")
+  func markNotificationReadWithoutAuth() async {
+    let client = DifferentRequestsClient(apiKey: "test-key")
+
+    await #expect(throws: DifferentRequestsError.self) {
+      try await client.markNotificationRead(id: "notif-1")
+    }
+  }
 }
 
 @Suite("Models")
@@ -195,6 +222,36 @@ struct FollowModelTests {
     let model = FollowModel(client: DifferentRequestsClient(apiKey: "test-key"), requestId: "req-1", isFollowing: false)
     await model.toggle()
     #expect(!model.isFollowing)
+    #expect(model.error != nil)
+  }
+}
+
+@Suite("NotificationCenterModel")
+@MainActor
+struct NotificationCenterModelTests {
+
+  @Test("starts empty with no known unread count")
+  func initialState() {
+    let model = NotificationCenterModel(client: DifferentRequestsClient(apiKey: "test-key"))
+    #expect(model.notifications.isEmpty)
+    #expect(model.unreadCount == nil)
+    #expect(!model.hasMore)
+    #expect(model.error == nil)
+  }
+
+  @Test("markRead on an unknown id is a no-op")
+  func markReadUnknownIdIsNoOp() async {
+    let model = NotificationCenterModel(client: DifferentRequestsClient(apiKey: "test-key"))
+    await model.markRead(id: "does-not-exist")
+    #expect(model.notifications.isEmpty)
+    #expect(model.error == nil)
+  }
+
+  @Test("refreshUnreadCount without a session surfaces notAuthenticated")
+  func refreshUnreadCountWithoutAuth() async {
+    let model = NotificationCenterModel(client: DifferentRequestsClient(apiKey: "test-key"))
+    await model.refreshUnreadCount()
+    #expect(model.unreadCount == nil)
     #expect(model.error != nil)
   }
 }
