@@ -8,4 +8,6 @@ public enum NotificationType: String, Sendable {
   case comment
   /// An official team reply on a followed request.
   case officialReply = "official_reply"
+  /// A changelog entry published, resolving a followed request.
+  case changelogPublished = "changelog_published"
 }

@@ -663,7 +663,42 @@ public actor DifferentRequestsClient {
     }
   }
 
+  /// List the app's published changelog entries ("What's New"), most recent first. Pro only.
+  public func listChangelog(limit: Int = 20, cursor: String? = nil) async throws -> PaginatedChangelogEntries {
+    let response = try await underlyingClient.listChangelog(
+      .init(query: .init(limit: limit, cursor: cursor))
+    )
+
+    switch response {
+    case .ok(let ok):
+      let data = try ok.body.json
+      return PaginatedChangelogEntries(
+        entries: data.data.map { mapChangelogEntry($0) },
+        cursor: data.cursor,
+        hasMore: data.hasMore
+      )
+    case .unauthorized(let err):
+      throw try mapError(err.body.json)
+    case .code402(let err):
+      throw try mapError(err.body.json)
+    case .undocumented(let statusCode, let payload):
+      throw mapUndocumented(statusCode: statusCode, payload)
+    }
+  }
+
   // MARK: - Private Helpers
+
+  private func mapChangelogEntry(_ e: Components.Schemas.ChangelogEntry) -> ChangelogEntry {
+    ChangelogEntry(
+      id: e.id,
+      title: e.title,
+      body: e.body,
+      requestIds: e.requestIds,
+      publishedAt: e.publishedAt,
+      createdAt: e.createdAt,
+      updatedAt: e.updatedAt
+    )
+  }
 
   private func mapRequest(_ r: Components.Schemas.Request) throws -> Request {
     let status: RequestStatus
@@ -734,6 +769,7 @@ public actor DifferentRequestsClient {
     case .status_change: type = .statusChange
     case .comment: type = .comment
     case .official_reply: type = .officialReply
+    case .changelog_published: type = .changelogPublished
     }
 
     return AppNotification(
