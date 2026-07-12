@@ -408,6 +408,98 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
+  /requests/{requestId}/follow:
+    post:
+      operationId: followRequest
+      summary: Explicitly follow a feature request
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Followed
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    delete:
+      operationId: unfollowRequest
+      summary: Explicitly unfollow a feature request
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Unfollowed
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /requests/{requestId}/followers:
+    get:
+      operationId: getFollowerCount
+      summary: Get a feature request's follower count. Never exposes the follower list.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Follower count
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FollowerCount"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /me/follows:
+    get:
+      operationId: listMyFollows
+      summary: List the authenticated user's followed requests, most recently followed first
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: cursor
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Paginated list of followed requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedFollows"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
   /decline-reasons:
     get:
       operationId: listDeclineReasons
@@ -650,6 +742,39 @@ components:
           type: ["string", "null"]
         hasMore:
           type: boolean
+
+    Follow:
+      type: object
+      required: [requestId, userId, appId, createdAt]
+      properties:
+        requestId:
+          type: string
+        userId:
+          type: string
+        appId:
+          type: string
+        createdAt:
+          type: string
+
+    PaginatedFollows:
+      type: object
+      required: [data, hasMore]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Follow"
+        cursor:
+          type: ["string", "null"]
+        hasMore:
+          type: boolean
+
+    FollowerCount:
+      type: object
+      required: [count]
+      properties:
+        count:
+          type: integer
 
     ApiError:
       type: object
