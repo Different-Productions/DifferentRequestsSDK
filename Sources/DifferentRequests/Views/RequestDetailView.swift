@@ -10,6 +10,7 @@ import SwiftUI
 public struct RequestDetailView: View {
 
   @State private var model: RequestDetailModel
+  private let client: DifferentRequestsClient
   private let requestId: String
 
   /// Creates a request detail view.
@@ -18,6 +19,7 @@ public struct RequestDetailView: View {
   ///   - requestId: The ID of the request to display.
   public init(client: DifferentRequestsClient, requestId: String) {
     self._model = State(initialValue: RequestDetailModel(client: client))
+    self.client = client
     self.requestId = requestId
   }
 
@@ -108,6 +110,10 @@ public struct RequestDetailView: View {
           metadataRow("Updated", value: DateFormatting.formatted(request.updatedAt))
           metadataRow("ID", value: request.id)
         }
+
+        Divider()
+
+        CommentsSection(client: client, requestId: request.id)
       }
       .padding()
     }

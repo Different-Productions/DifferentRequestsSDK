@@ -28,6 +28,31 @@ struct ClientTests {
       try await client.vote(requestId: "123", value: .upvote)
     }
   }
+
+  @Test("postComment throws notAuthenticated without session")
+  func postCommentWithoutAuth() async {
+    let client = DifferentRequestsClient(apiKey: "test-key")
+
+    await #expect(throws: DifferentRequestsError.self) {
+      try await client.postComment(requestId: "123", body: "Great idea!")
+    }
+  }
+
+  @Test("deleteComment throws notAuthenticated without session")
+  func deleteCommentWithoutAuth() async {
+    let client = DifferentRequestsClient(apiKey: "test-key")
+
+    await #expect(throws: DifferentRequestsError.self) {
+      try await client.deleteComment(requestId: "123", commentId: "456")
+    }
+  }
+
+  @Test("currentUserId is nil before authenticating")
+  func currentUserIdBeforeAuth() async {
+    let client = DifferentRequestsClient(apiKey: "test-key")
+    let userId = await client.currentUserId
+    #expect(userId == nil)
+  }
 }
 
 @Suite("Models")
@@ -62,6 +87,44 @@ struct ModelTests {
   }
 }
 
+@Suite("CommentsThreadModel")
+@MainActor
+struct CommentsThreadModelTests {
+
+  @Test("isDraftValid is false for blank or whitespace-only text")
+  func isDraftValidBlank() {
+    let model = CommentsThreadModel(client: DifferentRequestsClient(apiKey: "test-key"), requestId: "req-1")
+    model.draftBody = ""
+    #expect(!model.isDraftValid)
+    model.draftBody = "   \n  "
+    #expect(!model.isDraftValid)
+  }
+
+  @Test("isDraftValid is true for non-blank text")
+  func isDraftValidNonBlank() {
+    let model = CommentsThreadModel(client: DifferentRequestsClient(apiKey: "test-key"), requestId: "req-1")
+    model.draftBody = "Great idea!"
+    #expect(model.isDraftValid)
+  }
+
+  @Test("isMine is false before authenticating")
+  func isMineWithoutAuth() {
+    let model = CommentsThreadModel(client: DifferentRequestsClient(apiKey: "test-key"), requestId: "req-1")
+    let comment = Comment(
+      id: "c1",
+      requestId: "req-1",
+      appId: "app-1",
+      authorId: "user-1",
+      authorDisplayName: "Jane",
+      isOfficial: false,
+      body: "Hello",
+      hidden: false,
+      createdAt: .now
+    )
+    #expect(!model.isMine(comment))
+  }
+}
+
 @Suite("DifferentRequestsError")
 struct ErrorTests {
 
@@ -70,11 +133,12 @@ struct ErrorTests {
     let errors: [DifferentRequestsError] = [
       .notAuthenticated,
       .notFound(message: "Not found"),
+      .forbidden(message: "Forbidden"),
       .validationError(message: "Invalid"),
       .rateLimited(retryAfter: 60),
       .serverError(statusCode: 500, message: "Internal"),
       .merged(targetId: "abc"),
     ]
-    #expect(errors.count == 6)
+    #expect(errors.count == 7)
   }
 }
