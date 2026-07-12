@@ -644,18 +644,12 @@ public actor DifferentRequestsClient {
   // MARK: - Private Helpers
 
   private func mapRequest(_ r: Components.Schemas.Request) throws -> Request {
-    let status: RequestStatus
-    if let parsed = RequestStatus(rawValue: r.status.rawValue) {
-      status = parsed
-    } else {
-      status = .open
+    guard let status = RequestStatus(rawValue: r.status.rawValue) else {
+      throw DifferentRequestsError.decodingError(message: "Unrecognized request status: \(r.status.rawValue)")
     }
 
-    let source: RequestSource
-    if let parsed = RequestSource(rawValue: r.source.rawValue) {
-      source = parsed
-    } else {
-      source = .sdk
+    guard let source = RequestSource(rawValue: r.source.rawValue) else {
+      throw DifferentRequestsError.decodingError(message: "Unrecognized request source: \(r.source.rawValue)")
     }
 
     return Request(
