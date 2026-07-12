@@ -22,6 +22,19 @@ public actor DifferentRequestsClient {
   private let baseURL: URL
   private var sessionToken: String?
 
+  /// The authenticated user's ID, set by ``authenticate(externalUserId:displayName:avatarUrl:email:traits:)``.
+  ///
+  /// Comments don't carry a per-item "is mine" flag the way votes carry
+  /// `myVote`, so SDK views compare a comment's `authorId` against this to
+  /// decide whether to show a delete affordance.
+  public private(set) var currentUserId: String?
+
+  /// The authenticated user's display name, set alongside ``currentUserId``.
+  ///
+  /// Used to render an optimistically-inserted comment before the server
+  /// response (which carries the authoritative `authorDisplayName`) comes back.
+  public private(set) var currentUserDisplayName: String?
+
   /// The default production API base URL.
   ///
   /// This host is baked into every app that uses `init(apiKey:)`, so it cannot
@@ -110,6 +123,8 @@ public actor DifferentRequestsClient {
     case .ok(let ok):
       let data = try ok.body.json
       self.sessionToken = data.sessionToken
+      self.currentUserId = data.id
+      self.currentUserDisplayName = data.displayName
       rebuildClient()
       let traitsDict: [String: String]
       if let additional = data.traits?.additionalProperties {
@@ -269,6 +284,92 @@ public actor DifferentRequestsClient {
     }
   }
 
+  // MARK: - Comments
+
+  /// List comments on a feature request, oldest first.
+  public func listComments(
+    requestId: String,
+    limit: Int = 20,
+    cursor: String? = nil
+  ) async throws -> PaginatedComments {
+    let response = try await underlyingClient.listComments(
+      .init(
+        path: .init(requestId: requestId),
+        query: .init(limit: limit, cursor: cursor)
+      )
+    )
+
+    switch response {
+    case .ok(let ok):
+      let data = try ok.body.json
+      return PaginatedComments(
+        comments: data.data.map { mapComment($0) },
+        cursor: data.cursor,
+        hasMore: data.hasMore
+      )
+    case .unauthorized(let err):
+      throw try mapError(err.body.json)
+    case .notFound(let err):
+      throw try mapError(err.body.json)
+    case .undocumented(let statusCode, let payload):
+      throw mapUndocumented(statusCode: statusCode, payload)
+    }
+  }
+
+  /// Post a comment on a feature request. Requires authentication.
+  public func postComment(requestId: String, body: String) async throws -> Comment {
+    guard sessionToken != nil else {
+      throw DifferentRequestsError.notAuthenticated
+    }
+
+    let response = try await underlyingClient.postComment(
+      .init(
+        path: .init(requestId: requestId),
+        body: .json(.init(body: body))
+      )
+    )
+
+    switch response {
+    case .created(let created):
+      return mapComment(try created.body.json)
+    case .badRequest(let err):
+      throw try mapError(err.body.json)
+    case .unauthorized(let err):
+      throw try mapError(err.body.json)
+    case .notFound(let err):
+      throw try mapError(err.body.json)
+    case .undocumented(let statusCode, let payload):
+      throw mapUndocumented(statusCode: statusCode, payload)
+    }
+  }
+
+  /// Delete a comment you authored. Requires authentication.
+  ///
+  /// There is no admin delete from the SDK — deleting another user's
+  /// comment throws ``DifferentRequestsError/forbidden(message:)``.
+  public func deleteComment(requestId: String, commentId: String) async throws {
+    guard sessionToken != nil else {
+      throw DifferentRequestsError.notAuthenticated
+    }
+
+    let response = try await underlyingClient.deleteComment(
+      .init(path: .init(requestId: requestId, commentId: commentId))
+    )
+
+    switch response {
+    case .noContent:
+      return
+    case .unauthorized(let err):
+      throw try mapError(err.body.json)
+    case .forbidden(let err):
+      throw try mapError(err.body.json)
+    case .notFound(let err):
+      throw try mapError(err.body.json)
+    case .undocumented(let statusCode, let payload):
+      throw mapUndocumented(statusCode: statusCode, payload)
+    }
+  }
+
   // MARK: - Decline Reasons
 
   /// List decline reasons configured for this app.
@@ -332,6 +433,20 @@ public actor DifferentRequestsClient {
     )
   }
 
+  private func mapComment(_ c: Components.Schemas.Comment) -> Comment {
+    Comment(
+      id: c.id,
+      requestId: c.requestId,
+      appId: c.appId,
+      authorId: c.authorId,
+      authorDisplayName: c.authorDisplayName,
+      isOfficial: c.isOfficial,
+      body: c.body,
+      hidden: c.hidden,
+      createdAt: parseDate(c.createdAt)
+    )
+  }
+
   private func votePayload(
     _ value: VoteValue
   ) -> Operations.vote.Input.Body.jsonPayload.valuePayload {
@@ -356,6 +471,8 @@ public actor DifferentRequestsClient {
     switch err.statusCode {
     case 404:
       return .notFound(message: err.message)
+    case 403:
+      return .forbidden(message: err.message)
     case 400:
       return .validationError(message: err.message)
     case 401:
