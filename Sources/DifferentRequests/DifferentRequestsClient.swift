@@ -641,6 +641,28 @@ public actor DifferentRequestsClient {
     }
   }
 
+  // MARK: - Roadmap
+
+  /// List the app's public roadmap (Planned/In Progress/Shipped requests),
+  /// pinned-first then by manual order then most recent first. Pro plan only.
+  ///
+  /// Throws ``DifferentRequestsError/paymentRequired(message:)`` if the app's
+  /// plan does not include the roadmap.
+  public func listRoadmap() async throws -> [Request] {
+    let response = try await underlyingClient.listRoadmap(.init())
+
+    switch response {
+    case .ok(let ok):
+      return try ok.body.json.map { try mapRequest($0) }
+    case .unauthorized(let err):
+      throw try mapError(err.body.json)
+    case .code402(let err):
+      throw try mapError(err.body.json)
+    case .undocumented(let statusCode, let payload):
+      throw mapUndocumented(statusCode: statusCode, payload)
+    }
+  }
+
   // MARK: - Private Helpers
 
   private func mapRequest(_ r: Components.Schemas.Request) throws -> Request {
@@ -668,6 +690,9 @@ public actor DifferentRequestsClient {
       source: source,
       score: r.score,
       myVote: r.myVote,
+      roadmapPinned: r.roadmapPinned,
+      roadmapOrder: r.roadmapOrder,
+      roadmapVisible: r.roadmapVisible,
       mergedIntoId: r.mergedIntoId,
       declineReason: r.declineReason,
       declineReasonId: r.declineReasonId,
@@ -756,6 +781,8 @@ public actor DifferentRequestsClient {
       return .notFound(message: err.message)
     case 403:
       return .forbidden(message: err.message)
+    case 402:
+      return .paymentRequired(message: err.message)
     case 400:
       return .validationError(message: err.message)
     case 401:

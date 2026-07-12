@@ -594,6 +594,27 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
+  /roadmap:
+    get:
+      operationId: listRoadmap
+      summary: List the app's public roadmap (Pro)
+      description: Planned/InProgress/Shipped requests not explicitly hidden from the roadmap, sorted pinned-first then by manual order then by recency.
+      security:
+        - ApiKeyAuth: []
+      responses:
+        "200":
+          description: Roadmap-eligible requests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Request"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "402":
+          $ref: "#/components/responses/PaymentRequired"
+
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -629,6 +650,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/ApiError"
+    PaymentRequired:
+      description: The app's plan does not include this feature
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
 
   schemas:
     SortOrder:
@@ -656,7 +683,7 @@ components:
 
     Request:
       type: object
-      required: [id, appId, title, body, status, source, score, authorDisplayName, createdAt, updatedAt]
+      required: [id, appId, title, body, status, source, score, roadmapPinned, roadmapOrder, roadmapVisible, authorDisplayName, createdAt, updatedAt]
       properties:
         id:
           type: string
@@ -676,6 +703,12 @@ components:
           type: integer
         myVote:
           type: ["integer", "null"]
+        roadmapPinned:
+          type: boolean
+        roadmapOrder:
+          type: integer
+        roadmapVisible:
+          type: boolean
         mergedIntoId:
           type: ["string", "null"]
         declineReason:
