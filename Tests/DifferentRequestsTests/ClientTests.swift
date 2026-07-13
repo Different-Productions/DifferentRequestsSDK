@@ -362,3 +362,25 @@ struct RoadmapModelTests {
     makeRequest(id: id, status: status, roadmapPinned: false, roadmapOrder: 0)
   }
 }
+
+@Suite("ChangelogModel")
+@MainActor
+struct ChangelogModelTests {
+
+  @Test("starts empty with no error")
+  func initialState() {
+    let model = ChangelogModel(client: DifferentRequestsClient(apiKey: "test-key"))
+    #expect(model.entries.isEmpty)
+    #expect(!model.isLoading)
+    #expect(!model.hasMore)
+    #expect(model.error == nil)
+  }
+
+  @Test("loadMore is a no-op when there is no next page")
+  func loadMoreNoOpWithoutHasMore() async {
+    let model = ChangelogModel(client: DifferentRequestsClient(apiKey: "test-key"))
+    await model.loadMore()
+    #expect(model.entries.isEmpty)
+    #expect(model.error == nil)
+  }
+}
