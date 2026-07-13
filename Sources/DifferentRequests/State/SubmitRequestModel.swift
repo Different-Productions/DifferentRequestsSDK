@@ -71,10 +71,15 @@ public final class SubmitRequestModel {
     }
 
     isSearching = true
+    error = nil
 
     do {
       similarRequests = try await client.searchRequests(query: query, limit: 5)
+    } catch let err as DifferentRequestsError {
+      error = err
+      similarRequests = []
     } catch {
+      self.error = .networkError(underlying: error)
       similarRequests = []
     }
 
