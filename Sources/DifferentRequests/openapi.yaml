@@ -615,6 +615,37 @@ paths:
         "402":
           $ref: "#/components/responses/PaymentRequired"
 
+  /changelog:
+    get:
+      operationId: listChangelog
+      summary: List the app's published changelog entries ("What's New") (Pro)
+      description: Most recent first, cursor-paginated. Drafts are never returned here — only entries published from the console.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: cursor
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Paginated published changelog entries
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedChangelogEntries"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "402":
+          $ref: "#/components/responses/PaymentRequired"
+
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -895,7 +926,7 @@ components:
           type: string
         type:
           type: string
-          enum: [status_change, comment, official_reply]
+          enum: [status_change, comment, official_reply, changelog_published]
         status:
           type: ["string", "null"]
           description: New status — present only for a status_change notification.
@@ -907,6 +938,46 @@ components:
         createdAt:
           type: string
           format: date-time
+
+    ChangelogEntry:
+      type: object
+      required: [id, title, body, requestIds, published, publishedAt, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        body:
+          type: string
+        requestIds:
+          type: array
+          items:
+            type: string
+        published:
+          type: boolean
+          description: Always true — the SDK only ever sees published entries, never drafts.
+        publishedAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    PaginatedChangelogEntries:
+      type: object
+      required: [data, hasMore]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChangelogEntry"
+        cursor:
+          type: ["string", "null"]
+        hasMore:
+          type: boolean
 
     PaginatedNotifications:
       type: object
