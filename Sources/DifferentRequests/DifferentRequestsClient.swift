@@ -172,7 +172,7 @@ public actor DifferentRequestsClient {
     case .ok(let ok):
       let data = try ok.body.json
       return PaginatedRequests(
-        requests: data.data.map { mapRequest($0) },
+        requests: try data.data.map { try mapRequest($0) },
         cursor: data.cursor,
         hasMore: data.hasMore
       )
@@ -191,7 +191,7 @@ public actor DifferentRequestsClient {
 
     switch response {
     case .ok(let ok):
-      return mapRequest(try ok.body.json)
+      return try mapRequest(try ok.body.json)
     case .movedPermanently(let moved):
       let data = try moved.body.json
       throw DifferentRequestsError.merged(targetId: data.mergedIntoId)
@@ -216,7 +216,7 @@ public actor DifferentRequestsClient {
 
     switch response {
     case .created(let created):
-      return mapRequest(try created.body.json)
+      return try mapRequest(try created.body.json)
     case .badRequest(let err):
       throw try mapError(err.body.json)
     case .unauthorized(let err):
@@ -234,7 +234,7 @@ public actor DifferentRequestsClient {
 
     switch response {
     case .ok(let ok):
-      return try ok.body.json.map { mapRequest($0) }
+      return try ok.body.json.map { try mapRequest($0) }
     case .badRequest(let err):
       throw try mapError(err.body.json)
     case .unauthorized(let err):
@@ -269,7 +269,7 @@ public actor DifferentRequestsClient {
           requestId: v.requestId,
           userId: v.userId,
           value: v.value,
-          createdAt: parseDate(v.createdAt)
+          createdAt: try parseDate(v.createdAt)
         )
       } else {
         vote = nil
@@ -303,7 +303,7 @@ public actor DifferentRequestsClient {
     case .ok(let ok):
       let data = try ok.body.json
       return PaginatedComments(
-        comments: data.data.map { mapComment($0) },
+        comments: try data.data.map { try mapComment($0) },
         cursor: data.cursor,
         hasMore: data.hasMore
       )
@@ -331,7 +331,7 @@ public actor DifferentRequestsClient {
 
     switch response {
     case .created(let created):
-      return mapComment(try created.body.json)
+      return try mapComment(try created.body.json)
     case .badRequest(let err):
       throw try mapError(err.body.json)
     case .unauthorized(let err):
@@ -404,8 +404,8 @@ public actor DifferentRequestsClient {
       let data = try created.body.json
       return Device(
         tokenHash: data.tokenHash,
-        createdAt: parseDate(data.createdAt),
-        updatedAt: parseDate(data.updatedAt)
+        createdAt: try parseDate(data.createdAt),
+        updatedAt: try parseDate(data.updatedAt)
       )
     case .badRequest(let err):
       throw try mapError(err.body.json)
@@ -529,7 +529,7 @@ public actor DifferentRequestsClient {
     case .ok(let ok):
       let data = try ok.body.json
       return PaginatedFollows(
-        follows: data.data.map { mapFollow($0) },
+        follows: try data.data.map { try mapFollow($0) },
         cursor: data.cursor,
         hasMore: data.hasMore
       )
@@ -631,7 +631,7 @@ public actor DifferentRequestsClient {
           appId: reason.appId,
           label: reason.label,
           isDefault: reason.isDefault,
-          createdAt: parseDate(reason.createdAt)
+          createdAt: try parseDate(reason.createdAt)
         )
       }
     case .unauthorized(let err):
@@ -643,19 +643,13 @@ public actor DifferentRequestsClient {
 
   // MARK: - Private Helpers
 
-  private func mapRequest(_ r: Components.Schemas.Request) -> Request {
-    let status: RequestStatus
-    if let parsed = RequestStatus(rawValue: r.status.rawValue) {
-      status = parsed
-    } else {
-      status = .open
+  private func mapRequest(_ r: Components.Schemas.Request) throws -> Request {
+    guard let status = RequestStatus(rawValue: r.status.rawValue) else {
+      throw DifferentRequestsError.decodingError(message: "Unrecognized request status: \(r.status.rawValue)")
     }
 
-    let source: RequestSource
-    if let parsed = RequestSource(rawValue: r.source.rawValue) {
-      source = parsed
-    } else {
-      source = .sdk
+    guard let source = RequestSource(rawValue: r.source.rawValue) else {
+      throw DifferentRequestsError.decodingError(message: "Unrecognized request source: \(r.source.rawValue)")
     }
 
     return Request(
@@ -675,12 +669,12 @@ public actor DifferentRequestsClient {
       authorDisplayName: r.authorDisplayName,
       authorExternalUserId: r.authorExternalUserId,
       authorAvatarUrl: r.authorAvatarUrl,
-      createdAt: parseDate(r.createdAt),
-      updatedAt: parseDate(r.updatedAt)
+      createdAt: try parseDate(r.createdAt),
+      updatedAt: try parseDate(r.updatedAt)
     )
   }
 
-  private func mapComment(_ c: Components.Schemas.Comment) -> Comment {
+  private func mapComment(_ c: Components.Schemas.Comment) throws -> Comment {
     Comment(
       id: c.id,
       requestId: c.requestId,
@@ -690,16 +684,16 @@ public actor DifferentRequestsClient {
       isOfficial: c.isOfficial,
       body: c.body,
       hidden: c.hidden,
-      createdAt: parseDate(c.createdAt)
+      createdAt: try parseDate(c.createdAt)
     )
   }
 
-  private func mapFollow(_ f: Components.Schemas.Follow) -> Follow {
+  private func mapFollow(_ f: Components.Schemas.Follow) throws -> Follow {
     Follow(
       requestId: f.requestId,
       userId: f.userId,
       appId: f.appId,
-      createdAt: parseDate(f.createdAt)
+      createdAt: try parseDate(f.createdAt)
     )
   }
 
@@ -737,14 +731,17 @@ public actor DifferentRequestsClient {
     data.map { byte in String(format: "%02x", byte) }.joined()
   }
 
-  private func parseDate(_ string: String) -> Date {
+  private func parseDate(_ string: String) throws -> Date {
     let formatter = ISO8601DateFormatter()
     formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
     if let date = formatter.date(from: string) {
       return date
     }
     formatter.formatOptions = [.withInternetDateTime]
-    return formatter.date(from: string) ?? Date.now
+    if let date = formatter.date(from: string) {
+      return date
+    }
+    throw DifferentRequestsError.decodingError(message: "Could not parse date: \(string)")
   }
 
   private func mapError(_ err: Components.Schemas.ApiError) -> DifferentRequestsError {
