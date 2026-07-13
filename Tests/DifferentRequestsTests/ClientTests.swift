@@ -265,11 +265,100 @@ struct ErrorTests {
       .notAuthenticated,
       .notFound(message: "Not found"),
       .forbidden(message: "Forbidden"),
+      .paymentRequired(message: "Payment required"),
       .validationError(message: "Invalid"),
       .rateLimited(retryAfter: 60),
       .serverError(statusCode: 500, message: "Internal"),
       .merged(targetId: "abc"),
     ]
-    #expect(errors.count == 7)
+    #expect(errors.count == 8)
+  }
+
+  @Test("paymentRequired surfaces the server's message")
+  func paymentRequiredDescription() {
+    let error = DifferentRequestsError.paymentRequired(message: "Roadmap requires the Pro plan")
+    #expect(error.errorDescription == "Roadmap requires the Pro plan")
+  }
+}
+
+@Suite("RoadmapModel")
+@MainActor
+struct RoadmapModelTests {
+
+  @Test("starts empty with no error")
+  func initialState() {
+    let model = RoadmapModel(client: DifferentRequestsClient(apiKey: "test-key"))
+    #expect(model.columns.isEmpty)
+    #expect(!model.isLoading)
+    #expect(model.error == nil)
+  }
+
+  @Test("groups requests by status in Planned, In Progress, Shipped column order")
+  func groupOrdersColumnsByStatus() {
+    let planned = makeRequest(id: "1", status: .planned)
+    let inProgress = makeRequest(id: "2", status: .inProgress)
+    let shipped = makeRequest(id: "3", status: .shipped)
+
+    let columns = RoadmapModel.group([shipped, planned, inProgress])
+
+    #expect(columns.map(\.status) == [.planned, .inProgress, .shipped])
+    #expect(columns[0].requests.map(\.id) == ["1"])
+    #expect(columns[1].requests.map(\.id) == ["2"])
+    #expect(columns[2].requests.map(\.id) == ["3"])
+  }
+
+  @Test("group preserves server order within a column")
+  func groupPreservesServerOrderWithinColumn() {
+    let pinned = makeRequest(id: "pinned", status: .planned, roadmapPinned: true, roadmapOrder: 5)
+    let ordered = makeRequest(id: "ordered", status: .planned, roadmapPinned: false, roadmapOrder: 1)
+
+    let columns = RoadmapModel.group([pinned, ordered])
+
+    #expect(columns[0].requests.map(\.id) == ["pinned", "ordered"])
+  }
+
+  @Test("group drops statuses that never appear on the roadmap")
+  func groupExcludesNonRoadmapStatuses() {
+    let open = makeRequest(id: "1", status: .open)
+    let declined = makeRequest(id: "2", status: .declined)
+
+    let columns = RoadmapModel.group([open, declined])
+
+    #expect(columns.allSatisfy { $0.requests.isEmpty })
+  }
+
+  private func makeRequest(
+    id: String,
+    status: RequestStatus,
+    roadmapPinned: Bool,
+    roadmapOrder: Int
+  ) -> Request {
+    Request(
+      id: id,
+      appId: "app-1",
+      authorId: "user-1",
+      title: "Title",
+      body: "Body",
+      status: status,
+      source: .sdk,
+      score: 0,
+      myVote: nil,
+      roadmapPinned: roadmapPinned,
+      roadmapOrder: roadmapOrder,
+      roadmapVisible: true,
+      mergedIntoId: nil,
+      declineReason: nil,
+      declineReasonId: nil,
+      declineReasonLabel: nil,
+      authorDisplayName: "Jane",
+      authorExternalUserId: nil,
+      authorAvatarUrl: nil,
+      createdAt: .now,
+      updatedAt: .now
+    )
+  }
+
+  private func makeRequest(id: String, status: RequestStatus) -> Request {
+    makeRequest(id: id, status: status, roadmapPinned: false, roadmapOrder: 0)
   }
 }

@@ -29,6 +29,12 @@ public struct Request: Sendable, Identifiable {
   /// haven't voted or the client isn't authenticated. Mutable for the same
   /// in-place reconciliation as `score`.
   public var myVote: Int?
+  /// Pinned to the top of its roadmap column.
+  public let roadmapPinned: Bool
+  /// Manual sort position within its roadmap column, ascending.
+  public let roadmapOrder: Int
+  /// Whether this request appears on the public roadmap.
+  public let roadmapVisible: Bool
   /// If merged, the ID of the request this was merged into.
   public let mergedIntoId: String?
   /// Legacy decline reason text.

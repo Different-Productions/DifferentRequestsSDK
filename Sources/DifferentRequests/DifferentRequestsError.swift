@@ -13,6 +13,10 @@ public enum DifferentRequestsError: Error, Sendable, LocalizedError {
   /// (e.g. deleting another user's comment).
   case forbidden(message: String)
 
+  /// The app's plan does not include this feature (e.g. the roadmap requires
+  /// a Pro plan).
+  case paymentRequired(message: String)
+
   /// The request failed validation.
   case validationError(message: String)
 
@@ -39,6 +43,8 @@ public enum DifferentRequestsError: Error, Sendable, LocalizedError {
     case .notFound(let message):
       return message
     case .forbidden(let message):
+      return message
+    case .paymentRequired(let message):
       return message
     case .validationError(let message):
       return message
