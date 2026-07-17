@@ -1,13 +1,13 @@
 {
-  "originHash" : "e7b7ffed8c34cd018234b1df462983c5fba7610d4411b665e1611face4a92f24",
+  "originHash" : "2d488c1a045c307c28b51cd0cf3057b840d561ede64b2bac91e69ae70350b9ca",
   "pins" : [
     {
       "identity" : "openapikit",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mattpolzin/OpenAPIKit",
       "state" : {
-        "revision" : "343b2c1793058fcc53c1bd7e2907f8e3a4d640fb",
-        "version" : "3.9.0"
+        "revision" : "57b6318128e3f901c93f4fbf98d1c1464ec168d3",
+        "version" : "6.2.0"
       }
     },
     {
@@ -60,8 +60,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-openapi-generator",
       "state" : {
-        "revision" : "73997cc62c2193d5046e431c9d546119dda14502",
-        "version" : "1.11.1"
+        "revision" : "d002e5d9a1ac4ff6466bb89ab8fa1c9a0afd820f",
+        "version" : "1.12.2"
       }
     },
     {
