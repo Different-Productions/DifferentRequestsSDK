@@ -37,7 +37,7 @@ public struct VoteControl: View {
   public var body: some View {
     VStack(spacing: 2) {
       Button {
-        Task { await handleVote(.upvote) }
+        Task { await handleTap(.upvote) }
       } label: {
         Image(systemName: "chevron.up")
           .fontWeight(.semibold)
@@ -52,7 +52,7 @@ public struct VoteControl: View {
         .monospacedDigit()
 
       Button {
-        Task { await handleVote(.downvote) }
+        Task { await handleTap(.downvote) }
       } label: {
         Image(systemName: "chevron.down")
           .fontWeight(.semibold)
@@ -67,13 +67,33 @@ public struct VoteControl: View {
     .accessibilityAdjustableAction { direction in
       switch direction {
       case .increment:
-        Task { await handleVote(.upvote) }
+        Task { await handleTap(.upvote) }
       case .decrement:
-        Task { await handleVote(.downvote) }
+        Task { await handleTap(.downvote) }
       @unknown default:
         break
       }
     }
+  }
+
+  /// Resolves the vote to send when the user taps `direction`. Tapping the
+  /// direction the user has already voted toggles that vote off (`.remove`);
+  /// any other tap sets the tapped direction. `currentVote` is the raw
+  /// `myVote` value (``VoteValue/upvote`` or ``VoteValue/downvote`` raw value,
+  /// or `nil` when the user has not voted).
+  ///
+  /// - Parameters:
+  ///   - currentVote: The user's current vote as a raw score contribution.
+  ///   - direction: The direction the user tapped (`.upvote` or `.downvote`).
+  static func voteValue(currentVote: Int?, tapping direction: VoteValue) -> VoteValue {
+    if currentVote == direction.rawValue {
+      return .remove
+    }
+    return direction
+  }
+
+  private func handleTap(_ direction: VoteValue) async {
+    await handleVote(VoteControl.voteValue(currentVote: myVote, tapping: direction))
   }
 
   private func handleVote(_ value: VoteValue) async {

@@ -30,17 +30,30 @@ dependencies: [
 
 ## Create a Client
 
-Initialize the client with your API key and server URL. You can find both
-in the DifferentRequests console at
-[app.differentrequests.com](https://app.differentrequests.com).
+Initialize the client with your API key, which you can find in the
+DifferentRequests console at
+[app.differentrequests.com](https://app.differentrequests.com). This points the
+client at the production API:
 
 ```swift
 import DifferentRequests
 
-let client = DifferentRequestsClient(
-  apiKey: "your-api-key",
-  baseURL: URL(string: "https://kstb23efj8.execute-api.us-east-1.amazonaws.com")!
-)
+let client = DifferentRequestsClient(apiKey: "your-api-key")
+```
+
+To target a staging or self-hosted backend, pass a base URL. Build the URL
+without force-unwrapping, so a malformed string surfaces as a handled error
+rather than a crash:
+
+```swift
+import DifferentRequests
+
+func makeClient(apiKey: String) throws -> DifferentRequestsClient {
+  guard let baseURL = URL(string: "https://staging.differentrequests.com") else {
+    throw URLError(.badURL)
+  }
+  return DifferentRequestsClient(apiKey: apiKey, baseURL: baseURL)
+}
 ```
 
 ## Authenticate a User

@@ -162,7 +162,7 @@ public actor DifferentRequestsClient {
     let response = try await underlyingClient.listRequests(
       .init(query: .init(
         sort: .init(rawValue: sort.rawValue),
-        status: status.map { .init(rawValue: $0.rawValue) } ?? nil,
+        status: status.flatMap { .init(rawValue: $0.rawValue) },
         limit: limit,
         cursor: cursor
       ))
