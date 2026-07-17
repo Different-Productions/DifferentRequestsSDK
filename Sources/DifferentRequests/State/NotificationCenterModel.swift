@@ -126,11 +126,11 @@ public final class NotificationCenterModel {
     do {
       _ = try await client.markNotificationRead(id: id)
     } catch let err as DifferentRequestsError {
-      notifications[index] = previous
+      notifications.replacingFirst(id: id, with: previous)
       unreadCount = previousUnreadCount
       error = err
     } catch {
-      notifications[index] = previous
+      notifications.replacingFirst(id: id, with: previous)
       unreadCount = previousUnreadCount
       self.error = .networkError(underlying: error)
     }
