@@ -168,8 +168,8 @@ public final class CommentsThreadModel {
   /// Delete a comment authored by the current user.
   ///
   /// Removes the comment from the list immediately, then rolls back
-  /// (re-inserts at its original position) and sets ``error`` if the
-  /// server rejects the delete.
+  /// (re-inserts it, preserving chronological order) and sets ``error`` if
+  /// the server rejects the delete.
   /// - Parameter commentId: The comment to delete.
   public func delete(commentId: String) async {
     guard let index = comments.firstIndex(where: { $0.id == commentId }) else { return }
@@ -180,10 +180,10 @@ public final class CommentsThreadModel {
     do {
       try await client.deleteComment(requestId: requestId, commentId: commentId)
     } catch let err as DifferentRequestsError {
-      comments.insert(removed, at: index)
+      comments.reinsertPreservingOrder(removed)
       error = err
     } catch {
-      comments.insert(removed, at: index)
+      comments.reinsertPreservingOrder(removed)
       self.error = .networkError(underlying: error)
     }
   }
