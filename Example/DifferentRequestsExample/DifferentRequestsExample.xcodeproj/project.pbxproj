@@ -20,16 +20,6 @@
 			path = DifferentRequestsExample;
 			sourceTree = "<group>";
 		};
-		351C202D2F84516A00333378 /* DifferentRequestsExampleTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = DifferentRequestsExampleTests;
-			sourceTree = "<group>";
-		};
-		351C20372F84516A00333378 /* DifferentRequestsExampleUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = DifferentRequestsExampleUITests;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -48,8 +38,6 @@
 			isa = PBXGroup;
 			children = (
 				351C201F2F84516900333378 /* DifferentRequestsExample */,
-				351C202D2F84516A00333378 /* DifferentRequestsExampleTests */,
-				351C20372F84516A00333378 /* DifferentRequestsExampleUITests */,
 				351C201E2F84516900333378 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -113,7 +101,7 @@
 			mainGroup = 351C20142F84516900333378;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				351C20492F84528100333378 /* XCRemoteSwiftPackageReference "DifferentRequestsSDK" */,
+				351C20492F84528100333378 /* XCLocalSwiftPackageReference "DifferentRequestsSDK" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 351C201E2F84516900333378 /* Products */;
@@ -298,7 +286,7 @@
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
@@ -334,7 +322,7 @@
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
@@ -362,21 +350,16 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		351C20492F84528100333378 /* XCRemoteSwiftPackageReference "DifferentRequestsSDK" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Different-Productions/DifferentRequestsSDK";
-			requirement = {
-				kind = exactVersion;
-				version = 0.0.15;
-			};
+/* Begin XCLocalSwiftPackageReference section */
+		351C20492F84528100333378 /* XCLocalSwiftPackageReference "DifferentRequestsSDK" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../..";
 		};
-/* End XCRemoteSwiftPackageReference section */
+/* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		351C204A2F84528100333378 /* DifferentRequests */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 351C20492F84528100333378 /* XCRemoteSwiftPackageReference "DifferentRequestsSDK" */;
 			productName = DifferentRequests;
 		};
 /* End XCSwiftPackageProductDependency section */
