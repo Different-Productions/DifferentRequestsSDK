@@ -51,6 +51,7 @@ public struct DifferentRequestsView: View {
       .searchable(text: $searchText, prompt: "Search requests")
       .task(id: searchText) {
         try? await Task.sleep(for: .milliseconds(300))
+        guard !Task.isCancelled else { return }
         await model.search(query: searchText)
       }
       .navigationDestination(for: String.self) { requestId in

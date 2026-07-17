@@ -5,10 +5,13 @@ import Foundation
 @Suite("DifferentRequestsClient")
 struct ClientTests {
 
-  @Test("init succeeds")
-  func initSucceeds() {
+  @Test("a fresh client carries no authenticated user")
+  func freshClientIsUnauthenticated() async {
     let client = DifferentRequestsClient(apiKey: "test-key")
-    #expect(client != nil)
+    let userId = await client.currentUserId
+    let displayName = await client.currentUserDisplayName
+    #expect(userId == nil)
+    #expect(displayName == nil)
   }
 
   @Test("submitRequest throws notAuthenticated without session")
