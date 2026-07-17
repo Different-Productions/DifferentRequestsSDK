@@ -24,14 +24,29 @@ public enum PushNotifications {
   /// `UIApplication.shared.registerForRemoteNotifications()`. The host app
   /// must make that call itself after this method returns `true`.
   ///
-  /// - Returns: `true` if the user granted permission, `false` if denied or
-  ///   the request failed.
-  public static func requestPushAuthorization() async -> Bool {
+  /// A deliberate denial and a failed request are distinct outcomes: a denial
+  /// is a normal `false` return, whereas a request that could not complete
+  /// throws. Collapsing both into `false` would hide transient failures a
+  /// caller may want to retry, so they are kept separate here.
+  ///
+  /// - Returns: `true` if the user granted permission, `false` if the user
+  ///   denied it.
+  /// - Throws: The error thrown by the system authorization request when it
+  ///   could not be completed.
+  public static func requestPushAuthorization() async throws -> Bool {
     let center = UNUserNotificationCenter.current()
-    do {
-      return try await center.requestAuthorization(options: [.alert, .badge, .sound])
-    } catch {
-      return false
+    return try await requestAuthorization {
+      try await center.requestAuthorization(options: [.alert, .badge, .sound])
     }
+  }
+
+  /// The authorization core with its system dependency injected, so the
+  /// grant/deny/throw contract is exercisable without a real
+  /// `UNUserNotificationCenter`. Returns the granted flag unchanged and lets a
+  /// request failure propagate rather than masking it as a denial.
+  static func requestAuthorization(
+    _ request: () async throws -> Bool
+  ) async throws -> Bool {
+    try await request()
   }
 }
