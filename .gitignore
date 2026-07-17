@@ -1,5 +1,15 @@
+# Swift Package Manager
 .build/
 .swiftpm/
 Package.resolved
-*.xcodeproj/
+
+# A generated Xcode project at the package root is not tracked; the example
+# app's own .xcodeproj (Example/…) is, so this rule is anchored to root only.
+/*.xcodeproj/
 DerivedData/
+
+# Xcode per-user state and build artifacts
+xcuserdata/
+*.xcuserstate
+build/
+.DS_Store
