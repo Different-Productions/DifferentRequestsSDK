@@ -2,34 +2,61 @@ import Foundation
 
 /// Static configuration for the example app.
 ///
-/// The API key is read from the `DIFFERENT_REQUESTS_API_KEY` environment
-/// variable so a real key never has to live in source. Set it in the scheme's
-/// Run > Arguments > Environment Variables to talk to a real app; when it is
-/// absent the app uses an obviously-fake placeholder so the project still
-/// builds and launches without a committed key.
+/// The app key comes from an environment variable rather than from an edited constant, and the
+/// reason is specific: this repository is public, and a live key was once committed in this very
+/// example. A placeholder that a developer is invited to replace in a tracked file is a placeholder
+/// that eventually gets committed with a real value in it.
+///
+/// Set it in the scheme's Run > Arguments > Environment Variables. Without it the app still builds
+/// and launches, and says what to set — see ``isConfigured``.
 enum DemoConfig {
-  /// Name of the environment variable that carries a real API key at run time.
-  private static let apiKeyEnvironmentVariable = "DIFFERENT_REQUESTS_API_KEY"
+  /// Carries a real app key at run time.
+  static let appKeyEnvironmentVariable = "DIFFERENT_REQUESTS_APP_KEY"
 
-  /// Obviously-fake stand-in used when no key is provided. Never replace this
-  /// with a real key — supply one through the environment variable instead.
-  private static let placeholderAPIKey = "YOUR_API_KEY"
+  /// Obviously-fake stand-in used when no key is provided. Never replace this with a real key —
+  /// supply one through the environment variable instead.
+  private static let placeholderAppKey = "YOUR_APP_KEY"
 
-  /// The API key the client is initialized with.
-  static var apiKey: String {
+  /// The key the client presents.
+  static var appKey: String {
     let environment = ProcessInfo.processInfo.environment
-    if let key = environment[apiKeyEnvironmentVariable], !key.isEmpty {
+    if let key = environment[appKeyEnvironmentVariable], key.isEmpty == false {
       return key
     }
-    return placeholderAPIKey
+    return placeholderAppKey
   }
 
-  /// Your app's stable identifier for the signed-in user.
-  static let externalUserId = "demo-user"
+  /// Whether a real key was supplied.
+  ///
+  /// Checked so the app can explain itself instead of showing a sign-in failure: an unset variable
+  /// and a revoked key both produce a 401, and only one of them is worth a developer's time to
+  /// debug.
+  static var isConfigured: Bool {
+    appKey != placeholderAppKey
+  }
 
-  /// The user's display name, shown on requests and comments they author.
+  /// Your app's own stable identifier for the signed-in person.
+  ///
+  /// The dedupe key: the same value on a new device is the same person, which is what carries their
+  /// votes across a reinstall.
+  static let externalUserID = "demo-user"
+
+  /// Shown on requests and comments they author.
   static let displayName = "Demo User"
 
-  /// Segmentation attributes forwarded to the backend at authentication time.
+  /// Host-app attributes a triager sees next to a request.
   static let traits: [String: String] = ["platform": "ios", "tier": "demo"]
+
+  /// Which APNs environment minted this build's device tokens.
+  ///
+  /// Stated rather than detected, because the SDK refuses a token with no environment: a sandbox
+  /// token pushed to production fails per-token with no useful error, so guessing wrong makes push
+  /// quietly not work for that person.
+  static var pushEnvironment: DRPushEnvironment {
+    #if DEBUG
+    return .sandbox
+    #else
+    return .production
+    #endif
+  }
 }
