@@ -1,19 +1,28 @@
-import SwiftUI
 import DifferentRequests
+import SwiftUI
 
-/// The app's root. Gates on the sign-in phase and, once ready, presents every
-/// SDK surface as a tab. Owns a `NotificationCenterModel` purely to drive the
-/// Inbox tab's unread badge (the `NotificationCenterView` keeps its own model
-/// for the list itself).
+/// The app's root. Gates on the sign-in phase and, once ready, presents the SDK surfaces this app's
+/// plan includes.
+///
+/// Which tabs exist comes from `DRAppConfig`, not from this app's own guess. The roadmap and the
+/// changelog are Pro surfaces: a tab that answers `PLAN_REQUIRED` when tapped tells the person using
+/// the app that something is broken, when nothing is. An absent tab is the honest rendering of an
+/// absent feature.
 struct RootView: View {
   private let session: Session
   private let pushDelegate: PushRegistrationDelegate
-  @State private var inbox: NotificationCenterModel
+
+  /// The inbox badge.
+  ///
+  /// Read through the client rather than from the SDK's own inbox store, because that store is
+  /// internal — the SDK exposes screens, not the state behind them. A host app that wants a badge
+  /// outside those screens asks the API for the count, which is one read and exactly what the count
+  /// route exists for.
+  @State private var unreadCount = 0
 
   init(session: Session, pushDelegate: PushRegistrationDelegate) {
     self.session = session
     self.pushDelegate = pushDelegate
-    self._inbox = State(initialValue: NotificationCenterModel(client: session.client))
   }
 
   var body: some View {
@@ -31,8 +40,21 @@ struct RootView: View {
   @ViewBuilder
   private var phaseContent: some View {
     switch session.phase {
-    case .authenticating:
+    case .unconfigured:
+      ContentUnavailableView {
+        Label("No app key", systemImage: "key.slash")
+      } description: {
+        Text(
+          """
+          Set \(DemoConfig.appKeyEnvironmentVariable) in the scheme's \
+          Run › Arguments › Environment Variables, then run again.
+          """
+        )
+      }
+
+    case .creatingSession:
       ProgressView("Signing in…")
+
     case .failed(let message):
       ContentUnavailableView {
         Label("Sign-in failed", systemImage: "person.crop.circle.badge.exclamationmark")
@@ -43,42 +65,52 @@ struct RootView: View {
           Task { await session.start() }
         }
       }
-    case .ready:
-      tabs
+
+    case .ready(let signedIn):
+      tabs(for: signedIn)
     }
   }
 
   // MARK: - Tabs
 
-  private var tabs: some View {
+  private func tabs(for signedIn: Session.SignedIn) -> some View {
     TabView {
-      DifferentRequestsView(client: session.client)
-        .tabItem { Label("Requests", systemImage: "list.bullet") }
+      Tab("Requests", systemImage: "list.bullet") {
+        DifferentRequestsView(client: session.client)
+      }
 
-      FollowingView(client: session.client)
-        .tabItem { Label("Following", systemImage: "star") }
+      if signedIn.config.roadmapEnabled {
+        Tab("Roadmap", systemImage: "map") {
+          RoadmapView(client: session.client)
+        }
+      }
 
-      RoadmapView(client: session.client)
-        .tabItem { Label("Roadmap", systemImage: "map") }
+      if signedIn.config.changelogEnabled {
+        Tab("What's New", systemImage: "sparkles") {
+          ChangelogView(client: session.client)
+        }
+      }
 
-      ChangelogView(client: session.client)
-        .tabItem { Label("What's New", systemImage: "sparkles") }
-
-      NotificationCenterView(client: session.client)
-        .tabItem { Label("Inbox", systemImage: "bell") }
-        .badge(unreadBadge)
+      Tab("Inbox", systemImage: "bell") {
+        InboxView(client: session.client)
+      }
+      .badge(unreadCount)
     }
     .task {
-      await inbox.refreshUnreadCount()
+      await refreshUnreadCount()
     }
   }
 
-  /// The Inbox tab badge. Zero renders as no badge, which is also the right
-  /// display before the first unread count comes back.
-  private var unreadBadge: Int {
-    if let count = inbox.unreadCount {
-      return count
+  /// Reads the badge count once when the tabs appear.
+  ///
+  /// A failure leaves the count where it was and says nothing: a badge is the least important thing
+  /// on screen, and an alert about one would interrupt someone to tell them about a number they had
+  /// not looked at.
+  private func refreshUnreadCount() async {
+    do {
+      unreadCount = Int(try await session.client.unreadCount().unreadCount)
+    } catch {
+      NSLog("Unread count unavailable: %@", error.localizedDescription)
     }
-    return 0
   }
 }

@@ -1,3 +1,4 @@
+import DifferentRequests
 import Foundation
 
 /// Static configuration for the example app.

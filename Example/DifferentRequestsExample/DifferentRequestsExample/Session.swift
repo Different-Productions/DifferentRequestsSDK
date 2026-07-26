@@ -15,12 +15,22 @@ import UserNotifications
 @MainActor
 final class Session {
 
+  /// A signed-in person and what their app offers them.
+  ///
+  /// One value rather than two associated with the case: which surfaces exist is as much a part of
+  /// being signed in as who is signed in, and a screen that had one without the other would render
+  /// a tab it cannot serve.
+  struct SignedIn {
+    let user: DREndUser
+    let config: DRAppConfig
+  }
+
   /// Where the app is in the sign-in flow.
   enum Phase {
     /// No app key was supplied, so there is nothing to sign in to.
     case unconfigured
     case creatingSession
-    case ready(DREndUser)
+    case ready(SignedIn)
     case failed(String)
   }
 
@@ -41,7 +51,13 @@ final class Session {
 
   // MARK: - Signing in
 
-  /// Creates the session, then sets up push. Safe to call again to retry after a failure.
+  /// Creates the session, reads what the app offers, then sets up push. Safe to call again to retry
+  /// after a failure.
+  ///
+  /// Config is fetched here rather than by each screen because it decides which screens exist at
+  /// all: the roadmap and the changelog are Pro surfaces, and a tab that is shown and then answers
+  /// PLAN_REQUIRED has told the person using the app that something is broken. Asking once, before
+  /// anything is drawn, is the difference between an absent tab and a dead one.
   func start() async {
     if DemoConfig.isConfigured == false {
       phase = .unconfigured
@@ -56,7 +72,8 @@ final class Session {
         displayName: DemoConfig.displayName,
         traits: DemoConfig.traits
       )
-      phase = .ready(session.user)
+      let configured = try await client.config()
+      phase = .ready(SignedIn(user: session.user, config: configured.config))
       await requestPushAuthorization()
     } catch {
       phase = .failed(error.localizedDescription)
