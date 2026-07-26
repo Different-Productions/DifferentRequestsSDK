@@ -34,6 +34,14 @@ final class BoardStore {
   /// Every request loaded so far, in server order, with later pages appended.
   var requests: [DRFeatureRequest] = []
 
+  /// Free text over title and body, empty for the whole board.
+  ///
+  /// Settable, unlike the statuses and the sort, because searching is not a different board: it
+  /// is the same ranking and the same page shape, which is what lets one renderer show both.
+  /// Changing it takes effect on the next `load()` — the cursor a search handed back does not
+  /// address the results of another query.
+  var query: String = ""
+
   /// `true` while the first page is being fetched.
   var isLoading: Bool = false
 
@@ -44,8 +52,19 @@ final class BoardStore {
   /// allowed.
   var hasMore: Bool = true
 
+  /// Whether a first `load()` has finished, whether or not it succeeded. What separates "not
+  /// read yet" from "read, and the board is empty".
+  var hasLoaded: Bool = false
+
   /// The failure from the most recent page fetch, cleared when a fresh `load()` starts.
   var loadError: Error?
+
+  /// `true` while a vote is being written. One at a time: two votes racing would settle on
+  /// whichever answer arrived last rather than on the last tap.
+  var isWriting: Bool = false
+
+  /// The failure from the most recent write, cleared when the next write starts.
+  var writeError: Error?
 
   // MARK: - Private state
 
@@ -80,7 +99,10 @@ final class BoardStore {
     requests = []
     cursor = ""
     hasMore = true
-    defer { isLoading = false }
+    defer {
+      isLoading = false
+      hasLoaded = true
+    }
     await fetchPage()
   }
 
@@ -105,7 +127,7 @@ final class BoardStore {
       let page = try await client.requests(
         statuses: statuses,
         sort: sort,
-        query: nil,
+        query: query,
         cursor: requested
       )
       requests.append(contentsOf: page.requests)
@@ -113,6 +135,40 @@ final class BoardStore {
       hasMore = !page.nextCursor.isEmpty
     } catch {
       loadError = error
+    }
+  }
+
+  // MARK: - Writes
+
+  /// Adds the caller's vote to one request, or takes it back when it is already there.
+  ///
+  /// Which of the two is decided from the row as it is held before the call. The row is then
+  /// found again by id after the write answers, rather than by an index taken before it: a
+  /// `load()` can replace the whole array while the call is suspended, and an index from before
+  /// the suspension would address a different request or run past the end. A row that is gone by
+  /// then is left gone — the vote landed, and the next page it appears in will say so.
+  ///
+  /// What the write returned replaces the row whole. A count incremented locally is wrong the
+  /// moment anyone else votes.
+  func toggleVote(requestID: String) async {
+    if isWriting { return }
+    guard let current = requests.first(where: { $0.id == requestID }) else { return }
+    isWriting = true
+    writeError = nil
+    defer { isWriting = false }
+
+    do {
+      let written: DRFeatureRequest
+      if current.viewer.voted {
+        written = try await client.clearVote(requestID: requestID).request
+      } else {
+        written = try await client.vote(requestID: requestID).request
+      }
+      if let index = requests.firstIndex(where: { $0.id == written.id }) {
+        requests[index] = written
+      }
+    } catch {
+      writeError = error
     }
   }
 }
