@@ -24,15 +24,15 @@ final class BoardStore {
   let client: DifferentRequestsClient
 
   /// Which statuses the board covers. Empty means everything still on it.
-  let statuses: [RequestStatus]
+  let statuses: [DRRequestStatus]
 
   /// Whether the board is ranked by demand or by recency.
-  let sort: RequestSort
+  let sort: DRRequestSort
 
   // MARK: - State
 
   /// Every request loaded so far, in server order, with later pages appended.
-  var requests: [FeatureRequest] = []
+  var requests: [DRFeatureRequest] = []
 
   /// `true` while the first page is being fetched.
   var isLoading: Bool = false
@@ -60,8 +60,8 @@ final class BoardStore {
   ///   - sort: Whether to rank by demand or by recency.
   init(
     client: DifferentRequestsClient,
-    statuses: [RequestStatus],
-    sort: RequestSort
+    statuses: [DRRequestStatus],
+    sort: DRRequestSort
   ) {
     self.client = client
     self.statuses = statuses
@@ -101,11 +101,12 @@ final class BoardStore {
   /// retried rather than skipped.
   private func fetchPage() async {
     do {
-      let page = try await client.listRequests(
+      let requested: String? = cursor.isEmpty ? nil : cursor
+      let page = try await client.requests(
         statuses: statuses,
         sort: sort,
         query: nil,
-        cursor: cursor.isEmpty ? nil : cursor
+        cursor: requested
       )
       requests.append(contentsOf: page.requests)
       cursor = page.nextCursor

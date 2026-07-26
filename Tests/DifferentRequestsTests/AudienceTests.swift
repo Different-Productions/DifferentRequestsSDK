@@ -12,7 +12,7 @@ struct AudienceTests {
   /// Every rpc that acts for a person, named here so that adding one to the contract without
   /// gating it fails a test instead of shipping.
   private enum ActsForAPerson {
-    static let methods: [RequestsServiceMethod] = [
+    static let methods: [DRRequestsServiceRPC] = [
       .createRequest,
       .vote,
       .clearVote,
@@ -30,10 +30,10 @@ struct AudienceTests {
 
   @Test("Every rpc declares an audience")
   func everyRPCDeclaresAnAudience() {
-    for method in RequestsServiceMethod.allCases {
+    for method in DRRequestsServiceRPC.allCases {
       #expect(
         method.audience != .unspecified,
-        "\(method.path) has no audience, which would leave it open to anyone with an app key"
+        "\(method.rawValue) has no audience, which would leave it open to anyone with an app key"
       )
     }
   }
@@ -43,14 +43,14 @@ struct AudienceTests {
     for method in ActsForAPerson.methods {
       #expect(
         method.audience == .endUser,
-        "\(method.path) writes or reads on behalf of a person and must not accept a bare app key"
+        "\(method.rawValue) writes or reads on behalf of a person and must not accept a bare app key"
       )
     }
   }
 
   @Test("Reading the board needs only an app key, so a host app can show it before anyone signs in")
   func readingTheBoardNeedsOnlyAnAppKey() {
-    let openToAppKey: [RequestsServiceMethod] = [
+    let openToAppKey: [DRRequestsServiceRPC] = [
       .getConfig,
       .createSession,
       .listRequests,
@@ -61,7 +61,7 @@ struct AudienceTests {
     ]
 
     for method in openToAppKey {
-      #expect(method.audience == .appKey, "\(method.path) should be readable with an app key")
+      #expect(method.audience == .appKey, "\(method.rawValue) should be readable with an app key")
     }
   }
 
@@ -69,12 +69,12 @@ struct AudienceTests {
   func theTableCoversTheWholeSurface() {
     // Every case is either something acting for a person or something an app key may read.
     // A new rpc that is neither is a gap in these tests, not a third category.
-    let accountedFor = Set(ActsForAPerson.methods.map(\.path))
-    let appKeyReadable = RequestsServiceMethod.allCases
-      .filter { accountedFor.contains($0.path) == false }
+    let accountedFor = Set(ActsForAPerson.methods.map(\.rawValue))
+    let appKeyReadable = DRRequestsServiceRPC.allCases
+      .filter { accountedFor.contains($0.rawValue) == false }
 
     for method in appKeyReadable {
-      #expect(method.audience == .appKey, "\(method.path) is not covered by either audience")
+      #expect(method.audience == .appKey, "\(method.rawValue) is not covered by either audience")
     }
   }
 }

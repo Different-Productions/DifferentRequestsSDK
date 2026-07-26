@@ -4,55 +4,68 @@ import SwiftProtobuf
 
 /// A client for the DifferentRequests API.
 ///
-/// Every method is one rpc from the contract, taking and returning the contract's own
-/// types. There is no translation layer and no parallel set of models: what
-/// ``listRequests(statuses:sort:query:cursor:)`` hands back is the
-/// `ListRequestsResponse` the server sent.
+/// Every method is one rpc from the contract, taking and returning the contract's own types. There is
+/// no translation layer and no parallel set of models: what
+/// ``requests(statuses:sort:query:cursor:)`` hands back is the `DRListRequestsResponse` the server
+/// sent.
 ///
-/// Calls that act on behalf of a person need a session first — see
-/// ``createSession(externalID:email:displayName:traits:)``. Which calls those are is not a
-/// rule to remember: each rpc carries its audience, and one whose audience is `.endUser` is
-/// refused locally before it is sent.
+/// Nothing here writes a URL. Paths come from the generated endpoint table, query keys from the
+/// generated field names, and query values from the spellings the schema declares — so a call this
+/// makes is addressed exactly as the server registered it.
+///
+/// Calls that act for a person need a session first; see
+/// ``createSession(externalID:email:displayName:traits:)``. Which calls those are is not a rule to
+/// remember: each rpc carries its audience, and one that needs a session is refused here before it
+/// reaches the network.
 public actor DifferentRequestsClient {
+
+  /// Both directions carry protobuf. The same content type BacklogServer and the CMS speak.
+  private static let protobufContentType = "application/x-protobuf"
+
   private let appKey: String
   private let baseURL: URL
-  private let transport: any RPCTransport
+  private let session: URLSession
 
   private var sessionToken: String?
 
-  /// The signed-in user, once ``createSession(externalID:email:displayName:traits:)`` has
-  /// run. Views compare a comment's author against this to decide what a person may act on.
-  public private(set) var currentUser: EndUser?
+  /// The signed-in person, once a session has been created.
+  public private(set) var currentUser: DREndUser?
 
   // MARK: - Creation
 
   /// Assigns what it is given and nothing more. Use ``make(appKey:)`` for the ordinary case.
-  public init(appKey: String, baseURL: URL, transport: any RPCTransport) {
+  public init(appKey: String, baseURL: URL, session: URLSession) {
     self.appKey = appKey
     self.baseURL = baseURL
-    self.transport = transport
+    self.session = session
     self.sessionToken = nil
     self.currentUser = nil
   }
 
-  /// A client pointed at production over `URLSession`.
+  /// A client pointed at production.
   ///
   /// - Parameter appKey: Your app key, from the DifferentRequests console.
   public static func make(appKey: String) -> DifferentRequestsClient {
     make(appKey: appKey, baseURL: productionBaseURL)
   }
 
-  /// A client pointed at `baseURL` over `URLSession`. Use for a staging endpoint.
+  /// A client pointed at `baseURL`, for a staging endpoint.
+  ///
+  /// Owns its own `URLSession` so it does not entangle with a host app's, with timeouts short enough
+  /// that a board tab does not hang on a stalled connection.
   public static func make(appKey: String, baseURL: URL) -> DifferentRequestsClient {
-    DifferentRequestsClient(
+    let configuration = URLSessionConfiguration.ephemeral
+    configuration.timeoutIntervalForRequest = 15
+    configuration.timeoutIntervalForResource = 20
+    return DifferentRequestsClient(
       appKey: appKey,
       baseURL: baseURL,
-      transport: URLSessionRPCTransport(session: URLSession(configuration: .default))
+      session: URLSession(configuration: configuration)
     )
   }
 
-  /// Baked into every app built against this SDK version, so it cannot change without a
-  /// coordinated release.
+  /// Baked into every app built against this SDK version, so it cannot change without a coordinated
+  /// release.
   public static let productionBaseURL: URL = {
     guard let url = URL(string: "https://api.differentrequests.com") else {
       preconditionFailure("DifferentRequests: the built-in base URL is not a URL — SDK bug.")
@@ -62,35 +75,37 @@ public actor DifferentRequestsClient {
 
   // MARK: - Configuration and identity
 
-  /// What this app offers and how it presents itself. Fetch once per launch: which surfaces
-  /// exist is a property of the tenant's plan, not something a client should assume.
-  public func getConfig() async throws -> GetConfigResponse {
-    try await call(.getConfig, GetConfigRequest())
+  /// What this app offers and how it presents itself.
+  ///
+  /// Fetch once per launch: which surfaces exist is a property of the tenant's plan, not something a
+  /// client should assume.
+  public func config() async throws -> DRGetConfigResponse {
+    try await get(.getConfig, query: [])
   }
 
   /// Exchange your own identifier for this person for a session.
   ///
-  /// Upsert: the same `externalID` returns the same user with the other fields refreshed,
-  /// which is what lets someone reinstall and keep their votes.
+  /// Upsert: the same `externalID` returns the same person with the other fields refreshed, which is
+  /// what lets someone reinstall and keep their votes.
   public func createSession(
     externalID: String,
     email: String?,
     displayName: String?,
     traits: [String: String]?
-  ) async throws -> CreateSessionResponse {
-    var request = CreateSessionRequest()
-    request.externalID = externalID
+  ) async throws -> DRCreateSessionResponse {
+    var body = DRCreateSessionRequest()
+    body.externalID = externalID
     if let email {
-      request.email = email
+      body.email = email
     }
     if let displayName {
-      request.displayName = displayName
+      body.displayName = displayName
     }
     if let traits {
-      request.traits = traits
+      body.traits = traits
     }
 
-    let response: CreateSessionResponse = try await call(.createSession, request)
+    let response: DRCreateSessionResponse = try await send(.createSession, body: body)
     sessionToken = response.sessionToken
     currentUser = response.user
     return response
@@ -102,206 +117,263 @@ public actor DifferentRequestsClient {
   ///
   /// - Parameters:
   ///   - statuses: Empty for everything still on the board.
-  ///   - query: Free text over title and body. Also the search-before-submit path — the
-  ///     same ranking and the same page shape, so duplicates are caught while writing
-  ///     rather than in triage afterwards.
-  public func listRequests(
-    statuses: [RequestStatus],
-    sort: RequestSort,
+  ///   - query: Free text over title and body. Also the search-before-submit path — the same ranking
+  ///     and the same page shape, so duplicates are caught while writing rather than in triage.
+  ///   - cursor: What the previous page handed back. Nil for the first page.
+  public func requests(
+    statuses: [DRRequestStatus],
+    sort: DRRequestSort,
     query: String?,
     cursor: String?
-  ) async throws -> ListRequestsResponse {
-    var request = ListRequestsRequest()
-    request.statuses = statuses
-    request.sort = sort
-    if let query {
-      request.query = query
+  ) async throws -> DRListRequestsResponse {
+    var items: [URLQueryItem] = []
+
+    if let sortToken = sort.urlToken {
+      items.append(URLQueryItem(name: DRListRequestsRequest.Field.sort, value: sortToken))
     }
-    if let cursor {
-      request.cursor = cursor
+
+    // Comma-separated, matching what the server reads: a repeated query parameter is spelled three
+    // different ways by three different clients and one of them is always wrong.
+    let statusTokens = statuses.compactMap(\.urlToken)
+    if statusTokens.isEmpty == false {
+      items.append(
+        URLQueryItem(
+          name: DRListRequestsRequest.Field.statuses,
+          value: statusTokens.joined(separator: ",")
+        )
+      )
     }
-    return try await call(.listRequests, request)
+
+    if let query, query.isEmpty == false {
+      items.append(URLQueryItem(name: DRListRequestsRequest.Field.query, value: query))
+    }
+    if let cursor, cursor.isEmpty == false {
+      items.append(URLQueryItem(name: DRListRequestsRequest.Field.cursor, value: cursor))
+    }
+
+    return try await get(.listRequests, query: items)
   }
 
-  public func getRequest(id: String) async throws -> GetRequestResponse {
-    var request = GetRequestRequest()
-    request.requestID = id
-    return try await call(.getRequest, request)
+  public func request(id: String) async throws -> DRGetRequestResponse {
+    try await get(.getRequest(requestId: id), query: [])
   }
 
-  /// Submit a request. It comes back with the author's own vote already counted — asking
-  /// for something and then having to vote for it reads as a bug.
-  public func createRequest(title: String, body: String) async throws -> CreateRequestResponse {
-    var request = CreateRequestRequest()
-    request.title = title
-    request.body = body
-    return try await call(.createRequest, request)
+  /// Submit a request. It comes back with the author's own vote already counted.
+  public func submit(title: String, body: String) async throws -> DRCreateRequestResponse {
+    var payload = DRCreateRequestRequest()
+    payload.title = title
+    payload.body = body
+    return try await send(.createRequest, body: payload)
   }
 
   // MARK: - Votes and follows
 
-  /// Idempotent: voting twice is one vote. Returns the updated request so a list already on
-  /// screen can be reconciled without refetching it.
-  public func vote(requestID: String) async throws -> VoteResponse {
-    var request = VoteRequest()
-    request.requestID = requestID
-    return try await call(.vote, request)
+  /// Idempotent: voting twice is one vote.
+  public func vote(requestID: String) async throws -> DRVoteResponse {
+    try await send(.vote(requestId: requestID), body: DRVoteRequest())
   }
 
   /// Idempotent: clearing a vote nobody cast succeeds.
-  public func clearVote(requestID: String) async throws -> ClearVoteResponse {
-    var request = ClearVoteRequest()
-    request.requestID = requestID
-    return try await call(.clearVote, request)
+  public func clearVote(requestID: String) async throws -> DRClearVoteResponse {
+    try await send(.clearVote(requestId: requestID), body: DRClearVoteRequest())
   }
 
   /// Follow for updates without adding demand. Voting already follows implicitly.
-  public func follow(requestID: String) async throws -> FollowResponse {
-    var request = FollowRequest()
-    request.requestID = requestID
-    return try await call(.follow, request)
+  public func follow(requestID: String) async throws -> DRFollowResponse {
+    try await send(.follow(requestId: requestID), body: DRFollowRequest())
   }
 
-  public func unfollow(requestID: String) async throws -> UnfollowResponse {
-    var request = UnfollowRequest()
-    request.requestID = requestID
-    return try await call(.unfollow, request)
+  public func unfollow(requestID: String) async throws -> DRUnfollowResponse {
+    try await send(.unfollow(requestId: requestID), body: DRUnfollowRequest())
   }
 
   // MARK: - Comments
 
-  /// Oldest first, always — a discussion read newest-first is unreadable, so there is no
-  /// sort to choose.
-  public func listComments(
-    requestID: String,
-    cursor: String?
-  ) async throws -> ListCommentsResponse {
-    var request = ListCommentsRequest()
-    request.requestID = requestID
-    if let cursor {
-      request.cursor = cursor
-    }
-    return try await call(.listComments, request)
+  /// A page of a thread, oldest first.
+  public func comments(requestID: String, cursor: String?) async throws -> DRListCommentsResponse {
+    try await get(
+      .listComments(requestId: requestID),
+      query: Self.cursorQuery(cursor, named: DRListCommentsRequest.Field.cursor)
+    )
   }
 
-  public func createComment(requestID: String, body: String) async throws -> CreateCommentResponse {
-    var request = CreateCommentRequest()
-    request.requestID = requestID
-    request.body = body
-    return try await call(.createComment, request)
+  public func comment(requestID: String, body: String) async throws -> DRCreateCommentResponse {
+    var payload = DRCreateCommentRequest()
+    payload.body = body
+    return try await send(.createComment(requestId: requestID), body: payload)
   }
 
   // MARK: - Notifications
 
-  public func listNotifications(
-    cursor: String?
-  ) async throws -> ListNotificationsResponse {
-    var request = ListNotificationsRequest()
-    if let cursor {
-      request.cursor = cursor
-    }
-    return try await call(.listNotifications, request)
+  public func notifications(cursor: String?) async throws -> DRListNotificationsResponse {
+    try await get(
+      .listNotifications,
+      query: Self.cursorQuery(cursor, named: DRListNotificationsRequest.Field.cursor)
+    )
   }
 
-  /// The unread badge count. Prefer this over paging the inbox to count unread rows.
-  public func getUnreadCount() async throws -> GetUnreadCountResponse {
-    try await call(.getUnreadCount, GetUnreadCountRequest())
+  /// The badge count. Prefer this over paging the inbox to count unread rows.
+  public func unreadCount() async throws -> DRGetUnreadCountResponse {
+    try await get(.getUnreadCount, query: [])
   }
 
-  public func markNotificationRead(id: String) async throws -> MarkNotificationReadResponse {
-    var request = MarkNotificationReadRequest()
-    request.notificationID = id
-    return try await call(.markNotificationRead, request)
+  public func markRead(notificationID: String) async throws -> DRMarkNotificationReadResponse {
+    try await send(
+      .markNotificationRead(notificationId: notificationID),
+      body: DRMarkNotificationReadRequest()
+    )
   }
 
-  public func markAllNotificationsRead() async throws -> MarkAllNotificationsReadResponse {
-    try await call(.markAllNotificationsRead, MarkAllNotificationsReadRequest())
+  public func markAllRead() async throws -> DRMarkAllNotificationsReadResponse {
+    try await send(.markAllNotificationsRead, body: DRMarkAllNotificationsReadRequest())
   }
 
   // MARK: - Devices
 
-  /// Register this device for push. Call on every launch: a token rotates on reinstall and
-  /// Apple can invalidate one silently, so this is an upsert rather than a one-time write.
+  /// Register this device for push. Call on every launch: a token rotates on reinstall and Apple can
+  /// invalidate one silently, so this is an upsert rather than a one-time write.
   ///
-  /// This only submits the token. Ask for notification permission first — see
-  /// ``PushNotifications/requestPushAuthorization()`` — then pass the `Data` your app
-  /// receives in `application(_:didRegisterForRemoteNotificationsWithDeviceToken:)`.
-  ///
-  /// - Parameter environment: Which APNs environment minted the token. A sandbox token
-  ///   pushed to production fails per-token with no useful error, so the caller states it.
+  /// - Parameters:
+  ///   - tokenData: The `Data` handed to
+  ///     `application(_:didRegisterForRemoteNotificationsWithDeviceToken:)`.
+  ///   - environment: Which APNs environment minted the token. A sandbox token pushed to production
+  ///     fails per-token with no useful error, so the caller states it.
   public func registerDevice(
     tokenData: Data,
-    environment: PushEnvironment
-  ) async throws -> RegisterDeviceResponse {
-    var request = RegisterDeviceRequest()
-    request.token = Self.hexString(from: tokenData)
-    request.environment = environment
-    return try await call(.registerDevice, request)
+    environment: DRPushEnvironment
+  ) async throws -> DRRegisterDeviceResponse {
+    var payload = DRRegisterDeviceRequest()
+    payload.token = Self.hexString(from: tokenData)
+    payload.environment = environment
+    return try await send(.registerDevice, body: payload)
   }
 
-  /// Drop a device, e.g. on sign-out.
-  public func unregisterDevice(deviceID: String) async throws -> UnregisterDeviceResponse {
-    var request = UnregisterDeviceRequest()
-    request.deviceID = deviceID
-    return try await call(.unregisterDevice, request)
+  /// Drop a device, by the id registration handed back.
+  public func unregisterDevice(deviceID: String) async throws -> DRUnregisterDeviceResponse {
+    try await send(.unregisterDevice(deviceId: deviceID), body: DRUnregisterDeviceRequest())
   }
 
   // MARK: - Public surfaces
 
-  /// The roadmap, as columns in display order. Pro plan; `AppConfig.roadmapEnabled` says
-  /// whether to offer it at all.
-  public func getRoadmap() async throws -> GetRoadmapResponse {
-    try await call(.getRoadmap, GetRoadmapRequest())
+  /// The roadmap, as columns in display order. `DRAppConfig.roadmapEnabled` says whether to offer it.
+  public func roadmap() async throws -> DRGetRoadmapResponse {
+    try await get(.getRoadmap, query: [])
   }
 
-  /// Published changelog entries, newest first. Pro plan; see `AppConfig.changelogEnabled`.
-  public func listChangelog(cursor: String?) async throws -> ListChangelogResponse {
-    var request = ListChangelogRequest()
-    if let cursor {
-      request.cursor = cursor
-    }
-    return try await call(.listChangelog, request)
+  /// Published changelog entries, newest first. See `DRAppConfig.changelogEnabled`.
+  public func changelog(cursor: String?) async throws -> DRListChangelogResponse {
+    try await get(
+      .listChangelog,
+      query: Self.cursorQuery(cursor, named: DRListChangelogRequest.Field.cursor)
+    )
   }
 
   // MARK: - Calling
 
-  /// Serialize, send, decode. The one place any of those three happen.
-  private func call<Response: Message>(
-    _ method: RequestsServiceMethod,
-    _ request: some Message
-  ) async throws -> Response {
-    if method.audience == .endUser, sessionToken == nil {
-      throw DifferentRequestsError.notAuthenticated(method)
-    }
-
-    let result = try await transport.send(
-      RPCCall(
-        method: method,
-        body: try request.serializedBytes(),
-        appKey: appKey,
-        sessionToken: sessionToken
-      ),
-      baseURL: baseURL
-    )
-
-    if result.isSuccess {
-      do {
-        return try Response(serializedBytes: result.body)
-      } catch {
-        throw DifferentRequestsError.decodingFailed(method, underlying: error)
-      }
-    }
-
-    // A failure body is an ApiError encoded exactly like a response. When it will not
-    // decode, there is nothing to branch on and saying so beats inventing a code.
-    guard let apiError = try? ApiError(serializedBytes: result.body) else {
-      throw DifferentRequestsError.unreadableError(byteCount: result.body.count)
-    }
-    throw DifferentRequestsError.api(apiError)
+  /// A read: no body, query parameters if there are any.
+  private func get<Answer: Message>(
+    _ endpoint: DRRequestsServiceEndpoint,
+    query: [URLQueryItem]
+  ) async throws -> Answer {
+    try await perform(endpoint, query: query, body: nil)
   }
 
-  /// APNs tokens are conventionally written as lowercase hex, so callers hand over the raw
-  /// `Data` and never do this themselves.
+  /// A write: the request message as the body.
+  private func send<Answer: Message>(
+    _ endpoint: DRRequestsServiceEndpoint,
+    body: some Message
+  ) async throws -> Answer {
+    try await perform(endpoint, query: [], body: try body.serializedData())
+  }
+
+  /// Builds the request, sends it, and decodes what came back.
+  ///
+  /// The audience check happens before anything is sent, so an unauthenticated call costs no round
+  /// trip and reports the rpc that needed a session rather than a bare 401.
+  private func perform<Answer: Message>(
+    _ endpoint: DRRequestsServiceEndpoint,
+    query: [URLQueryItem],
+    body: Data?
+  ) async throws -> Answer {
+    let rpc = endpoint.rpc
+    if rpc.audience == .endUser, sessionToken == nil {
+      throw DifferentRequestsError.notAuthenticated(rpc)
+    }
+
+    guard var components = URLComponents(
+      url: baseURL.appendingPathComponent(endpoint.path),
+      resolvingAgainstBaseURL: false
+    ) else {
+      throw DifferentRequestsError.invalidBaseURL(baseURL)
+    }
+    if query.isEmpty == false {
+      components.queryItems = query
+    }
+    guard let url = components.url else {
+      throw DifferentRequestsError.invalidBaseURL(baseURL)
+    }
+
+    var request = URLRequest(url: url)
+    request.httpMethod = Self.httpMethod(for: rpc)
+    request.setValue(Self.protobufContentType, forHTTPHeaderField: "Accept")
+    request.setValue(appKey, forHTTPHeaderField: "X-App-Key")
+    if let sessionToken {
+      request.setValue("Bearer \(sessionToken)", forHTTPHeaderField: "Authorization")
+    }
+    if let body {
+      request.httpBody = body
+      request.setValue(Self.protobufContentType, forHTTPHeaderField: "Content-Type")
+    }
+
+    let data: Data
+    let response: URLResponse
+    do {
+      (data, response) = try await session.data(for: request)
+    } catch {
+      throw DifferentRequestsError.networkError(underlying: error)
+    }
+
+    guard let http = response as? HTTPURLResponse else {
+      throw DifferentRequestsError.notAnHTTPResponse
+    }
+
+    // The status says only whether the body is the answer or a failure. Which failure is in the
+    // body, because a status code cannot distinguish "upgrade to Pro" from "not your request".
+    guard (200..<300).contains(http.statusCode) else {
+      guard let apiError = try? DRApiError(serializedBytes: [UInt8](data)) else {
+        throw DifferentRequestsError.unreadableError(byteCount: data.count)
+      }
+      throw DifferentRequestsError.api(apiError)
+    }
+
+    do {
+      return try Answer(serializedBytes: [UInt8](data))
+    } catch {
+      throw DifferentRequestsError.decodingFailed(rpc, underlying: error)
+    }
+  }
+
+  private static func httpMethod(for rpc: DRRequestsServiceRPC) -> String {
+    switch rpc.method {
+    case .get: return "GET"
+    case .post: return "POST"
+    case .put: return "PUT"
+    case .delete: return "DELETE"
+    case .unspecified, .UNRECOGNIZED:
+      // Unreachable: endpoint-gen refuses to emit an rpc whose route is incomplete.
+      return "GET"
+    }
+  }
+
+  private static func cursorQuery(_ cursor: String?, named name: String) -> [URLQueryItem] {
+    guard let cursor, cursor.isEmpty == false else {
+      return []
+    }
+    return [URLQueryItem(name: name, value: cursor)]
+  }
+
+  /// APNs tokens are conventionally written as lowercase hex, so callers hand over the raw `Data` and
+  /// never do this themselves.
   private static func hexString(from data: Data) -> String {
     data.map { byte in String(format: "%02x", byte) }.joined()
   }
