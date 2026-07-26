@@ -2,6 +2,14 @@
 
 import PackageDescription
 
+// The contract is a dependency, not a file in this repository. DifferentRequestsProtos
+// carries every type this SDK sends and receives, generated from
+// Different-Productions/differentrequests-proto, and this package neither copies those
+// types nor wraps them in types of its own.
+//
+// Pinned `exact:`. A range would let `swift package update` move the wire contract
+// underneath a released SDK version, and that is the one dependency which cannot be
+// allowed to drift: an installed app speaks whatever it was built against, forever.
 let package = Package(
   name: "DifferentRequestsSDK",
   platforms: [
@@ -15,26 +23,21 @@ let package = Package(
     ),
   ],
   dependencies: [
-    // Pinned below 1.13.0: from that release the generator emits access-level
-    // qualified imports (`package import`) in the generated sources, which
-    // clash with the hand-written targets' unqualified imports and fail to
-    // compile ("ambiguous implicit access level for import"). 1.13.0 also
-    // trips an OpenAPIKit trait-resolution error. `swift build` masked both
-    // because Package.resolved is not committed and stale resolutions stayed
-    // on a compatible version.
-    .package(url: "https://github.com/apple/swift-openapi-generator", "1.7.0" ..< "1.13.0"),
-    .package(url: "https://github.com/apple/swift-openapi-runtime", from: "1.7.0"),
-    .package(url: "https://github.com/apple/swift-openapi-urlsession", from: "1.1.0"),
+    .package(
+      url: "https://github.com/Different-Productions/differentrequests-proto.git",
+      exact: "0.3.0"
+    ),
+    // Declared directly, not leaned on transitively: this target names `Message` and
+    // `serializedData()` itself. The range matches the contract package's own, so one
+    // runtime resolves for both.
+    .package(url: "https://github.com/apple/swift-protobuf.git", from: "1.30.0"),
   ],
   targets: [
     .target(
       name: "DifferentRequests",
       dependencies: [
-        .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
-        .product(name: "OpenAPIURLSession", package: "swift-openapi-urlsession"),
-      ],
-      plugins: [
-        .plugin(name: "OpenAPIGenerator", package: "swift-openapi-generator"),
+        .product(name: "DifferentRequestsProtos", package: "differentrequests-proto"),
+        .product(name: "SwiftProtobuf", package: "swift-protobuf"),
       ]
     ),
     .testTarget(

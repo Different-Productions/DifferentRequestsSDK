@@ -1,872 +1,308 @@
+import DifferentRequestsProtos
 import Foundation
-import HTTPTypes
-import OpenAPIRuntime
-import OpenAPIURLSession
-
-// MARK: - Custom Header
-
-// MARK: - Auth Errors
-
-private enum AuthMiddlewareError: Error {
-  case invalidHeaderName
-}
+import SwiftProtobuf
 
 /// A client for the DifferentRequests API.
 ///
-/// Thread-safe actor that manages API key auth and user session tokens.
-/// Call `authenticate` before using methods that require a user session
-/// (submitting requests, voting).
+/// Every method is one rpc from the contract, taking and returning the contract's own
+/// types. There is no translation layer and no parallel set of models: what
+/// ``listRequests(statuses:sort:query:cursor:)`` hands back is the
+/// `ListRequestsResponse` the server sent.
+///
+/// Calls that act on behalf of a person need a session first — see
+/// ``createSession(externalID:email:displayName:traits:)``. Which calls those are is not a
+/// rule to remember: each rpc carries its audience, and one whose audience is `.endUser` is
+/// refused locally before it is sent.
 public actor DifferentRequestsClient {
-  private var underlyingClient: any APIProtocol
-  private let apiKey: String
+  private let appKey: String
   private let baseURL: URL
+  private let transport: any RPCTransport
+
   private var sessionToken: String?
 
-  /// The authenticated user's ID, set by ``authenticate(externalUserId:displayName:avatarUrl:email:traits:)``.
-  ///
-  /// Comments don't carry a per-item "is mine" flag the way votes carry
-  /// `myVote`, so SDK views compare a comment's `authorId` against this to
-  /// decide whether to show a delete affordance.
-  public private(set) var currentUserId: String?
+  /// The signed-in user, once ``createSession(externalID:email:displayName:traits:)`` has
+  /// run. Views compare a comment's author against this to decide what a person may act on.
+  public private(set) var currentUser: EndUser?
 
-  /// The authenticated user's display name, set alongside ``currentUserId``.
-  ///
-  /// Used to render an optimistically-inserted comment before the server
-  /// response (which carries the authoritative `authorDisplayName`) comes back.
-  public private(set) var currentUserDisplayName: String?
+  // MARK: - Creation
 
-  /// The default production API base URL.
+  /// Assigns what it is given and nothing more. Use ``make(appKey:)`` for the ordinary case.
+  public init(appKey: String, baseURL: URL, transport: any RPCTransport) {
+    self.appKey = appKey
+    self.baseURL = baseURL
+    self.transport = transport
+    self.sessionToken = nil
+    self.currentUser = nil
+  }
+
+  /// A client pointed at production over `URLSession`.
   ///
-  /// This host is baked into every app that uses `init(apiKey:)`, so it cannot
-  /// change without a coordinated SDK release. Both `api.different.productions`
-  /// (the previous default) and the raw API Gateway endpoint it replaced
-  /// (`kstb23efj8.execute-api.us-east-1.amazonaws.com`) stay served by the API
-  /// indefinitely, so apps built against older SDK versions keep working.
-  private static let defaultBaseURL: URL = {
+  /// - Parameter appKey: Your app key, from the DifferentRequests console.
+  public static func make(appKey: String) -> DifferentRequestsClient {
+    make(appKey: appKey, baseURL: productionBaseURL)
+  }
+
+  /// A client pointed at `baseURL` over `URLSession`. Use for a staging endpoint.
+  public static func make(appKey: String, baseURL: URL) -> DifferentRequestsClient {
+    DifferentRequestsClient(
+      appKey: appKey,
+      baseURL: baseURL,
+      transport: URLSessionRPCTransport(session: URLSession(configuration: .default))
+    )
+  }
+
+  /// Baked into every app built against this SDK version, so it cannot change without a
+  /// coordinated release.
+  public static let productionBaseURL: URL = {
     guard let url = URL(string: "https://api.differentrequests.com") else {
-      preconditionFailure("DifferentRequests: built-in default base URL is invalid — SDK bug.")
+      preconditionFailure("DifferentRequests: the built-in base URL is not a URL — SDK bug.")
     }
     return url
   }()
 
-  // MARK: - Initialization
+  // MARK: - Configuration and identity
 
-  /// Create a client with your API key, pointed at the production API.
-  ///
-  /// Get your API key from the DifferentRequests console.
-  /// - Parameter apiKey: Your app's API key.
-  public init(apiKey: String) {
-    self.init(apiKey: apiKey, baseURL: DifferentRequestsClient.defaultBaseURL)
+  /// What this app offers and how it presents itself. Fetch once per launch: which surfaces
+  /// exist is a property of the tenant's plan, not something a client should assume.
+  public func getConfig() async throws -> GetConfigResponse {
+    try await call(.getConfig, GetConfigRequest())
   }
 
-  /// Create a client with your API key and a custom base URL.
+  /// Exchange your own identifier for this person for a session.
   ///
-  /// Use this to point at a staging or self-hosted DifferentRequests backend.
-  /// - Parameters:
-  ///   - apiKey: Your app's API key.
-  ///   - baseURL: The API base URL to use instead of production.
-  public init(apiKey: String, baseURL: URL) {
-    self.apiKey = apiKey
-    self.baseURL = baseURL
-    self.sessionToken = nil
-    self.underlyingClient = Client(
-      serverURL: baseURL,
-      transport: URLSessionTransport(),
-      middlewares: [AuthMiddleware(apiKey: apiKey, sessionToken: nil)]
-    )
-  }
-
-  private func rebuildClient() {
-    self.underlyingClient = Client(
-      serverURL: baseURL,
-      transport: URLSessionTransport(),
-      middlewares: [AuthMiddleware(apiKey: apiKey, sessionToken: sessionToken)]
-    )
-  }
-
-  // MARK: - Authentication
-
-  /// Authenticate a user and store the session token.
-  ///
-  /// - Parameters:
-  ///   - externalUserId: Your app's stable identifier for this user.
-  ///   - displayName: The user's display name.
-  ///   - avatarUrl: Optional avatar URL.
-  ///   - email: Optional contact email.
-  ///   - traits: Optional key/value attributes (plan tier, MRR, cohort, …) used
-  ///     for segmentation. Passing this replaces the user's stored traits.
-  public func authenticate(
-    externalUserId: String,
-    displayName: String,
-    avatarUrl: URL?,
+  /// Upsert: the same `externalID` returns the same user with the other fields refreshed,
+  /// which is what lets someone reinstall and keep their votes.
+  public func createSession(
+    externalID: String,
     email: String?,
+    displayName: String?,
     traits: [String: String]?
-  ) async throws -> User {
-    let traitsPayload: Operations.createUser.Input.Body.jsonPayload.traitsPayload?
+  ) async throws -> CreateSessionResponse {
+    var request = CreateSessionRequest()
+    request.externalID = externalID
+    if let email {
+      request.email = email
+    }
+    if let displayName {
+      request.displayName = displayName
+    }
     if let traits {
-      traitsPayload = .init(additionalProperties: traits)
-    } else {
-      traitsPayload = nil
+      request.traits = traits
     }
 
-    let response = try await underlyingClient.createUser(
-      .init(body: .json(.init(
-        externalUserId: externalUserId,
-        displayName: displayName,
-        avatarUrl: avatarUrl?.absoluteString,
-        email: email,
-        traits: traitsPayload
-      )))
-    )
-
-    switch response {
-    case .ok(let ok):
-      let data = try ok.body.json
-      self.sessionToken = data.sessionToken
-      self.currentUserId = data.id
-      self.currentUserDisplayName = data.displayName
-      rebuildClient()
-      let traitsDict: [String: String]
-      if let additional = data.traits?.additionalProperties {
-        traitsDict = additional
-      } else {
-        traitsDict = [:]
-      }
-      return User(
-        userId: data.id,
-        sessionToken: data.sessionToken,
-        externalUserId: data.externalUserId,
-        displayName: data.displayName,
-        avatarUrl: data.avatarUrl,
-        email: data.email,
-        traits: traitsDict
-      )
-    case .badRequest(let err):
-      throw try mapError(err.body.json)
-    case .unauthorized(let err):
-      throw try mapError(err.body.json)
-    case .undocumented(let statusCode, let payload):
-      throw mapUndocumented(statusCode: statusCode, payload)
-    }
+    let response: CreateSessionResponse = try await call(.createSession, request)
+    sessionToken = response.sessionToken
+    currentUser = response.user
+    return response
   }
 
-  // MARK: - Requests
+  // MARK: - The board
 
-  /// List feature requests with sorting, filtering, and pagination.
+  /// A page of the board.
+  ///
+  /// - Parameters:
+  ///   - statuses: Empty for everything still on the board.
+  ///   - query: Free text over title and body. Also the search-before-submit path — the
+  ///     same ranking and the same page shape, so duplicates are caught while writing
+  ///     rather than in triage afterwards.
   public func listRequests(
-    sort: SortOrder = .recent,
-    status: RequestStatus? = nil,
-    limit: Int = 20,
-    cursor: String? = nil
-  ) async throws -> PaginatedRequests {
-    let response = try await underlyingClient.listRequests(
-      .init(query: .init(
-        sort: .init(rawValue: sort.rawValue),
-        status: status.flatMap { .init(rawValue: $0.rawValue) },
-        limit: limit,
-        cursor: cursor
-      ))
-    )
-
-    switch response {
-    case .ok(let ok):
-      let data = try ok.body.json
-      return PaginatedRequests(
-        requests: try data.data.map { try mapRequest($0) },
-        cursor: data.cursor,
-        hasMore: data.hasMore
-      )
-    case .unauthorized(let err):
-      throw try mapError(err.body.json)
-    case .undocumented(let statusCode, let payload):
-      throw mapUndocumented(statusCode: statusCode, payload)
+    statuses: [RequestStatus],
+    sort: RequestSort,
+    query: String?,
+    cursor: String?
+  ) async throws -> ListRequestsResponse {
+    var request = ListRequestsRequest()
+    request.statuses = statuses
+    request.sort = sort
+    if let query {
+      request.query = query
     }
+    if let cursor {
+      request.cursor = cursor
+    }
+    return try await call(.listRequests, request)
   }
 
-  /// Get a single feature request by ID.
-  public func getRequest(id: String) async throws -> Request {
-    let response = try await underlyingClient.getRequest(
-      .init(path: .init(requestId: id))
-    )
-
-    switch response {
-    case .ok(let ok):
-      return try mapRequest(try ok.body.json)
-    case .movedPermanently(let moved):
-      let data = try moved.body.json
-      throw DifferentRequestsError.merged(targetId: data.mergedIntoId)
-    case .unauthorized(let err):
-      throw try mapError(err.body.json)
-    case .notFound(let err):
-      throw try mapError(err.body.json)
-    case .undocumented(let statusCode, let payload):
-      throw mapUndocumented(statusCode: statusCode, payload)
-    }
+  public func getRequest(id: String) async throws -> GetRequestResponse {
+    var request = GetRequestRequest()
+    request.requestID = id
+    return try await call(.getRequest, request)
   }
 
-  /// Submit a new feature request. Requires authentication.
-  public func submitRequest(title: String, body: String) async throws -> Request {
-    guard sessionToken != nil else {
-      throw DifferentRequestsError.notAuthenticated
-    }
-
-    let response = try await underlyingClient.submitRequest(
-      .init(body: .json(.init(title: title, body: body)))
-    )
-
-    switch response {
-    case .created(let created):
-      return try mapRequest(try created.body.json)
-    case .badRequest(let err):
-      throw try mapError(err.body.json)
-    case .unauthorized(let err):
-      throw try mapError(err.body.json)
-    case .undocumented(let statusCode, let payload):
-      throw mapUndocumented(statusCode: statusCode, payload)
-    }
+  /// Submit a request. It comes back with the author's own vote already counted — asking
+  /// for something and then having to vote for it reads as a bug.
+  public func createRequest(title: String, body: String) async throws -> CreateRequestResponse {
+    var request = CreateRequestRequest()
+    request.title = title
+    request.body = body
+    return try await call(.createRequest, request)
   }
 
-  /// Search requests by title.
-  public func searchRequests(query: String, limit: Int = 10) async throws -> [Request] {
-    let response = try await underlyingClient.searchRequests(
-      .init(query: .init(q: query, limit: limit))
-    )
+  // MARK: - Votes and follows
 
-    switch response {
-    case .ok(let ok):
-      return try ok.body.json.map { try mapRequest($0) }
-    case .badRequest(let err):
-      throw try mapError(err.body.json)
-    case .unauthorized(let err):
-      throw try mapError(err.body.json)
-    case .undocumented(let statusCode, let payload):
-      throw mapUndocumented(statusCode: statusCode, payload)
-    }
+  /// Idempotent: voting twice is one vote. Returns the updated request so a list already on
+  /// screen can be reconciled without refetching it.
+  public func vote(requestID: String) async throws -> VoteResponse {
+    var request = VoteRequest()
+    request.requestID = requestID
+    return try await call(.vote, request)
   }
 
-  // MARK: - Voting
+  /// Idempotent: clearing a vote nobody cast succeeds.
+  public func clearVote(requestID: String) async throws -> ClearVoteResponse {
+    var request = ClearVoteRequest()
+    request.requestID = requestID
+    return try await call(.clearVote, request)
+  }
 
-  /// Vote on a feature request. Requires authentication.
-  public func vote(requestId: String, value: VoteValue) async throws -> VoteResult {
-    guard sessionToken != nil else {
-      throw DifferentRequestsError.notAuthenticated
-    }
+  /// Follow for updates without adding demand. Voting already follows implicitly.
+  public func follow(requestID: String) async throws -> FollowResponse {
+    var request = FollowRequest()
+    request.requestID = requestID
+    return try await call(.follow, request)
+  }
 
-    let response = try await underlyingClient.vote(
-      .init(
-        path: .init(requestId: requestId),
-        body: .json(.init(value: votePayload(value)))
-      )
-    )
-
-    switch response {
-    case .ok(let ok):
-      let data = try ok.body.json
-      let vote: Vote?
-      if let v = data.vote {
-        vote = Vote(
-          id: v.id,
-          requestId: v.requestId,
-          userId: v.userId,
-          value: v.value,
-          createdAt: try parseDate(v.createdAt)
-        )
-      } else {
-        vote = nil
-      }
-      return VoteResult(vote: vote, newScore: data.newScore)
-    case .unauthorized(let err):
-      throw try mapError(err.body.json)
-    case .notFound(let err):
-      throw try mapError(err.body.json)
-    case .undocumented(let statusCode, let payload):
-      throw mapUndocumented(statusCode: statusCode, payload)
-    }
+  public func unfollow(requestID: String) async throws -> UnfollowResponse {
+    var request = UnfollowRequest()
+    request.requestID = requestID
+    return try await call(.unfollow, request)
   }
 
   // MARK: - Comments
 
-  /// List comments on a feature request, oldest first.
+  /// Oldest first, always — a discussion read newest-first is unreadable, so there is no
+  /// sort to choose.
   public func listComments(
-    requestId: String,
-    limit: Int = 20,
-    cursor: String? = nil
-  ) async throws -> PaginatedComments {
-    let response = try await underlyingClient.listComments(
-      .init(
-        path: .init(requestId: requestId),
-        query: .init(limit: limit, cursor: cursor)
-      )
-    )
-
-    switch response {
-    case .ok(let ok):
-      let data = try ok.body.json
-      return PaginatedComments(
-        comments: try data.data.map { try mapComment($0) },
-        cursor: data.cursor,
-        hasMore: data.hasMore
-      )
-    case .unauthorized(let err):
-      throw try mapError(err.body.json)
-    case .notFound(let err):
-      throw try mapError(err.body.json)
-    case .undocumented(let statusCode, let payload):
-      throw mapUndocumented(statusCode: statusCode, payload)
+    requestID: String,
+    cursor: String?
+  ) async throws -> ListCommentsResponse {
+    var request = ListCommentsRequest()
+    request.requestID = requestID
+    if let cursor {
+      request.cursor = cursor
     }
+    return try await call(.listComments, request)
   }
 
-  /// Post a comment on a feature request. Requires authentication.
-  public func postComment(requestId: String, body: String) async throws -> Comment {
-    guard sessionToken != nil else {
-      throw DifferentRequestsError.notAuthenticated
-    }
-
-    let response = try await underlyingClient.postComment(
-      .init(
-        path: .init(requestId: requestId),
-        body: .json(.init(body: body))
-      )
-    )
-
-    switch response {
-    case .created(let created):
-      return try mapComment(try created.body.json)
-    case .badRequest(let err):
-      throw try mapError(err.body.json)
-    case .unauthorized(let err):
-      throw try mapError(err.body.json)
-    case .notFound(let err):
-      throw try mapError(err.body.json)
-    case .undocumented(let statusCode, let payload):
-      throw mapUndocumented(statusCode: statusCode, payload)
-    }
+  public func createComment(requestID: String, body: String) async throws -> CreateCommentResponse {
+    var request = CreateCommentRequest()
+    request.requestID = requestID
+    request.body = body
+    return try await call(.createComment, request)
   }
 
-  /// Delete a comment you authored. Requires authentication.
-  ///
-  /// There is no admin delete from the SDK — deleting another user's
-  /// comment throws ``DifferentRequestsError/forbidden(message:)``.
-  public func deleteComment(requestId: String, commentId: String) async throws {
-    guard sessionToken != nil else {
-      throw DifferentRequestsError.notAuthenticated
-    }
+  // MARK: - Notifications
 
-    let response = try await underlyingClient.deleteComment(
-      .init(path: .init(requestId: requestId, commentId: commentId))
-    )
-
-    switch response {
-    case .noContent:
-      return
-    case .unauthorized(let err):
-      throw try mapError(err.body.json)
-    case .forbidden(let err):
-      throw try mapError(err.body.json)
-    case .notFound(let err):
-      throw try mapError(err.body.json)
-    case .undocumented(let statusCode, let payload):
-      throw mapUndocumented(statusCode: statusCode, payload)
+  public func listNotifications(
+    cursor: String?
+  ) async throws -> ListNotificationsResponse {
+    var request = ListNotificationsRequest()
+    if let cursor {
+      request.cursor = cursor
     }
+    return try await call(.listNotifications, request)
+  }
+
+  /// The unread badge count. Prefer this over paging the inbox to count unread rows.
+  public func getUnreadCount() async throws -> GetUnreadCountResponse {
+    try await call(.getUnreadCount, GetUnreadCountRequest())
+  }
+
+  public func markNotificationRead(id: String) async throws -> MarkNotificationReadResponse {
+    var request = MarkNotificationReadRequest()
+    request.notificationID = id
+    return try await call(.markNotificationRead, request)
+  }
+
+  public func markAllNotificationsRead() async throws -> MarkAllNotificationsReadResponse {
+    try await call(.markAllNotificationsRead, MarkAllNotificationsReadRequest())
   }
 
   // MARK: - Devices
 
-  /// Register (or refresh) an APNs device token for the authenticated user. Requires authentication.
+  /// Register this device for push. Call on every launch: a token rotates on reinstall and
+  /// Apple can invalidate one silently, so this is an upsert rather than a one-time write.
   ///
-  /// Idempotent — calling this again with the same token is safe and will
-  /// not create a duplicate registration; a stale token is simply overwritten
-  /// on the next call with the current one.
+  /// This only submits the token. Ask for notification permission first — see
+  /// ``PushNotifications/requestPushAuthorization()`` — then pass the `Data` your app
+  /// receives in `application(_:didRegisterForRemoteNotificationsWithDeviceToken:)`.
   ///
-  /// This method only submits the token to the DifferentRequests backend. It
-  /// does not request notification permission or trigger APNs registration —
-  /// call ``PushNotifications/requestPushAuthorization()`` first, then pass
-  /// this method the `Data` your app receives in its own
-  /// `application(_:didRegisterForRemoteNotificationsWithDeviceToken:)`
-  /// delegate callback. The raw `Data` is converted to the lowercase-hex
-  /// string form APNs tokens are conventionally represented as before being
-  /// sent — callers do not need to do this conversion themselves.
-  ///
-  /// - Parameter tokenData: The raw device token `Data` handed to
-  ///   `application(_:didRegisterForRemoteNotificationsWithDeviceToken:)`.
-  /// - Returns: The stored registration record (token hash, not the raw token).
-  public func registerDevice(tokenData: Data) async throws -> Device {
-    guard sessionToken != nil else {
-      throw DifferentRequestsError.notAuthenticated
+  /// - Parameter environment: Which APNs environment minted the token. A sandbox token
+  ///   pushed to production fails per-token with no useful error, so the caller states it.
+  public func registerDevice(
+    tokenData: Data,
+    environment: PushEnvironment
+  ) async throws -> RegisterDeviceResponse {
+    var request = RegisterDeviceRequest()
+    request.token = Self.hexString(from: tokenData)
+    request.environment = environment
+    return try await call(.registerDevice, request)
+  }
+
+  /// Drop a device, e.g. on sign-out.
+  public func unregisterDevice(deviceID: String) async throws -> UnregisterDeviceResponse {
+    var request = UnregisterDeviceRequest()
+    request.deviceID = deviceID
+    return try await call(.unregisterDevice, request)
+  }
+
+  // MARK: - Public surfaces
+
+  /// The roadmap, as columns in display order. Pro plan; `AppConfig.roadmapEnabled` says
+  /// whether to offer it at all.
+  public func getRoadmap() async throws -> GetRoadmapResponse {
+    try await call(.getRoadmap, GetRoadmapRequest())
+  }
+
+  /// Published changelog entries, newest first. Pro plan; see `AppConfig.changelogEnabled`.
+  public func listChangelog(cursor: String?) async throws -> ListChangelogResponse {
+    var request = ListChangelogRequest()
+    if let cursor {
+      request.cursor = cursor
+    }
+    return try await call(.listChangelog, request)
+  }
+
+  // MARK: - Calling
+
+  /// Serialize, send, decode. The one place any of those three happen.
+  private func call<Response: Message>(
+    _ method: RequestsServiceMethod,
+    _ request: some Message
+  ) async throws -> Response {
+    if method.audience == .endUser, sessionToken == nil {
+      throw DifferentRequestsError.notAuthenticated(method)
     }
 
-    let response = try await underlyingClient.registerDevice(
-      .init(body: .json(.init(token: hexString(from: tokenData))))
+    let result = try await transport.send(
+      RPCCall(
+        method: method,
+        body: try request.serializedBytes(),
+        appKey: appKey,
+        sessionToken: sessionToken
+      ),
+      baseURL: baseURL
     )
 
-    switch response {
-    case .created(let created):
-      let data = try created.body.json
-      return Device(
-        tokenHash: data.tokenHash,
-        createdAt: try parseDate(data.createdAt),
-        updatedAt: try parseDate(data.updatedAt)
-      )
-    case .badRequest(let err):
-      throw try mapError(err.body.json)
-    case .unauthorized(let err):
-      throw try mapError(err.body.json)
-    case .undocumented(let statusCode, let payload):
-      throw mapUndocumented(statusCode: statusCode, payload)
-    }
-  }
-
-  /// Unregister a device token for the authenticated user (e.g. on sign-out). Requires authentication.
-  ///
-  /// A no-op if the token was never registered or was already unregistered —
-  /// this never throws `.notFound`.
-  ///
-  /// - Parameter tokenData: The same raw device token `Data` previously
-  ///   passed to ``registerDevice(tokenData:)``.
-  public func unregisterDevice(tokenData: Data) async throws {
-    guard sessionToken != nil else {
-      throw DifferentRequestsError.notAuthenticated
-    }
-
-    let response = try await underlyingClient.unregisterDevice(
-      .init(path: .init(token: hexString(from: tokenData)))
-    )
-
-    switch response {
-    case .noContent:
-      return
-    case .unauthorized(let err):
-      throw try mapError(err.body.json)
-    case .undocumented(let statusCode, let payload):
-      throw mapUndocumented(statusCode: statusCode, payload)
-    }
-  }
-
-
-  // MARK: - Following
-
-  /// Explicitly follow a feature request. Requires authentication.
-  ///
-  /// Following also happens automatically when you submit, vote (value != 0),
-  /// or comment on a request — call this only for an explicit follow toggle
-  /// the user requests independent of those actions.
-  public func follow(requestId: String) async throws {
-    guard sessionToken != nil else {
-      throw DifferentRequestsError.notAuthenticated
-    }
-
-    let response = try await underlyingClient.followRequest(
-      .init(path: .init(requestId: requestId))
-    )
-
-    switch response {
-    case .noContent:
-      return
-    case .unauthorized(let err):
-      throw try mapError(err.body.json)
-    case .notFound(let err):
-      throw try mapError(err.body.json)
-    case .undocumented(let statusCode, let payload):
-      throw mapUndocumented(statusCode: statusCode, payload)
-    }
-  }
-
-  /// Explicitly unfollow a feature request. Requires authentication.
-  public func unfollow(requestId: String) async throws {
-    guard sessionToken != nil else {
-      throw DifferentRequestsError.notAuthenticated
-    }
-
-    let response = try await underlyingClient.unfollowRequest(
-      .init(path: .init(requestId: requestId))
-    )
-
-    switch response {
-    case .noContent:
-      return
-    case .unauthorized(let err):
-      throw try mapError(err.body.json)
-    case .notFound(let err):
-      throw try mapError(err.body.json)
-    case .undocumented(let statusCode, let payload):
-      throw mapUndocumented(statusCode: statusCode, payload)
-    }
-  }
-
-  /// Get a feature request's follower count.
-  ///
-  /// Only the count is available — the SDK never exposes the raw list of
-  /// who follows a request.
-  public func followerCount(requestId: String) async throws -> Int {
-    let response = try await underlyingClient.getFollowerCount(
-      .init(path: .init(requestId: requestId))
-    )
-
-    switch response {
-    case .ok(let ok):
-      return try ok.body.json.count
-    case .notFound(let err):
-      throw try mapError(err.body.json)
-    case .undocumented(let statusCode, let payload):
-      throw mapUndocumented(statusCode: statusCode, payload)
-    }
-  }
-
-  /// List the current user's followed requests, most recently followed first. Requires authentication.
-  public func listFollowedRequests(
-    limit: Int = 20,
-    cursor: String? = nil
-  ) async throws -> PaginatedFollows {
-    guard sessionToken != nil else {
-      throw DifferentRequestsError.notAuthenticated
-    }
-
-    let response = try await underlyingClient.listMyFollows(
-      .init(query: .init(limit: limit, cursor: cursor))
-    )
-
-    switch response {
-    case .ok(let ok):
-      let data = try ok.body.json
-      return PaginatedFollows(
-        follows: try data.data.map { try mapFollow($0) },
-        cursor: data.cursor,
-        hasMore: data.hasMore
-      )
-    case .unauthorized(let err):
-      throw try mapError(err.body.json)
-    case .undocumented(let statusCode, let payload):
-      throw mapUndocumented(statusCode: statusCode, payload)
-    }
-  }
-
-
-  // MARK: - Notifications
-
-  /// List the authenticated user's in-app inbox, most recent first. Requires authentication.
-  ///
-  /// Populated by an async fan-out worker off status changes and new
-  /// comments on requests you follow — never written synchronously by
-  /// whatever triggered it, so expect a short, unspecified delay.
-  public func listNotifications(
-    limit: Int = 20,
-    cursor: String? = nil
-  ) async throws -> PaginatedNotifications {
-    guard sessionToken != nil else {
-      throw DifferentRequestsError.notAuthenticated
-    }
-
-    let response = try await underlyingClient.listMyNotifications(
-      .init(query: .init(limit: limit, cursor: cursor))
-    )
-
-    switch response {
-    case .ok(let ok):
-      let data = try ok.body.json
-      return PaginatedNotifications(
-        notifications: data.data.map { mapNotification($0) },
-        cursor: data.cursor,
-        hasMore: data.hasMore
-      )
-    case .unauthorized(let err):
-      throw try mapError(err.body.json)
-    case .undocumented(let statusCode, let payload):
-      throw mapUndocumented(statusCode: statusCode, payload)
-    }
-  }
-
-  /// Get the authenticated user's unread notification count, for a badge. Requires authentication.
-  ///
-  /// Prefer this over paginating ``listNotifications(limit:cursor:)`` just to count unread rows.
-  public func unreadNotificationCount() async throws -> Int {
-    guard sessionToken != nil else {
-      throw DifferentRequestsError.notAuthenticated
-    }
-
-    let response = try await underlyingClient.getUnreadNotificationCount(.init())
-
-    switch response {
-    case .ok(let ok):
-      return try ok.body.json.count
-    case .unauthorized(let err):
-      throw try mapError(err.body.json)
-    case .undocumented(let statusCode, let payload):
-      throw mapUndocumented(statusCode: statusCode, payload)
-    }
-  }
-
-  /// Mark one notification read. Requires authentication.
-  public func markNotificationRead(id: String) async throws -> AppNotification {
-    guard sessionToken != nil else {
-      throw DifferentRequestsError.notAuthenticated
-    }
-
-    let response = try await underlyingClient.markNotificationRead(
-      .init(path: .init(notificationId: id))
-    )
-
-    switch response {
-    case .ok(let ok):
-      return mapNotification(try ok.body.json)
-    case .unauthorized(let err):
-      throw try mapError(err.body.json)
-    case .notFound(let err):
-      throw try mapError(err.body.json)
-    case .undocumented(let statusCode, let payload):
-      throw mapUndocumented(statusCode: statusCode, payload)
-    }
-  }
-
-  // MARK: - Decline Reasons
-
-  /// List decline reasons configured for this app.
-  public func listDeclineReasons() async throws -> [DeclineReason] {
-    let response = try await underlyingClient.listDeclineReasons(.init())
-
-    switch response {
-    case .ok(let ok):
-      return try ok.body.json.map { reason in
-        DeclineReason(
-          id: reason.id,
-          appId: reason.appId,
-          label: reason.label,
-          isDefault: reason.isDefault,
-          createdAt: try parseDate(reason.createdAt)
-        )
+    if result.isSuccess {
+      do {
+        return try Response(serializedBytes: result.body)
+      } catch {
+        throw DifferentRequestsError.decodingFailed(method, underlying: error)
       }
-    case .unauthorized(let err):
-      throw try mapError(err.body.json)
-    case .undocumented(let statusCode, let payload):
-      throw mapUndocumented(statusCode: statusCode, payload)
-    }
-  }
-
-  // MARK: - Roadmap
-
-  /// List the app's public roadmap (Planned/In Progress/Shipped requests),
-  /// pinned-first then by manual order then most recent first. Pro plan only.
-  ///
-  /// Throws ``DifferentRequestsError/paymentRequired(message:)`` if the app's
-  /// plan does not include the roadmap.
-  public func listRoadmap() async throws -> [Request] {
-    let response = try await underlyingClient.listRoadmap(.init())
-
-    switch response {
-    case .ok(let ok):
-      return try ok.body.json.map { try mapRequest($0) }
-    case .unauthorized(let err):
-      throw try mapError(err.body.json)
-    case .code402(let err):
-      throw try mapError(err.body.json)
-    case .undocumented(let statusCode, let payload):
-      throw mapUndocumented(statusCode: statusCode, payload)
-    }
-  }
-
-  /// List the app's published changelog entries ("What's New"), most recent first. Pro only.
-  public func listChangelog(limit: Int = 20, cursor: String? = nil) async throws -> PaginatedChangelogEntries {
-    let response = try await underlyingClient.listChangelog(
-      .init(query: .init(limit: limit, cursor: cursor))
-    )
-
-    switch response {
-    case .ok(let ok):
-      let data = try ok.body.json
-      return PaginatedChangelogEntries(
-        entries: data.data.map { mapChangelogEntry($0) },
-        cursor: data.cursor,
-        hasMore: data.hasMore
-      )
-    case .unauthorized(let err):
-      throw try mapError(err.body.json)
-    case .code402(let err):
-      throw try mapError(err.body.json)
-    case .undocumented(let statusCode, let payload):
-      throw mapUndocumented(statusCode: statusCode, payload)
-    }
-  }
-
-  // MARK: - Private Helpers
-
-  private func mapChangelogEntry(_ e: Components.Schemas.ChangelogEntry) -> ChangelogEntry {
-    ChangelogEntry(
-      id: e.id,
-      title: e.title,
-      body: e.body,
-      requestIds: e.requestIds,
-      publishedAt: e.publishedAt,
-      createdAt: e.createdAt,
-      updatedAt: e.updatedAt
-    )
-  }
-
-  private func mapRequest(_ r: Components.Schemas.Request) throws -> Request {
-    guard let status = RequestStatus(rawValue: r.status.rawValue) else {
-      throw DifferentRequestsError.decodingError(message: "Unrecognized request status: \(r.status.rawValue)")
     }
 
-    guard let source = RequestSource(rawValue: r.source.rawValue) else {
-      throw DifferentRequestsError.decodingError(message: "Unrecognized request source: \(r.source.rawValue)")
+    // A failure body is an ApiError encoded exactly like a response. When it will not
+    // decode, there is nothing to branch on and saying so beats inventing a code.
+    guard let apiError = try? ApiError(serializedBytes: result.body) else {
+      throw DifferentRequestsError.unreadableError(byteCount: result.body.count)
     }
-
-    return Request(
-      id: r.id,
-      appId: r.appId,
-      authorId: r.authorId,
-      title: r.title,
-      body: r.body,
-      status: status,
-      source: source,
-      score: r.score,
-      myVote: r.myVote,
-      roadmapPinned: r.roadmapPinned,
-      roadmapOrder: r.roadmapOrder,
-      roadmapVisible: r.roadmapVisible,
-      mergedIntoId: r.mergedIntoId,
-      declineReason: r.declineReason,
-      declineReasonId: r.declineReasonId,
-      declineReasonLabel: r.declineReasonLabel,
-      authorDisplayName: r.authorDisplayName,
-      authorExternalUserId: r.authorExternalUserId,
-      authorAvatarUrl: r.authorAvatarUrl,
-      createdAt: try parseDate(r.createdAt),
-      updatedAt: try parseDate(r.updatedAt)
-    )
+    throw DifferentRequestsError.api(apiError)
   }
 
-  private func mapComment(_ c: Components.Schemas.Comment) throws -> Comment {
-    Comment(
-      id: c.id,
-      requestId: c.requestId,
-      appId: c.appId,
-      authorId: c.authorId,
-      authorDisplayName: c.authorDisplayName,
-      isOfficial: c.isOfficial,
-      body: c.body,
-      hidden: c.hidden,
-      createdAt: try parseDate(c.createdAt)
-    )
-  }
-
-  private func mapFollow(_ f: Components.Schemas.Follow) throws -> Follow {
-    Follow(
-      requestId: f.requestId,
-      userId: f.userId,
-      appId: f.appId,
-      createdAt: try parseDate(f.createdAt)
-    )
-  }
-
-  private func mapNotification(_ n: Components.Schemas.Notification) -> AppNotification {
-    let type: NotificationType
-    switch n._type {
-    case .status_change: type = .statusChange
-    case .comment: type = .comment
-    case .official_reply: type = .officialReply
-    case .changelog_published: type = .changelogPublished
-    }
-
-    return AppNotification(
-      id: n.id,
-      requestId: n.requestId,
-      type: type,
-      status: n.status,
-      commentId: n.commentId,
-      read: n.read,
-      createdAt: n.createdAt
-    )
-  }
-
-  private func votePayload(
-    _ value: VoteValue
-  ) -> Operations.vote.Input.Body.jsonPayload.valuePayload {
-    switch value {
-    case .upvote: return ._1
-    case .downvote: return ._n1
-    case .remove: return ._0
-    }
-  }
-
-  /// Convert a raw APNs device token to its conventional lowercase-hex string representation.
-  private func hexString(from data: Data) -> String {
+  /// APNs tokens are conventionally written as lowercase hex, so callers hand over the raw
+  /// `Data` and never do this themselves.
+  private static func hexString(from data: Data) -> String {
     data.map { byte in String(format: "%02x", byte) }.joined()
-  }
-
-  private func parseDate(_ string: String) throws -> Date {
-    let formatter = ISO8601DateFormatter()
-    formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-    if let date = formatter.date(from: string) {
-      return date
-    }
-    formatter.formatOptions = [.withInternetDateTime]
-    if let date = formatter.date(from: string) {
-      return date
-    }
-    throw DifferentRequestsError.decodingError(message: "Could not parse date: \(string)")
-  }
-
-  private func mapError(_ err: Components.Schemas.ApiError) -> DifferentRequestsError {
-    switch err.statusCode {
-    case 404:
-      return .notFound(message: err.message)
-    case 403:
-      return .forbidden(message: err.message)
-    case 402:
-      return .paymentRequired(message: err.message)
-    case 400:
-      return .validationError(message: err.message)
-    case 401:
-      return .notAuthenticated
-    default:
-      return .serverError(statusCode: err.statusCode, message: err.message)
-    }
-  }
-
-  /// Map a response the API contract doesn't document to a typed error. A 429
-  /// becomes `.rateLimited` (reading `Retry-After` when the server sends it) so
-  /// callers can back off; anything else is a generic server error.
-  private func mapUndocumented(
-    statusCode: Int,
-    _ payload: UndocumentedPayload
-  ) -> DifferentRequestsError {
-    if statusCode == 429 {
-      return .rateLimited(retryAfter: retryAfterSeconds(payload))
-    }
-    return .serverError(statusCode: statusCode, message: "Unexpected response")
-  }
-
-  private func retryAfterSeconds(_ payload: UndocumentedPayload) -> Int {
-    guard let name = HTTPField.Name("Retry-After"),
-          let raw = payload.headerFields[name],
-          let seconds = Int(raw) else {
-      return 0
-    }
-    return seconds
-  }
-
-}
-
-// MARK: - Auth Middleware
-
-package struct AuthMiddleware: ClientMiddleware, Sendable {
-  let apiKey: String
-  let sessionToken: String?
-
-  package func intercept(
-    _ request: HTTPRequest,
-    body: HTTPBody?,
-    baseURL: URL,
-    operationID: String,
-    next: @Sendable (HTTPRequest, HTTPBody?, URL) async throws -> (HTTPResponse, HTTPBody?)
-  ) async throws -> (HTTPResponse, HTTPBody?) {
-    var request = request
-    guard let appKeyName = HTTPField.Name("X-App-Key") else {
-      throw AuthMiddlewareError.invalidHeaderName
-    }
-    request.headerFields[appKeyName] = apiKey
-    if let token = sessionToken {
-      request.headerFields[.authorization] = "Bearer \(token)"
-    }
-    return try await next(request, body, baseURL)
   }
 }

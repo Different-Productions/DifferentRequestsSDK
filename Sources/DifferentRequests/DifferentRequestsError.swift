@@ -1,63 +1,65 @@
+import DifferentRequestsProtos
 import Foundation
 
 /// Errors thrown by the DifferentRequests SDK.
+///
+/// The server's half of this is `ApiError` from the contract, and ``api`` carries it
+/// through unflattened: `code` is what a caller branches on, and it is the same value the
+/// server sent rather than a re-derivation of it from an HTTP status.
 public enum DifferentRequestsError: Error, Sendable, LocalizedError {
-  /// The operation requires an authenticated user session.
-  /// Call ``DifferentRequestsClient/authenticate(externalUserId:displayName:avatarUrl:)`` first.
-  case notAuthenticated
+  /// The rpc requires an end-user session and none has been created. Raised before the
+  /// call is sent, from the audience the contract declares for it.
+  case notAuthenticated(RequestsServiceMethod)
 
-  /// The requested resource was not found.
-  case notFound(message: String)
+  /// The server answered with an error. `error.code` says which.
+  case api(ApiError)
 
-  /// The caller is authenticated but not permitted to perform this action
-  /// (e.g. deleting another user's comment).
-  case forbidden(message: String)
+  /// A failure response whose body was not a readable `ApiError`, so there is nothing to
+  /// branch on. Carries the bytes' length only — the content is not something a caller can
+  /// act on and may be an infrastructure page rather than anything of ours.
+  case unreadableError(byteCount: Int)
 
-  /// The app's plan does not include this feature (e.g. the roadmap requires
-  /// a Pro plan).
-  case paymentRequired(message: String)
+  /// The response body was not the message the rpc returns.
+  case decodingFailed(RequestsServiceMethod, underlying: any Error)
 
-  /// The request failed validation.
-  case validationError(message: String)
-
-  /// Too many requests. Wait before retrying.
-  case rateLimited(retryAfter: Int)
-
-  /// The server returned an unexpected error.
-  case serverError(statusCode: Int, message: String)
-
-  /// A network-level error occurred.
+  /// A network-level failure: no connection, timeout, TLS.
   case networkError(underlying: any Error)
 
-  /// The request was merged into another request.
-  case merged(targetId: String)
+  /// The response was not HTTP at all.
+  case notAnHTTPResponse
 
-  /// The server returned a value in a shape the SDK could not decode (e.g. an
-  /// unparseable timestamp).
-  case decodingError(message: String)
+  /// The configured base URL cannot have an rpc path resolved against it.
+  case invalidBaseURL(URL)
 
   public var errorDescription: String? {
     switch self {
-    case .notAuthenticated:
-      return "Not authenticated. Call authenticate() first."
-    case .notFound(let message):
-      return message
-    case .forbidden(let message):
-      return message
-    case .paymentRequired(let message):
-      return message
-    case .validationError(let message):
-      return message
-    case .rateLimited(let retryAfter):
-      return "Rate limited. Try again in \(retryAfter) seconds."
-    case .serverError(let statusCode, let message):
-      return "Server error (\(statusCode)): \(message)"
+    case .notAuthenticated(let method):
+      return "\(method.path) requires an end-user session. Call createSession first."
+    case .api(let error):
+      // The contract states this message is written for a developer reading a log, never
+      // for an end user, so it is surfaced here and not into UI copy.
+      return "\(error.code): \(error.message)"
+    case .unreadableError(let byteCount):
+      return "The server returned a failure with \(byteCount) bytes that were not an ApiError."
+    case .decodingFailed(let method, let underlying):
+      return "Could not decode the response to \(method.path): \(underlying.localizedDescription)"
     case .networkError(let underlying):
       return "Network error: \(underlying.localizedDescription)"
-    case .merged(let targetId):
-      return "This request was merged into \(targetId)."
-    case .decodingError(let message):
-      return message
+    case .notAnHTTPResponse:
+      return "The transport returned a non-HTTP response."
+    case .invalidBaseURL(let url):
+      return "Not a usable API base URL: \(url.absoluteString)"
     }
+  }
+
+  /// How long to wait before retrying, when the server said to wait.
+  ///
+  /// Reads the contract's own field. There is no `Retry-After` header in this protocol to
+  /// disagree with it.
+  public var retryAfterSeconds: Int? {
+    guard case .api(let error) = self, error.code == .rateLimited else {
+      return nil
+    }
+    return Int(error.retryAfterSeconds)
   }
 }
