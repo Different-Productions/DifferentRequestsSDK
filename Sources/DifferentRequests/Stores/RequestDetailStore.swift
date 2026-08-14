@@ -43,6 +43,14 @@ final class RequestDetailStore {
   /// The thread, oldest first — the order a discussion reads in.
   var thread: ReadState<[DRComment]> = .unread
 
+  /// Whether this app takes comments, and how far the asking got.
+  ///
+  /// Not a Pro gate: comments are free on every plan, and this is off when the tenant has chosen
+  /// not to moderate a discussion. The same question all the same — a composer under a thread that
+  /// does not take comments is a field whose Send has one possible answer, and whether that answer
+  /// is a refusal today is the server's to change without telling anyone.
+  var commenting: PlanState = .unread
+
   /// Whether there is another page of the thread, and what became of the last attempt at one.
   var page: PageState = .more
 
@@ -69,15 +77,21 @@ final class RequestDetailStore {
 
   // MARK: - Loading
 
-  /// Reads the request, then the first page of its thread.
+  /// Reads the request, then the first page of its thread, then whether this app takes comments.
   ///
   /// Returns immediately when either read is already running. What is held stays on screen for
   /// the length of the read: a pull-to-refresh runs on the list's own task, and a list cleared at
   /// the start of a read would take that task with it.
   ///
-  /// A request that cannot be read leaves the thread unread rather than failed. There is no
-  /// thread worth showing under a request nobody can see, and a second failure would only be a
-  /// second thing to say about the first.
+  /// A request that cannot be read leaves the thread unread rather than failed, and leaves the
+  /// question of commenting unasked. There is no thread worth showing under a request nobody can
+  /// see and nothing to comment on, and a second failure would only be a second thing to say about
+  /// the first.
+  ///
+  /// Commenting is asked about last because it is the last thing needed: the discussion is what
+  /// someone came here to read, and whether they may answer it matters at the moment they have
+  /// finished reading. It is usually free by then — the client answers it from the first read any
+  /// gated surface made.
   func load() async {
     if read.isReading || thread.isReading { return }
     read = read.whileReading
@@ -104,6 +118,26 @@ final class RequestDetailStore {
     } catch {
       thread = ReadState(readFailure: error)
       page = .done
+    }
+
+    await loadCommenting()
+  }
+
+  /// Asks whether this app takes comments.
+  ///
+  /// Its own method as well as part of ``load()``, because it is the retry behind the one failure
+  /// the composer's own slot can show. A reader who could not be told whether the discussion is
+  /// open is owed a way to ask again that does not re-read the request and the thread they are
+  /// already looking at.
+  func loadCommenting() async {
+    if commenting.needsReading == false { return }
+    commenting = .reading
+
+    do {
+      let answer = try await client.config()
+      commenting = PlanState(surface: .comments, response: answer)
+    } catch {
+      commenting = .failed(error)
     }
   }
 

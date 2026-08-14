@@ -41,11 +41,30 @@ public struct RoadmapView: View {
 
   // MARK: - Content
 
+  /// Whether this app has a roadmap is asked before anything is drawn, and answered on the screen
+  /// rather than by a read that would come back refused. An app without one is not a failure and
+  /// not an empty roadmap: it is a screen that says what is there instead.
+  @ViewBuilder
+  private var content: some View {
+    switch store.plan {
+    case .unread, .reading:
+      ProgressView()
+    case .failed:
+      LoadFailure {
+        await store.load()
+      }
+    case .excluded:
+      AbsentSurface(surface: .roadmap)
+    case .included:
+      columns
+    }
+  }
+
   /// Four outcomes, from one state. The list stays up through a refresh even while its columns
   /// are being replaced: a pull-to-refresh runs on the list's own task, and a list that
   /// disappears takes that task with it.
   @ViewBuilder
-  private var content: some View {
+  private var columns: some View {
     switch store.read {
     case .unread, .reading:
       ProgressView()
@@ -59,8 +78,8 @@ public struct RoadmapView: View {
       } description: {
         Text("Nothing has been planned publicly.")
       }
-    case .loaded(let columns), .refreshing(let columns):
-      list(columns)
+    case .loaded(let held), .refreshing(let held):
+      list(held)
     }
   }
 

@@ -22,6 +22,14 @@ public enum DifferentRequestsError: Error, Sendable, LocalizedError {
   /// The response body was not the message the rpc returns.
   case decodingFailed(DRRequestsServiceRPC, underlying: any Error)
 
+  /// The response was the message the rpc returns and left out the part it is made of — a
+  /// `GetConfigResponse` carrying no `AppConfig`.
+  ///
+  /// Its own case rather than a decode failure, because the bytes decoded. Its own case rather
+  /// than a default-shaped answer, because every flag on an absent message reads as `false`: a
+  /// server that said nothing would otherwise be read as a tenant who bought nothing.
+  case incompleteResponse(DRRequestsServiceRPC)
+
   /// A network-level failure: no connection, timeout, TLS.
   case networkError(underlying: any Error)
 
@@ -43,6 +51,8 @@ public enum DifferentRequestsError: Error, Sendable, LocalizedError {
       return "The server returned a failure with \(byteCount) bytes that were not an ApiError."
     case .decodingFailed(let method, let underlying):
       return "Could not decode the response to \(method.rawValue): \(underlying.localizedDescription)"
+    case .incompleteResponse(let method):
+      return "\(method.rawValue) answered without the message its answer is made of."
     case .networkError(let underlying):
       return "Network error: \(underlying.localizedDescription)"
     case .notAnHTTPResponse:

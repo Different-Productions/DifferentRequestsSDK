@@ -98,9 +98,17 @@ read-and-empty, read-and-here-it-is — and says so when a write does not land. 
 comment or a notification marked read that the server refuses puts a line on screen next to the
 control that was tapped. Nothing fails quietly.
 
-`RoadmapView` and `ChangelogView` are plan-gated. Read `client.config()` once at launch and offer
-them only where `roadmapEnabled` and `changelogEnabled` say so: a tab that answers `PLAN_REQUIRED`
-when tapped tells someone the app is broken when nothing is.
+`RoadmapView` and `ChangelogView` are plan-gated, and they gate themselves. Each asks
+`client.config()` before it reads anything, and an app whose plan does not include that surface gets
+a screen saying what is there instead — never a call that comes back `PLAN_REQUIRED`, which is an
+error written for you and not for the person holding the phone. The composer under a request does
+the same on `commentsEnabled`. `config()` is read once and remembered, so however many screens ask,
+it is one round trip.
+
+Hide the tab anyway where you can. Read `client.config()` at launch and build a tab only where
+`roadmapEnabled` and `changelogEnabled` say so: an absent tab is a better answer than a tab that
+explains itself. The SDK's own gate is the backstop for the ways a screen is reached that a tab bar
+does not cover — a deep link, a settings row, a tab built before the config arrived.
 
 ## Client API
 

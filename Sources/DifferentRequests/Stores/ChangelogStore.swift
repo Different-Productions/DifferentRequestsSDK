@@ -11,6 +11,10 @@ import Foundation
 /// Drafts never arrive here — presence of a published stamp is what makes an entry public, and
 /// that is decided by the server — so there is nothing to filter on the way in.
 ///
+/// Whether this app publishes release notes at all is asked first. `ListChangelog` is one of
+/// exactly two rpcs the server refuses on plan, and an app that does not have this surface would
+/// get a refusal written for its developer in place of a screen written for its reader.
+///
 /// Nothing is written from this surface, so there is no write state to hold.
 ///
 /// Main-actor isolated and observable.
@@ -24,6 +28,9 @@ final class ChangelogStore {
   let client: DifferentRequestsClient
 
   // MARK: - State
+
+  /// Whether this app publishes release notes, and how far the asking got.
+  var plan: PlanState = .unread
 
   /// The changelog itself: where its read got to, and the entries it found.
   var read: ReadState<[DRChangelogEntry]> = .unread
@@ -45,13 +52,41 @@ final class ChangelogStore {
 
   // MARK: - Loading
 
-  /// Reads the first page, replacing everything held.
+  /// Asks what this app includes, then reads the first page if it publishes release notes.
   ///
-  /// Returns immediately when a read is already running. What is held stays on screen for the
-  /// length of the read: a pull-to-refresh runs on the list's own task, and a list cleared at the
-  /// start of a read would take that task with it.
+  /// Returns immediately when a read is already running. Also the retry behind both failures the
+  /// screen can show: the configuration is asked for again when the last ask did not answer, and
+  /// asked for once when it did.
   func load() async {
     if read.isReading { return }
+
+    await readPlan()
+    if plan.isIncluded {
+      await readFirstPage()
+    }
+  }
+
+  /// Asks whether this app publishes release notes.
+  ///
+  /// The client answers a second ask from the first read, so the cost of every gated surface
+  /// asking for itself is one round trip for all of them.
+  private func readPlan() async {
+    if plan.needsReading == false { return }
+    plan = .reading
+
+    do {
+      let answer = try await client.config()
+      plan = PlanState(surface: .changelog, response: answer)
+    } catch {
+      plan = .failed(error)
+    }
+  }
+
+  /// Reads the first page, replacing everything held.
+  ///
+  /// What is held stays on screen for the length of the read: a pull-to-refresh runs on the list's
+  /// own task, and a list cleared at the start of a read would take that task with it.
+  private func readFirstPage() async {
     read = read.whileReading
     cursor = ""
     page = .more

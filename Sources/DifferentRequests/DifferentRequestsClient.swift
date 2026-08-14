@@ -28,6 +28,14 @@ public actor DifferentRequestsClient {
 
   private var sessionToken: String?
 
+  /// The last answer to ``config()``, kept for the rest of this client's life.
+  ///
+  /// Only a successful read lands here. A read that threw leaves this nil so that whoever asks
+  /// next reaches the server: a config read fails for the same reasons any read does, and a plan
+  /// remembered as unreadable would keep every gated surface shut for the whole launch over one
+  /// dropped connection.
+  private var configuration: DRGetConfigResponse?
+
   /// The signed-in person, once a session has been created.
   public private(set) var currentUser: DREndUser?
 
@@ -77,10 +85,26 @@ public actor DifferentRequestsClient {
 
   /// What this app offers and how it presents itself.
   ///
-  /// Fetch once per launch: which surfaces exist is a property of the tenant's plan, not something a
-  /// client should assume.
+  /// Read once and then remembered, so that asking is cheap enough to do from everywhere it
+  /// matters. Which surfaces exist is a property of the tenant's plan rather than something a
+  /// client may assume, and the screens that are gated on it ask for themselves — the roadmap,
+  /// the changelog, and the composer under a request. Without the cache that is three round trips
+  /// for one answer that cannot change between them, and the screens would go back to guessing to
+  /// avoid paying it.
+  ///
+  /// The contract states this is fetched once per launch, so a tenant who upgrades mid-session is
+  /// seen on the next one. That is the contract's decision, not an approximation of it.
+  ///
+  /// Two asks made before the first has answered both read. That costs one extra GET of a route
+  /// with no side effects, which is a cheaper thing to be wrong about than a lock held across a
+  /// network call.
   public func config() async throws -> DRGetConfigResponse {
-    try await get(.getConfig, query: [])
+    if let configuration {
+      return configuration
+    }
+    let answer: DRGetConfigResponse = try await get(.getConfig, query: [])
+    configuration = answer
+    return answer
   }
 
   /// Exchange your own identifier for this person for a session.

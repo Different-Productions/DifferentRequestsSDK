@@ -36,15 +36,19 @@ struct StoreReadTests {
     #expect(board.read.isReading == false)
     #expect(board.page.isDone, "a failed board still offering another page spins under its rows")
 
+    // The two plan-gated surfaces fail one step earlier: they ask what the app includes before
+    // they ask for themselves, so an unreachable server is answered by the plan rather than by a
+    // read that was never started. `PlanGatingTests` walks that leg; here it is asserted only so
+    // far as to say the failure did not go missing between the two states.
     let roadmap = RoadmapStore(client: client)
     await roadmap.load()
-    #expect(roadmap.read.failure != nil)
-    #expect(roadmap.read.hasRead)
+    #expect(roadmap.plan.failure != nil)
+    #expect(roadmap.read.hasRead == false)
 
     let changelog = ChangelogStore(client: client)
     await changelog.load()
-    #expect(changelog.read.failure != nil)
-    #expect(changelog.read.hasRead)
+    #expect(changelog.plan.failure != nil)
+    #expect(changelog.read.hasRead == false)
 
     let detail = RequestDetailStore(client: client, requestID: "r1")
     await detail.load()
