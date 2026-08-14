@@ -58,9 +58,11 @@ public struct SubmitRequestView: View {
           Text("Anything else?")
         }
 
-        if store.submitError != nil {
+        if let failure = store.write.failure {
           Section {
-            failureNotice
+            WriteFailureNotice(failure: failure) {
+              store.acknowledgeWriteFailure()
+            }
           }
         }
       }
@@ -89,17 +91,5 @@ public struct SubmitRequestView: View {
     await hub.fileRequest()
     if store.submitted == nil { return }
     dismiss()
-  }
-
-  /// The server's own message is written for whoever is debugging and may name internals, so it
-  /// is not what a reader is told.
-  private var failureNotice: some View {
-    Label {
-      Text("That didn't send. Try again in a moment.")
-    } icon: {
-      Image(systemName: "exclamationmark.triangle")
-    }
-    .font(.subheadline)
-    .foregroundStyle(.secondary)
   }
 }

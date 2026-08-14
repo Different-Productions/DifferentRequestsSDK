@@ -89,7 +89,14 @@ your app owns — that stack is what gives them a title bar, a search field, and
 - **`InboxView(hub:)`** — Status changes, replies and merges on what someone follows
 - **`SubmitRequestView(hub:)`** — The composer sheet, if you want your own way in to it. Call
   `hub.beginSubmission()` before presenting it
-- **`VoteControl(voteCount:voted:toggle:)`** — The vote button on its own, for your own rows
+- **`VoteControl(voteCount:voted:isWriting:toggle:)`** — The vote button on its own, for your own
+  rows. `isWriting` is what makes it go inert while a vote is in flight, instead of taking a tap
+  nothing comes of
+
+Every one of these screens draws its four outcomes from one state on its store — reading, failed,
+read-and-empty, read-and-here-it-is — and says so when a write does not land. A vote, a follow, a
+comment or a notification marked read that the server refuses puts a line on screen next to the
+control that was tapped. Nothing fails quietly.
 
 `RoadmapView` and `ChangelogView` are plan-gated. Read `client.config()` once at launch and offer
 them only where `roadmapEnabled` and `changelogEnabled` say so: a tab that answers `PLAN_REQUIRED`

@@ -52,6 +52,18 @@ public enum DifferentRequestsError: Error, Sendable, LocalizedError {
     }
   }
 
+  /// Whether the server said the thing being read is not there.
+  ///
+  /// Distinct from every other failure because it is an answer rather than an outage: a link to
+  /// a request that has since gone is not a connection to retry, and a surface that offers
+  /// "Try Again" for it sends someone to retry a read that will never succeed.
+  public var isNotFound: Bool {
+    guard case .api(let error) = self else {
+      return false
+    }
+    return error.code == .notFound
+  }
+
   /// How long to wait before retrying, when the server said to wait.
   ///
   /// Reads the contract's own field. There is no `Retry-After` header in this protocol to

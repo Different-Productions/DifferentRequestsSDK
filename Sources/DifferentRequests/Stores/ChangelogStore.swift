@@ -11,6 +11,8 @@ import Foundation
 /// Drafts never arrive here — presence of a published stamp is what makes an entry public, and
 /// that is decided by the server — so there is nothing to filter on the way in.
 ///
+/// Nothing is written from this surface, so there is no write state to hold.
+///
 /// Main-actor isolated and observable.
 @MainActor
 @Observable
@@ -23,24 +25,11 @@ final class ChangelogStore {
 
   // MARK: - State
 
-  /// Every entry loaded so far, in server order, with later pages appended.
-  var entries: [DRChangelogEntry] = []
+  /// The changelog itself: where its read got to, and the entries it found.
+  var read: ReadState<[DRChangelogEntry]> = .unread
 
-  /// `true` while the first page is being fetched.
-  var isLoading: Bool = false
-
-  /// `true` while a deeper page is being fetched.
-  var isLoadingMore: Bool = false
-
-  /// Whether the server reported another page. Starts `true` so the first `load()` is allowed.
-  var hasMore: Bool = true
-
-  /// Whether a first `load()` has finished, whether or not it succeeded. What separates "not
-  /// read yet" from "read, and nothing has been published".
-  var hasLoaded: Bool = false
-
-  /// The failure from the most recent page fetch, cleared when a fresh `load()` starts.
-  var loadError: Error?
+  /// Whether there is another page, and what became of the last attempt at one.
+  var page: PageState = .more
 
   // MARK: - Private state
 
@@ -56,47 +45,45 @@ final class ChangelogStore {
 
   // MARK: - Loading
 
-  /// Discards everything loaded and fetches the first page.
+  /// Reads the first page, replacing everything held.
   ///
-  /// Returns immediately when a first-page load is already running.
+  /// Returns immediately when a read is already running. What is held stays on screen for the
+  /// length of the read: a pull-to-refresh runs on the list's own task, and a list cleared at the
+  /// start of a read would take that task with it.
   func load() async {
-    if isLoading { return }
-    isLoading = true
-    loadError = nil
-    entries = []
+    if read.isReading { return }
+    read = read.whileReading
     cursor = ""
-    hasMore = true
-    defer {
-      isLoading = false
-      hasLoaded = true
+    page = .more
+
+    do {
+      let answer = try await client.changelog(cursor: nil)
+      read = ReadState(page: answer.entries)
+      cursor = answer.nextCursor
+      page = PageState(nextCursor: answer.nextCursor)
+    } catch {
+      read = ReadState(readFailure: error)
+      page = .done
     }
-    await fetchPage()
   }
 
   /// Appends the next page.
   ///
-  /// Returns immediately when the server reported no further page, or when a first-page load or
-  /// another append is already running.
+  /// Returns immediately when the server reported no further page, when one is already in flight,
+  /// or when the whole changelog is being re-read.
   func loadMore() async {
-    if !hasMore || isLoading || isLoadingMore { return }
-    isLoadingMore = true
-    defer { isLoadingMore = false }
-    await fetchPage()
-  }
+    if page.isReading || page.isDone { return }
+    if read.isReading { return }
+    page = .reading
 
-  /// Fetches one page at the current cursor, appends it, and advances the cursor.
-  ///
-  /// A failure publishes `loadError` and leaves the cursor where it was, so the same page is
-  /// retried rather than skipped.
-  private func fetchPage() async {
     do {
-      let requested: String? = cursor.isEmpty ? nil : cursor
-      let page = try await client.changelog(cursor: requested)
-      entries.append(contentsOf: page.entries)
-      cursor = page.nextCursor
-      hasMore = !page.nextCursor.isEmpty
+      let answer = try await client.changelog(cursor: cursor)
+      read = read.appending(answer.entries)
+      cursor = answer.nextCursor
+      page = PageState(nextCursor: answer.nextCursor)
     } catch {
-      loadError = error
+      // The cursor is left where it was, so the retry asks for this page rather than skipping it.
+      page = .failed(error)
     }
   }
 }

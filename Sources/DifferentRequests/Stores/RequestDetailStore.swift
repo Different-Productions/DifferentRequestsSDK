@@ -9,6 +9,10 @@ import Foundation
 /// deeper pages from `loadMore()`; only one page is in flight at a time, so a fast scroll
 /// cannot queue duplicate requests.
 ///
+/// Two reads rather than one, because they are two rpcs that fail apart: a request that arrives
+/// beside a thread that did not is still worth reading, and telling someone the whole screen is
+/// broken because the discussion under it would not load is a lie about what they can see.
+///
 /// Every write here answers with the request as the server now holds it, and that answer
 /// replaces what is held rather than being merged into it. A count adjusted locally is wrong
 /// from the moment anyone else votes.
@@ -28,40 +32,25 @@ final class RequestDetailStore {
 
   // MARK: - State
 
-  /// The request, once a read has answered. Kept across a refresh so the screen does not empty
-  /// while it reloads.
-  var request: DRFeatureRequest?
+  /// The request itself: where its read got to, and what it found.
+  ///
+  /// `empty` is a server that says there is no such request. Someone arrives here from a
+  /// notification kept overnight or a link pasted last month, and "it is not here any more" is a
+  /// different screen from "check your connection" — one of them has a Try Again on it that will
+  /// never work.
+  var read: ReadState<DRFeatureRequest> = .unread
 
-  /// The thread so far, oldest first — the order a discussion reads in — with later pages
-  /// appended.
-  var comments: [DRComment] = []
+  /// The thread, oldest first — the order a discussion reads in.
+  var thread: ReadState<[DRComment]> = .unread
+
+  /// Whether there is another page of the thread, and what became of the last attempt at one.
+  var page: PageState = .more
+
+  /// What the last vote, follow or comment is doing, or what it did instead.
+  var write: WriteState = .idle
 
   /// The comment being written, held here so what a reader typed survives a redraw.
   var draft: String = ""
-
-  /// `true` while the request and the first page of its thread are being fetched.
-  var isLoading: Bool = false
-
-  /// `true` while a deeper page of the thread is being fetched.
-  var isLoadingMore: Bool = false
-
-  /// Whether the server reported another page of the thread. Starts `true` so the first
-  /// `load()` is allowed.
-  var hasMore: Bool = true
-
-  /// Whether a first `load()` has finished, whether or not it succeeded. What separates "not
-  /// read yet" from "read, and this is all there is".
-  var hasLoaded: Bool = false
-
-  /// The failure from the most recent read, cleared when a fresh `load()` starts.
-  var loadError: Error?
-
-  /// `true` while a vote, a follow, or a comment is being written. One write at a time: two
-  /// votes racing would settle on whichever answer arrived last rather than on the last tap.
-  var isWriting: Bool = false
-
-  /// The failure from the most recent write, cleared when the next write starts.
-  var writeError: Error?
 
   // MARK: - Private state
 
@@ -80,57 +69,61 @@ final class RequestDetailStore {
 
   // MARK: - Loading
 
-  /// Reads the request and the first page of its thread.
+  /// Reads the request, then the first page of its thread.
   ///
-  /// Returns immediately when a read is already running.
+  /// Returns immediately when either read is already running. What is held stays on screen for
+  /// the length of the read: a pull-to-refresh runs on the list's own task, and a list cleared at
+  /// the start of a read would take that task with it.
+  ///
+  /// A request that cannot be read leaves the thread unread rather than failed. There is no
+  /// thread worth showing under a request nobody can see, and a second failure would only be a
+  /// second thing to say about the first.
   func load() async {
-    if isLoading { return }
-    isLoading = true
-    loadError = nil
-    comments = []
-    cursor = ""
-    hasMore = true
-    defer {
-      isLoading = false
-      hasLoaded = true
-    }
+    if read.isReading || thread.isReading { return }
+    read = read.whileReading
 
     do {
       let answer = try await client.request(id: requestID)
-      request = answer.request
+      read = .loaded(answer.request)
     } catch {
-      loadError = error
-      // No thread read: a request that cannot be read has no thread worth showing, and a
-      // second failure would only replace the one already published.
+      read = ReadState(readFailure: error)
+      thread = .unread
+      page = .done
       return
     }
-    await fetchPage()
+
+    thread = thread.whileReading
+    cursor = ""
+    page = .more
+
+    do {
+      let answer = try await client.comments(requestID: requestID, cursor: nil)
+      thread = ReadState(page: answer.comments)
+      cursor = answer.nextCursor
+      page = PageState(nextCursor: answer.nextCursor)
+    } catch {
+      thread = ReadState(readFailure: error)
+      page = .done
+    }
   }
 
   /// Appends the next page of the thread.
   ///
-  /// Returns immediately when the server reported no further page, or when a read or another
-  /// append is already running.
+  /// Returns immediately when the server reported no further page, when one is already in flight,
+  /// or when the screen is being re-read.
   func loadMore() async {
-    if !hasMore || isLoading || isLoadingMore { return }
-    isLoadingMore = true
-    defer { isLoadingMore = false }
-    await fetchPage()
-  }
+    if page.isReading || page.isDone { return }
+    if read.isReading || thread.isReading { return }
+    page = .reading
 
-  /// Fetches one page of the thread at the current cursor, appends it, and advances the cursor.
-  ///
-  /// A failure publishes `loadError` and leaves the cursor where it was, so the same page is
-  /// retried rather than skipped.
-  private func fetchPage() async {
     do {
-      let requested: String? = cursor.isEmpty ? nil : cursor
-      let page = try await client.comments(requestID: requestID, cursor: requested)
-      comments.append(contentsOf: page.comments)
-      cursor = page.nextCursor
-      hasMore = !page.nextCursor.isEmpty
+      let answer = try await client.comments(requestID: requestID, cursor: cursor)
+      thread = thread.appending(answer.comments)
+      cursor = answer.nextCursor
+      page = PageState(nextCursor: answer.nextCursor)
     } catch {
-      loadError = error
+      // The cursor is left where it was, so the retry asks for this page rather than skipping it.
+      page = .failed(error)
     }
   }
 
@@ -138,47 +131,59 @@ final class RequestDetailStore {
 
   /// Adds the caller's vote, or takes it back when it is already there.
   ///
-  /// Which of the two is decided from what is held before the call and never re-read
-  /// afterwards: the answer to a vote is the request the write returned, not a second guess at
-  /// what it should now say.
+  /// Which of the two is decided from what is held before the call and never re-read afterwards:
+  /// the answer to a vote is the request the write returned, not a second guess at what it should
+  /// now say.
   func toggleVote() async {
-    if isWriting { return }
-    guard let current = request else { return }
-    isWriting = true
-    writeError = nil
-    defer { isWriting = false }
+    if write.isWriting { return }
+    guard let current = read.content else { return }
+
+    let attempt: WriteAttempt
+    if current.viewer.voted {
+      attempt = .clearVote
+    } else {
+      attempt = .vote
+    }
+    write = .writing(attempt)
 
     do {
+      let written: DRFeatureRequest
       if current.viewer.voted {
-        let written = try await client.clearVote(requestID: requestID)
-        request = written.request
+        written = try await client.clearVote(requestID: requestID).request
       } else {
-        let written = try await client.vote(requestID: requestID)
-        request = written.request
+        written = try await client.vote(requestID: requestID).request
       }
+      read = read.holding(written)
+      write = .idle
     } catch {
-      writeError = error
+      write = .failed(WriteFailure(attempt: attempt, error: error))
     }
   }
 
   /// Starts or stops following, so status changes reach this reader without adding demand.
   func toggleFollow() async {
-    if isWriting { return }
-    guard let current = request else { return }
-    isWriting = true
-    writeError = nil
-    defer { isWriting = false }
+    if write.isWriting { return }
+    guard let current = read.content else { return }
+
+    let attempt: WriteAttempt
+    if current.viewer.isFollowing {
+      attempt = .unfollow
+    } else {
+      attempt = .follow
+    }
+    write = .writing(attempt)
 
     do {
+      let written: DRFeatureRequest
       if current.viewer.isFollowing {
-        let written = try await client.unfollow(requestID: requestID)
-        request = written.request
+        written = try await client.unfollow(requestID: requestID).request
       } else {
-        let written = try await client.follow(requestID: requestID)
-        request = written.request
+        written = try await client.follow(requestID: requestID).request
       }
+      read = read.holding(written)
+      write = .idle
     } catch {
-      writeError = error
+      write = .failed(WriteFailure(attempt: attempt, error: error))
     }
   }
 
@@ -194,22 +199,32 @@ final class RequestDetailStore {
   /// read oldest first, so appending to a partly read one would put the new comment ahead of
   /// comments not yet fetched; left alone, it arrives in its own place when the reader pages to
   /// the end.
+  ///
+  /// A failure leaves the draft exactly as typed. The message says to send it again, and there
+  /// has to be something to send.
   func postComment() async {
-    if isWriting { return }
+    if write.isWriting { return }
     let body = draft.trimmingCharacters(in: .whitespacesAndNewlines)
     if body.isEmpty { return }
-    isWriting = true
-    writeError = nil
-    defer { isWriting = false }
+    write = .writing(.comment)
 
     do {
       let written = try await client.comment(requestID: requestID, body: body)
       draft = ""
-      if hasMore == false {
-        comments.append(written.comment)
+      if page.isDone {
+        thread = thread.appending([written.comment])
       }
+      write = .idle
     } catch {
-      writeError = error
+      write = .failed(WriteFailure(attempt: .comment, error: error))
     }
+  }
+
+  /// Puts away the notice about the last failed write.
+  ///
+  /// Acknowledgement, not repair: nothing landed, and every control that starts one of these is
+  /// on screen either way.
+  func acknowledgeWriteFailure() {
+    write = .idle
   }
 }

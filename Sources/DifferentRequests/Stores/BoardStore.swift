@@ -13,6 +13,11 @@ import Foundation
 /// change is a new store with its own pagination instead of a cursor pointing into a
 /// different query's results.
 ///
+/// Three states, one per thing that can be happening: the board is being read, a further page is
+/// being read, a vote is being written. They are separate values because they are true at the
+/// same time — a vote is cast on a board that is already loaded, and folding the two together
+/// would mean a failed vote erasing the list it was cast on.
+///
 /// Main-actor isolated and observable.
 @MainActor
 @Observable
@@ -31,8 +36,14 @@ final class BoardStore {
 
   // MARK: - State
 
-  /// Every request loaded so far, in server order, with later pages appended.
-  var requests: [DRFeatureRequest] = []
+  /// The board itself: where its read got to, and the requests it found.
+  var read: ReadState<[DRFeatureRequest]> = .unread
+
+  /// Whether there is another page, and what became of the last attempt at one.
+  var page: PageState = .more
+
+  /// What the last vote is doing, or what it did instead.
+  var write: WriteState = .idle
 
   /// Free text over title and body, empty for the whole board.
   ///
@@ -42,30 +53,6 @@ final class BoardStore {
   /// address the results of another query.
   var query: String = ""
 
-  /// `true` while the first page is being fetched.
-  var isLoading: Bool = false
-
-  /// `true` while a deeper page is being fetched.
-  var isLoadingMore: Bool = false
-
-  /// Whether the server reported another page. Starts `true` so the first `load()` is
-  /// allowed.
-  var hasMore: Bool = true
-
-  /// Whether a first `load()` has finished, whether or not it succeeded. What separates "not
-  /// read yet" from "read, and the board is empty".
-  var hasLoaded: Bool = false
-
-  /// The failure from the most recent page fetch, cleared when a fresh `load()` starts.
-  var loadError: Error?
-
-  /// `true` while a vote is being written. One at a time: two votes racing would settle on
-  /// whichever answer arrived last rather than on the last tap.
-  var isWriting: Bool = false
-
-  /// The failure from the most recent write, cleared when the next write starts.
-  var writeError: Error?
-
   // MARK: - Derived
 
   /// Whether what is held is the answer to what the search field now says.
@@ -74,7 +61,7 @@ final class BoardStore {
   /// whenever anything above it redraws. Reading this before reloading is what stops that from
   /// discarding every page after the first, and the reader's place in them with it.
   var isShowingQuery: Bool {
-    hasLoaded && query == loadedQuery
+    read.hasRead && query == loadedQuery
   }
 
   // MARK: - Private state
@@ -106,60 +93,71 @@ final class BoardStore {
 
   // MARK: - Loading
 
-  /// Discards everything loaded and fetches the first page for whatever ``query`` now says.
+  /// Reads the first page for whatever ``query`` now says, replacing everything held.
   ///
   /// Returns immediately when a read is already running — and that read finishes the job, because
   /// it reads again for any query typed while it was suspended. Returning without that, a search
   /// entered while the first page was still in flight would be dropped and stay dropped: this
   /// store outlives the screen that asked, so nothing rebuilds it and asks again.
+  ///
+  /// What is already held stays held for the length of the read. It is replaced by the answer
+  /// rather than cleared before the question, so a pull-to-refresh does not take away the list
+  /// that is running it.
   func load() async {
-    if isLoading { return }
-    isLoading = true
-    defer {
-      isLoading = false
-      hasLoaded = true
-    }
+    if read.isReading { return }
 
     repeat {
+      read = read.whileReading
       loadedQuery = query
-      loadError = nil
-      requests = []
       cursor = ""
-      hasMore = true
-      await fetchPage()
+      page = .more
+      await readFirstPage()
     } while loadedQuery != query
   }
 
   /// Appends the next page.
   ///
-  /// Returns immediately when the server reported no further page, or when a first-page load
-  /// or another append is already running.
+  /// Returns immediately when the server reported no further page, when one is already in flight,
+  /// or when the whole board is being re-read. A page that failed is not one of those: the retry
+  /// under the last row is how it is asked for again.
   func loadMore() async {
-    if !hasMore || isLoading || isLoadingMore { return }
-    isLoadingMore = true
-    defer { isLoadingMore = false }
-    await fetchPage()
+    if page.isReading || page.isDone { return }
+    if read.isReading { return }
+    page = .reading
+
+    do {
+      let answer = try await fetch(cursor: cursor)
+      read = read.appending(answer.requests)
+      cursor = answer.nextCursor
+      page = PageState(nextCursor: answer.nextCursor)
+    } catch {
+      // The cursor is left where it was, so the retry asks for this page rather than skipping it.
+      page = .failed(error)
+    }
   }
 
-  /// Fetches one page at the current cursor, appends it, and advances the cursor.
-  ///
-  /// A failure publishes `loadError` and leaves the cursor where it was, so the same page is
-  /// retried rather than skipped.
-  private func fetchPage() async {
+  /// Reads page one and replaces the board with it.
+  private func readFirstPage() async {
     do {
-      let requested: String? = cursor.isEmpty ? nil : cursor
-      let page = try await client.requests(
-        statuses: statuses,
-        sort: sort,
-        query: query,
-        cursor: requested
-      )
-      requests.append(contentsOf: page.requests)
-      cursor = page.nextCursor
-      hasMore = !page.nextCursor.isEmpty
+      let answer = try await fetch(cursor: "")
+      read = ReadState(page: answer.requests)
+      cursor = answer.nextCursor
+      page = PageState(nextCursor: answer.nextCursor)
     } catch {
-      loadError = error
+      read = ReadState(readFailure: error)
+      page = .done
     }
+  }
+
+  /// One page at `cursor`, or the first when it is empty.
+  private func fetch(cursor: String) async throws -> DRListRequestsResponse {
+    let requested: String? = cursor.isEmpty ? nil : cursor
+    return try await client.requests(
+      statuses: statuses,
+      sort: sort,
+      query: query,
+      cursor: requested
+    )
   }
 
   // MARK: - Writes
@@ -168,18 +166,21 @@ final class BoardStore {
   ///
   /// Which of the two is decided from the row as it is held before the call. The row is then
   /// found again by id after the write answers, rather than by an index taken before it: a
-  /// `load()` can replace the whole array while the call is suspended, and an index from before
-  /// the suspension would address a different request or run past the end. A row that is gone by
-  /// then is left gone — the vote landed, and the next page it appears in will say so.
+  /// `load()` can replace the whole board while the call is suspended.
   ///
   /// What the write returned replaces the row whole. A count incremented locally is wrong the
   /// moment anyone else votes.
   func toggleVote(requestID: String) async {
-    if isWriting { return }
-    guard let current = requests.first(where: { $0.id == requestID }) else { return }
-    isWriting = true
-    writeError = nil
-    defer { isWriting = false }
+    if write.isWriting { return }
+    guard let current = read.held.first(where: { $0.id == requestID }) else { return }
+
+    let attempt: WriteAttempt
+    if current.viewer.voted {
+      attempt = .clearVote
+    } else {
+      attempt = .vote
+    }
+    write = .writing(attempt)
 
     do {
       let written: DRFeatureRequest
@@ -188,11 +189,18 @@ final class BoardStore {
       } else {
         written = try await client.vote(requestID: requestID).request
       }
-      if let index = requests.firstIndex(where: { $0.id == written.id }) {
-        requests[index] = written
-      }
+      read = read.replacing(written, identifiedBy: { $0.id })
+      write = .idle
     } catch {
-      writeError = error
+      write = .failed(WriteFailure(attempt: attempt, error: error))
     }
+  }
+
+  /// Puts away the notice about the last failed vote.
+  ///
+  /// Acknowledgement, not repair: the vote still did not land, and the control that casts it is
+  /// on screen either way.
+  func acknowledgeWriteFailure() {
+    write = .idle
   }
 }

@@ -12,7 +12,8 @@ import SwiftUI
 /// ```
 ///
 /// A merged request answers here rather than 404ing, and says where the vote went — someone
-/// holding a link to it is owed that instead of a dead end.
+/// holding a link to it is owed that instead of a dead end. A request that has actually gone says
+/// so, which is a different screen from one that could not be reached: there is nothing to retry.
 ///
 /// The hub hands back the same store for the same request every time, so a screen pushed from a
 /// board that redraws keeps its thread, its place in it, and the comment being written.
@@ -39,23 +40,33 @@ public struct RequestDetailView: View {
   public var body: some View {
     content
       .navigationTitle("Request")
-      .firstRead(hasLoaded: store.hasLoaded) {
+      .firstRead(store.read) {
         await store.load()
       }
   }
 
   // MARK: - Content
 
+  /// Four outcomes, from one state. "Gone" and "unreachable" are two of them and not one: a
+  /// request the server says is not there gets no Try Again, because there is nothing on the
+  /// other side of it to try again for.
   @ViewBuilder
   private var content: some View {
-    if store.hasLoaded == false {
+    switch store.read {
+    case .unread, .reading:
       ProgressView()
-    } else if let request = store.request {
-      loaded(request)
-    } else {
+    case .failed:
       LoadFailure {
         await store.load()
       }
+    case .empty:
+      ContentUnavailableView {
+        Label("This request is gone", systemImage: "questionmark.folder")
+      } description: {
+        Text("It was removed, or the link that got you here is out of date.")
+      }
+    case .loaded(let request), .refreshing(let request):
+      loaded(request)
     }
   }
 
@@ -83,7 +94,7 @@ public struct RequestDetailView: View {
       CommentComposer(
         draft: $store.draft,
         canSend: store.canPostComment,
-        isWriting: store.isWriting
+        isWriting: store.write.isWriting
       ) {
         await store.postComment()
       }
@@ -129,13 +140,25 @@ public struct RequestDetailView: View {
       }
 
       HStack(spacing: Self.actionSpacing) {
-        VoteControl(voteCount: Int(request.voteCount), voted: request.viewer.voted) {
+        VoteControl(
+          voteCount: Int(request.voteCount),
+          voted: request.viewer.voted,
+          isWriting: store.write.isWriting
+        ) {
           await store.toggleVote()
         }
 
         followButton(request)
 
         Spacer()
+      }
+
+      // Directly under the two controls that write, which is where whoever tapped one is
+      // looking. Every write on this screen — vote, follow, comment — reports here.
+      if let failure = store.write.failure {
+        WriteFailureNotice(failure: failure) {
+          store.acknowledgeWriteFailure()
+        }
       }
     }
   }
@@ -186,6 +209,7 @@ public struct RequestDetailView: View {
       .font(.subheadline)
     }
     .buttonStyle(.bordered)
+    .disabled(store.write.isWriting)
   }
 
   /// The contract says an author is absent for a deleted account and that this is normal, so it
@@ -199,23 +223,33 @@ public struct RequestDetailView: View {
 
   // MARK: - The thread
 
+  /// Four outcomes again, on the read that is not the request's. A discussion that could not be
+  /// read says so and offers to try again; one that is genuinely empty says that instead. Drawn
+  /// as one thing they are blank space under a heading that says "Discussion", which reads as a
+  /// request nobody has replied to whichever of the two is true.
   @ViewBuilder
   private var thread: some View {
-    if store.comments.isEmpty, store.hasMore == false {
+    switch store.thread {
+    case .unread, .reading:
+      ProgressView()
+        .frame(maxWidth: .infinity)
+    case .failed:
+      RetryRow(message: "Couldn't load the discussion.") {
+        await store.load()
+      }
+    case .empty:
       Text("No comments yet.")
         .font(.subheadline)
         .foregroundStyle(.secondary)
-    } else {
-      ForEach(store.comments, id: \.id) { comment in
+    case .loaded(let comments), .refreshing(let comments):
+      ForEach(comments, id: \.id) { comment in
         CommentRow(comment: comment)
       }
 
-      if store.hasMore {
-        ProgressView()
-          .frame(maxWidth: .infinity)
-          .task {
-            await store.loadMore()
-          }
+      if store.page.isDone == false {
+        NextPageRow(state: store.page) {
+          await store.loadMore()
+        }
       }
     }
   }

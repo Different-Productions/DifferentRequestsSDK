@@ -117,7 +117,7 @@ in the scheme, or it never signs in and never reaches the board at all.
 | --- | --- |
 | Title is empty, or only spaces and newlines | **Submit** is greyed out and does nothing. No error text — nothing has been attempted |
 | The write is in flight | **Submit** is greyed out for the duration; a second tap cannot file a second request |
-| No end-user session exists (`createSession` was never called) | "That didn't send. Try again in a moment." The thrown `DifferentRequestsError.notAuthenticated(.createRequest)` never reaches the network, and reaches the developer through `SubmitStore.submitError` |
+| No end-user session exists (`createSession` was never called) | "That didn't send. Try again in a moment." The thrown `DifferentRequestsError.notAuthenticated(.createRequest)` never reaches the network, and reaches the developer through `SubmitStore.write.failure?.error` |
 | The server refuses — plan required, rate limited, anything with a `DRApiError` | "That didn't send. Try again in a moment." The server's own message is written for whoever is debugging and may name internals, so it is not shown |
 | The network is unreachable or times out | "That didn't send. Try again in a moment." |
 | Any failure at all while sending | The sheet stays up with the title and detail exactly as typed. Dismissing on a failure would throw the words away |
@@ -144,7 +144,7 @@ Host app (composition root, built once and held)
     body
      ├── .searchable(text: $store.query) ──► BoardStore.query
      ├── .toolbar { primaryAction: askButton.labelStyle(.iconOnly) }    ── always present
-     ├── .firstRead(hasLoaded:)  ──► FirstRead.swift ──► BoardStore.load()   once per store
+     ├── .firstRead(store.read)  ──► FirstRead.swift ──► BoardStore.load()   once per store
      ├── .task(id: store.query)  ──► runSearch()
      │        ├── store.isShowingQuery == true  ──► return   (a redraw is not a search)
      │        ├── query non-empty ──► Task.sleep(300ms)      (cancelled by the next keystroke)
@@ -159,7 +159,7 @@ Host app (composition root, built once and held)
         │
         ├──► DifferentRequestsHub.beginSubmission()
         │        └──► SubmitStore.begin(title: board.query)
-        │                 title = query · body = "" · submitted = nil · submitError = nil
+        │                 title = query · body = "" · submitted = nil · write = .idle
         └──► isComposing = true            (the view's only job: navigation)
 
   SubmitRequestView.swift
@@ -167,8 +167,8 @@ Host app (composition root, built once and held)
     Form
      ├── TextField("Title",  text: $store.title)
      ├── TextField("Detail", text: $store.body)
-     ├── if store.submitError != nil ──► failureNotice
-     │        "That didn't send. Try again in a moment."
+     ├── if let failure = store.write.failure ──► WriteFailureNotice.swift
+     │        "That didn't send. Try again in a moment."  + Dismiss
      └── toolbar
           ├── Cancel ──► dismiss()
           └── AsyncButton(Submit).disabled(store.canSubmit == false)
@@ -177,7 +177,7 @@ Host app (composition root, built once and held)
                         ▼
                   send()  ──► DifferentRequestsHub.fileRequest()
                                  ├── SubmitStore.submit()
-                                 │      guard !isSubmitting · trim title · guard non-empty
+                                 │      guard !write.isWriting · trim title · guard non-empty
                                  │      └──► DifferentRequestsClient.submit(title:body:)
                                  │             └──► perform(.createRequest, body:)
                                  │                    ├── rpc.audience == .endUser && no token
@@ -186,7 +186,8 @@ Host app (composition root, built once and held)
                                  │                    ├── non-2xx ──► throw .api(DRApiError)
                                  │                    └── 2xx ──► DRCreateRequestResponse
                                  │      success ──► submitted = written.request
-                                 │      failure ──► submitError = error   (sheet stays up)
+                                 │      failure ──► write = .failed(WriteFailure(.fileRequest,
+                                 │                                              error))  (sheet stays up)
                                  └── submitted == nil ? return : BoardStore.load()
                         │
                         ▼
@@ -220,7 +221,7 @@ DifferentRequestsView — loaded, nothing searched
 │  74   …                                      │
 │       [Open]                    last week    │
 │ ─────────────────────────────────────────── │
-│              ( spinner )                     │ ← only while hasMore; pages on appear
+│              ( spinner )                     │ ← NextPageRow, while page is not .done
 │ ─────────────────────────────────────────── │
 │        ┌────────────────────────────┐        │
 │        │ ⊕  Ask for a feature       │        │ ← end of list, every state

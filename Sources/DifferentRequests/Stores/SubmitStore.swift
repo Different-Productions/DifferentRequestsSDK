@@ -11,6 +11,8 @@ import Foundation
 /// dismissed and re-presented, and a store rebuilt alongside it would be a draft lost to a
 /// redraw.
 ///
+/// Nothing is read from this surface, so there is no read state to hold — only the write.
+///
 /// Main-actor isolated and observable.
 @MainActor
 @Observable
@@ -29,15 +31,12 @@ final class SubmitStore {
   /// The detail, which the server accepts empty.
   var body: String = ""
 
-  /// `true` while the request is being written.
-  var isSubmitting: Bool = false
+  /// What the filing is doing, or what it did instead.
+  var write: WriteState = .idle
 
   /// What the server filed, once it has answered. It arrives with the author's own vote already
   /// counted, and its presence is what tells a presenter the sheet is done.
   var submitted: DRFeatureRequest?
-
-  /// The failure from the most recent attempt, cleared when the next one starts.
-  var submitError: Error?
 
   // MARK: - Init
 
@@ -61,7 +60,7 @@ final class SubmitStore {
     self.title = title
     body = ""
     submitted = nil
-    submitError = nil
+    write = .idle
   }
 
   /// Whether there is enough to file. A blank title is refused by the server, so it is refused
@@ -75,12 +74,10 @@ final class SubmitStore {
   /// Returns immediately when a write is already running: a second tap on a slow network would
   /// otherwise file the duplicate this whole flow exists to prevent.
   func submit() async {
-    if isSubmitting { return }
+    if write.isWriting { return }
     let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
     if trimmedTitle.isEmpty { return }
-    isSubmitting = true
-    submitError = nil
-    defer { isSubmitting = false }
+    write = .writing(.fileRequest)
 
     do {
       let written = try await client.submit(
@@ -88,8 +85,17 @@ final class SubmitStore {
         body: body.trimmingCharacters(in: .whitespacesAndNewlines)
       )
       submitted = written.request
+      write = .idle
     } catch {
-      submitError = error
+      write = .failed(WriteFailure(attempt: .fileRequest, error: error))
     }
+  }
+
+  /// Puts away the notice about the last failed filing.
+  ///
+  /// Acknowledgement, not repair: nothing was filed, and Submit is still in the bar with
+  /// everything typed still under it.
+  func acknowledgeWriteFailure() {
+    write = .idle
   }
 }

@@ -55,7 +55,7 @@ public struct DifferentRequestsView: View {
             .labelStyle(.iconOnly)
         }
       }
-      .firstRead(hasLoaded: store.hasLoaded) {
+      .firstRead(store.read) {
         await store.load()
       }
       .task(id: store.query) {
@@ -90,21 +90,23 @@ public struct DifferentRequestsView: View {
 
   // MARK: - Content
 
-  /// The list stays up while a read is in flight even with nothing in it, and not only because an
-  /// empty state that flashes on every refresh is noise: a pull-to-refresh runs on the list's own
-  /// task, and a page cleared at the start of a read would take the list — and the read with it.
+  /// Four outcomes, from one state. A board that has read and found nothing looks nothing like
+  /// one still reading, and the list stays up through a refresh even while its rows are being
+  /// replaced — a pull-to-refresh runs on the list's own task, and a list that disappears takes
+  /// that task with it.
   @ViewBuilder
   private var content: some View {
-    if store.hasLoaded == false {
+    switch store.read {
+    case .unread, .reading:
       ProgressView()
-    } else if store.requests.isEmpty == false || store.isLoading {
-      list
-    } else if store.loadError != nil {
+    case .failed:
       LoadFailure {
         await store.load()
       }
-    } else {
+    case .empty:
       empty
+    case .loaded(let requests), .refreshing(let requests):
+      list(requests)
     }
   }
 
@@ -132,14 +134,24 @@ public struct DifferentRequestsView: View {
     }
   }
 
-  private var list: some View {
+  private func list(_ requests: [DRFeatureRequest]) -> some View {
     List {
-      ForEach(store.requests, id: \.id) { request in
+      if let failure = store.write.failure {
+        Section {
+          WriteFailureNotice(failure: failure) {
+            store.acknowledgeWriteFailure()
+          }
+        }
+      }
+
+      ForEach(requests, id: \.id) { request in
         row(request)
       }
 
-      if store.hasMore {
-        loadMoreRow
+      if store.page.isDone == false {
+        NextPageRow(state: store.page) {
+          await store.loadMore()
+        }
       }
 
       Section {
@@ -159,9 +171,18 @@ public struct DifferentRequestsView: View {
   /// The vote control sits beside the link rather than inside its label: a button inside a
   /// `NavigationLink` label never receives the tap, so a vote there would push the detail
   /// instead.
+  ///
+  /// Every control on the board goes inert while any one of them is writing, because the store
+  /// takes one vote at a time. Without that, a tap on a second row during the first row's round
+  /// trip is refused by the store and nothing at all happens on screen — the same silence this
+  /// surface exists to stop.
   private func row(_ request: DRFeatureRequest) -> some View {
     HStack(alignment: .top, spacing: Self.rowSpacing) {
-      VoteControl(voteCount: Int(request.voteCount), voted: request.viewer.voted) {
+      VoteControl(
+        voteCount: Int(request.voteCount),
+        voted: request.viewer.voted,
+        isWriting: store.write.isWriting
+      ) {
         await store.toggleVote(requestID: request.id)
       }
 
@@ -171,15 +192,6 @@ public struct DifferentRequestsView: View {
         RequestSummary(request: request)
       }
     }
-  }
-
-  /// Appears under the last row, and pages when it does.
-  private var loadMoreRow: some View {
-    ProgressView()
-      .frame(maxWidth: .infinity)
-      .task {
-        await store.loadMore()
-      }
   }
 
   /// The way in to the composer: in the bar, and again under the list.

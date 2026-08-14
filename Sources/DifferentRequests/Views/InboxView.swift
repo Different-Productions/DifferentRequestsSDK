@@ -39,50 +39,58 @@ public struct InboxView: View {
             } label: {
               Text("Read All")
             }
+            .disabled(store.write.isWriting)
           }
         }
       }
-      .firstRead(hasLoaded: store.hasLoaded) {
+      .firstRead(store.read) {
         await store.load()
       }
   }
 
   // MARK: - Content
 
-  /// The list stays up while a read is in flight even with nothing in it: a pull-to-refresh runs on
-  /// the list's own task, and a page cleared at the start of a read would take the list — and the
-  /// read with it.
+  /// Four outcomes, from one state. The list stays up through a refresh even while its rows are
+  /// being replaced: a pull-to-refresh runs on the list's own task, and a list that disappears
+  /// takes that task with it.
   @ViewBuilder
   private var content: some View {
-    if store.hasLoaded == false {
+    switch store.read {
+    case .unread, .reading:
       ProgressView()
-    } else if store.notifications.isEmpty == false || store.isLoading {
-      list
-    } else if store.loadError != nil {
+    case .failed:
       LoadFailure {
         await store.load()
       }
-    } else {
+    case .empty:
       ContentUnavailableView {
         Label("Nothing yet", systemImage: "bell")
       } description: {
         Text("Vote for a request or follow one, and you'll hear when it moves.")
       }
+    case .loaded(let notifications), .refreshing(let notifications):
+      list(notifications)
     }
   }
 
-  private var list: some View {
+  private func list(_ notifications: [DRNotification]) -> some View {
     List {
-      ForEach(store.notifications, id: \.id) { notification in
+      if let failure = store.write.failure {
+        Section {
+          WriteFailureNotice(failure: failure) {
+            store.acknowledgeWriteFailure()
+          }
+        }
+      }
+
+      ForEach(notifications, id: \.id) { notification in
         row(notification)
       }
 
-      if store.hasMore {
-        ProgressView()
-          .frame(maxWidth: .infinity)
-          .task {
-            await store.loadMore()
-          }
+      if store.page.isDone == false {
+        NextPageRow(state: store.page) {
+          await store.loadMore()
+        }
       }
     }
     .listStyle(.plain)
@@ -93,6 +101,10 @@ public struct InboxView: View {
 
   /// The dot sits beside the link rather than inside its label: a button inside a
   /// `NavigationLink` label never receives the tap.
+  ///
+  /// Every dot goes inert while any stamp is being written, because the store writes one at a
+  /// time. Without that, a second dot tapped during the first one's round trip is refused before
+  /// it reaches the network and nothing at all happens on screen.
   private func row(_ notification: DRNotification) -> some View {
     HStack(spacing: Self.rowSpacing) {
       NavigationLink {
@@ -107,12 +119,22 @@ public struct InboxView: View {
         } label: {
           Image(systemName: "circle.fill")
             .font(.caption2)
-            .foregroundStyle(Color.accentColor)
+            .foregroundStyle(dotTint)
         }
         .buttonStyle(.plain)
+        .disabled(store.write.isWriting)
         .accessibilityLabel("Mark as read")
       }
     }
+  }
+
+  /// `.buttonStyle(.plain)` renders its own label, so a disabled plain button looks exactly like
+  /// an enabled one. The dim is stated here instead, or the inert dot would be inert in secret.
+  private var dotTint: AnyShapeStyle {
+    if store.write.isWriting {
+      return AnyShapeStyle(HierarchicalShapeStyle.tertiary)
+    }
+    return AnyShapeStyle(Color.accentColor)
   }
 
   private func summary(_ notification: DRNotification) -> some View {

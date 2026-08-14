@@ -11,6 +11,8 @@ import Foundation
 /// The columns are kept in the order the server sent them. Ordering is the server's to decide so
 /// every client's roadmap reads the same way.
 ///
+/// One state and nothing else: no paging, and nothing is written from this surface.
+///
 /// Main-actor isolated and observable.
 @MainActor
 @Observable
@@ -23,18 +25,8 @@ final class RoadmapStore {
 
   // MARK: - State
 
-  /// The columns, in display order, left to right.
-  var columns: [DRRoadmapColumn] = []
-
-  /// `true` while the roadmap is being fetched.
-  var isLoading: Bool = false
-
-  /// Whether a first `load()` has finished, whether or not it succeeded. What separates "not
-  /// read yet" from "read, and there is nothing on the roadmap".
-  var hasLoaded: Bool = false
-
-  /// The failure from the most recent read, cleared when a fresh `load()` starts.
-  var loadError: Error?
+  /// The roadmap itself: where its read got to, and the columns it found, in display order.
+  var read: ReadState<[DRRoadmapColumn]> = .unread
 
   // MARK: - Init
 
@@ -47,22 +39,19 @@ final class RoadmapStore {
 
   /// Reads the roadmap.
   ///
-  /// Returns immediately when a read is already running. The columns already held survive a
-  /// failure, so a refresh that cannot reach the network leaves the roadmap readable.
+  /// Returns immediately when a read is already running. The columns already held stay on screen
+  /// for the length of the read, and a read that fails replaces them with the failure: columns
+  /// left up after a refresh that could not reach the server are a roadmap presenting itself as
+  /// current when nobody knows whether it is.
   func load() async {
-    if isLoading { return }
-    isLoading = true
-    loadError = nil
-    defer {
-      isLoading = false
-      hasLoaded = true
-    }
+    if read.isReading { return }
+    read = read.whileReading
 
     do {
       let answer = try await client.roadmap()
-      columns = answer.columns
+      read = ReadState(page: answer.columns)
     } catch {
-      loadError = error
+      read = ReadState(readFailure: error)
     }
   }
 }

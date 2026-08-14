@@ -34,37 +34,39 @@ public struct RoadmapView: View {
   public var body: some View {
     content
       .navigationTitle("Roadmap")
-      .firstRead(hasLoaded: store.hasLoaded) {
+      .firstRead(store.read) {
         await store.load()
       }
   }
 
   // MARK: - Content
 
-  /// The list stays up while a read is in flight even with nothing in it: a pull-to-refresh runs on
-  /// the list's own task, and losing the list mid-read would take the read with it.
+  /// Four outcomes, from one state. The list stays up through a refresh even while its columns
+  /// are being replaced: a pull-to-refresh runs on the list's own task, and a list that
+  /// disappears takes that task with it.
   @ViewBuilder
   private var content: some View {
-    if store.hasLoaded == false {
+    switch store.read {
+    case .unread, .reading:
       ProgressView()
-    } else if store.columns.isEmpty == false || store.isLoading {
-      list
-    } else if store.loadError != nil {
+    case .failed:
       LoadFailure {
         await store.load()
       }
-    } else {
+    case .empty:
       ContentUnavailableView {
         Label("No roadmap yet", systemImage: "map")
       } description: {
         Text("Nothing has been planned publicly.")
       }
+    case .loaded(let columns), .refreshing(let columns):
+      list(columns)
     }
   }
 
-  private var list: some View {
+  private func list(_ columns: [DRRoadmapColumn]) -> some View {
     List {
-      ForEach(store.columns, id: \.status.rawValue) { column in
+      ForEach(columns, id: \.status.rawValue) { column in
         Section {
           if column.requests.isEmpty {
             Text("Nothing here yet.")
