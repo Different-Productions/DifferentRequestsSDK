@@ -7,29 +7,33 @@ import SwiftUI
 ///
 /// ```swift
 /// NavigationStack {
-///   RequestDetailView(client: client, requestID: id)
+///   RequestDetailView(hub: requests, requestID: id)
 /// }
 /// ```
 ///
 /// A merged request answers here rather than 404ing, and says where the vote went — someone
 /// holding a link to it is owed that instead of a dead end.
+///
+/// The hub hands back the same store for the same request every time, so a screen pushed from a
+/// board that redraws keeps its thread, its place in it, and the comment being written.
 public struct RequestDetailView: View {
 
   private static let headerSpacing: CGFloat = 10
   private static let actionSpacing: CGFloat = 16
   private static let metadataSpacing: CGFloat = 8
 
-  private let client: DifferentRequestsClient
+  /// What the screen reads from, and what a push from here is built against.
+  private let hub: DifferentRequestsHub
 
   /// Bindable for the composer, which edits the draft the store holds.
   @Bindable private var store: RequestDetailStore
 
   /// - Parameters:
-  ///   - client: The client the screen reads and writes through.
+  ///   - hub: What the host app built once and holds.
   ///   - requestID: Which request to show.
-  public init(client: DifferentRequestsClient, requestID: String) {
-    self.client = client
-    self._store = Bindable(wrappedValue: RequestDetailStore(client: client, requestID: requestID))
+  public init(hub: DifferentRequestsHub, requestID: String) {
+    self.hub = hub
+    self._store = Bindable(hub.detail(requestID: requestID))
   }
 
   public var body: some View {
@@ -161,7 +165,7 @@ public struct RequestDetailView: View {
 
   private func mergedLink(_ requestID: String) -> some View {
     NavigationLink {
-      RequestDetailView(client: client, requestID: requestID)
+      RequestDetailView(hub: hub, requestID: requestID)
     } label: {
       Label(
         "Folded into another request — your vote went with it",

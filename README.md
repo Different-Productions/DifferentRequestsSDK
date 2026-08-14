@@ -1,6 +1,7 @@
 # DifferentRequests SDK
 
-Feature request management for iOS apps. Let your users submit, vote on, and browse feature requests directly inside your app.
+Feature request management for iOS and macOS apps. Let your users submit, vote on, and browse
+feature requests directly inside your app.
 
 ## Installation
 
@@ -14,81 +15,141 @@ Or in `Package.swift`:
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/Different-Productions/DifferentRequestsSDK", from: "0.6.0"),
+  .package(url: "https://github.com/Different-Productions/DifferentRequestsSDK", branch: "master"),
 ]
 ```
 
+`master` speaks protobuf to the current API and is not tagged yet. The newest tag, `0.6.2`, is the
+JSON client that came before it and does not talk to that API.
+
 ## Quick Start
+
+Build one hub where your app builds everything else it keeps, and hand it to the screens. The
+screens hold no state of their own — SwiftUI throws them away and rebuilds them on every redraw, and
+the board, the search text and the half-typed request have to survive that.
 
 ```swift
 import DifferentRequests
+import SwiftUI
 
-// 1. Create the client with your API key
-let client = DifferentRequestsClient(apiKey: "your-api-key")
+@main
+struct MyApp: App {
+  // 1. Built once, held for the life of the app.
+  private let requests = DifferentRequestsHub(client: .make(appKey: "your-app-key"))
 
-// 2. Authenticate your user
-try await client.authenticate(
-  externalUserId: currentUser.id,
-  displayName: currentUser.name
-)
-
-// 3. Show the request board
-DifferentRequestsView(client: client)
+  var body: some Scene {
+    WindowGroup {
+      // 2. The NavigationStack is yours. Every SDK screen needs one.
+      NavigationStack {
+        DifferentRequestsView(hub: requests)
+      }
+    }
+  }
+}
 ```
 
-That's it. Your users can now browse, submit, and vote on feature requests.
+Reading the board needs only the app key. Voting, asking and commenting act on behalf of a person,
+so they need a session — exchange your own identifier for one at launch:
 
-## Get Your API Key
+```swift
+do {
+  let signedIn = try await requests.client.createSession(
+    externalID: currentUser.id,
+    email: currentUser.email,
+    displayName: currentUser.name,
+    traits: ["tier": currentUser.tier]
+  )
+  logger.info("DifferentRequests: signed in as \(signedIn.user.id)")
+} catch {
+  logger.error("DifferentRequests: \(error.localizedDescription)")
+}
+```
 
-Sign up at [app.differentrequests.com](https://app.differentrequests.com), create an organization, and copy your API key.
+The same `externalID` returns the same person on a new device, which is what carries someone's votes
+across a reinstall. `Example/DifferentRequestsExample/DifferentRequestsExample/Session.swift` is
+this, with the failure shown on screen instead of logged.
+
+## Get Your App Key
+
+Sign up at [app.differentrequests.com](https://app.differentrequests.com), create an organization,
+and copy your app key. It identifies your app to the API — it is not a per-person credential, which
+is what `createSession` is for.
 
 ## Drop-in Views
 
-The SDK provides ready-to-use SwiftUI views:
+Every one of these takes the hub you built, and every one of them belongs inside a `NavigationStack`
+your app owns — that stack is what gives them a title bar, a search field, and somewhere to push to.
 
-- **`DifferentRequestsView`** — Full request board with sort, filter, search, pagination, and voting
-- **`RequestDetailView`** — Single request with full detail and voting
-- **`SubmitRequestView`** — Form with title, description, and duplicate detection
-- **`VoteControl`** — Reusable upvote/downvote component
+- **`DifferentRequestsView(hub:)`** — The board: ranked by demand, searchable, paged, votable, and
+  the way in to asking for something new from every state it can be in
+- **`RequestDetailView(hub:requestID:)`** — One request, its thread, its vote and its follow. Open it
+  straight from a notification or a deep link
+- **`RoadmapView(hub:)`** — Planned, building, shipped, as a section per column
+- **`ChangelogView(hub:)`** — What shipped, newest first
+- **`InboxView(hub:)`** — Status changes, replies and merges on what someone follows
+- **`SubmitRequestView(hub:)`** — The composer sheet, if you want your own way in to it. Call
+  `hub.beginSubmission()` before presenting it
+- **`VoteControl(voteCount:voted:toggle:)`** — The vote button on its own, for your own rows
+
+`RoadmapView` and `ChangelogView` are plan-gated. Read `client.config()` once at launch and offer
+them only where `roadmapEnabled` and `changelogEnabled` say so: a tab that answers `PLAN_REQUIRED`
+when tapped tells someone the app is broken when nothing is.
 
 ## Client API
 
-For custom UI, use the client directly:
+For custom UI, use the client directly. Every call takes and returns the contract's own types.
 
 ```swift
-// List requests
-let page = try await client.listRequests(sort: .top, limit: 10)
+// A page of the board — statuses empty means everything still on it
+let page = try await client.requests(statuses: [], sort: .top, query: nil, cursor: nil)
 
-// Submit a request
-let request = try await client.submitRequest(title: "Dark mode", body: "Please add dark mode")
+// The next page, from what the last one handed back
+let next = try await client.requests(
+  statuses: [], sort: .top, query: nil, cursor: page.nextCursor
+)
 
-// Vote
-let result = try await client.vote(requestId: request.id, value: .upvote)
+// Search: the same rpc, the same ranking, the same page shape
+let matches = try await client.requests(
+  statuses: [], sort: .top, query: "dark mode", cursor: nil
+)
 
-// Search
-let matches = try await client.searchRequests(query: "dark mode")
+// One request, and its thread
+let one = try await client.request(id: "abc-123")
+let thread = try await client.comments(requestID: one.request.id, cursor: nil)
+
+// Write
+let filed = try await client.submit(title: "Dark mode", body: "Please add dark mode")
+let voted = try await client.vote(requestID: filed.request.id)
+let followed = try await client.follow(requestID: filed.request.id)
+let posted = try await client.comment(requestID: filed.request.id, body: "Yes please")
 ```
 
 ## Error Handling
 
+The server's half of a failure is a `DRApiError` carried through unflattened, so `code` is the value
+the server sent rather than a guess made from an HTTP status. That message is written for whoever is
+reading a log and may name internals — the SDK's own screens never show it to anyone, and neither
+should yours.
+
 ```swift
 do {
-  let request = try await client.getRequest(id: "abc-123")
+  let answer = try await client.request(id: "abc-123")
+  show(answer.request)
 } catch let error as DifferentRequestsError {
-  switch error {
-  case .notAuthenticated:
-    // Call authenticate() first
-  case .notFound(let message):
-    // Request doesn't exist
-  case .rateLimited(let retryAfter):
-    // Wait retryAfter seconds
-  case .merged(let targetId):
-    // Request was merged into targetId
-  default:
-    break
+  if let seconds = error.retryAfterSeconds {
+    // The server said to wait, and said how long.
+    schedule(after: seconds)
   }
+  if case .api(let apiError) = error, apiError.code == .planRequired {
+    // This surface is not on the tenant's plan.
+  }
+  logger.error("DifferentRequests: \(error.localizedDescription)")
 }
 ```
+
+`notAuthenticated(rpc)` is thrown before anything is sent, from the audience the contract declares
+for that rpc: an rpc that acts for a person is refused locally rather than costing a round trip to
+be told 401.
 
 ## Requirements
 

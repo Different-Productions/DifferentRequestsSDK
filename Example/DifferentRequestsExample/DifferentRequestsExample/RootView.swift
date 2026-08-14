@@ -73,26 +73,41 @@ struct RootView: View {
 
   // MARK: - Tabs
 
+  /// Every tab is its own `NavigationStack`, which the SDK's screens require and none of them
+  /// carries: a navigation stack belongs to the app that arranges the screens, not to a package
+  /// dropped inside one. Without it a tap on a row pushes nothing, the board's title and its way in
+  /// to the composer have no bar to sit in, and the search field has nowhere to appear.
+  ///
+  /// One stack per tab rather than one around the whole `TabView`, so each tab keeps its own
+  /// history and switching tabs does not pop anyone out of what they were reading.
   private func tabs(for signedIn: Session.SignedIn) -> some View {
     TabView {
       Tab("Requests", systemImage: "list.bullet") {
-        DifferentRequestsView(client: session.client)
+        NavigationStack {
+          DifferentRequestsView(hub: session.hub)
+        }
       }
 
       if signedIn.config.roadmapEnabled {
         Tab("Roadmap", systemImage: "map") {
-          RoadmapView(client: session.client)
+          NavigationStack {
+            RoadmapView(hub: session.hub)
+          }
         }
       }
 
       if signedIn.config.changelogEnabled {
         Tab("What's New", systemImage: "sparkles") {
-          ChangelogView(client: session.client)
+          NavigationStack {
+            ChangelogView(hub: session.hub)
+          }
         }
       }
 
       Tab("Inbox", systemImage: "bell") {
-        InboxView(client: session.client)
+        NavigationStack {
+          InboxView(hub: session.hub)
+        }
       }
       .badge(unreadCount)
     }

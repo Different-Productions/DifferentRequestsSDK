@@ -36,17 +36,25 @@ final class Session {
 
   // MARK: - Inputs
 
-  /// The single client every screen shares.
-  let client: DifferentRequestsClient
+  /// What every SDK screen in this app reads from, and what holds their state between redraws.
+  let hub: DifferentRequestsHub
 
   // MARK: - State
 
   var phase: Phase = .creatingSession
 
+  // MARK: - Derived
+
+  /// The client the hub was built with — the same one the screens call through, so a session
+  /// created here is the session they act under.
+  var client: DifferentRequestsClient {
+    hub.client
+  }
+
   // MARK: - Init
 
-  init(client: DifferentRequestsClient) {
-    self.client = client
+  init(hub: DifferentRequestsHub) {
+    self.hub = hub
   }
 
   // MARK: - Signing in

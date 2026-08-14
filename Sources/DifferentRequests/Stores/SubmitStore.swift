@@ -6,9 +6,10 @@ import Foundation
 /// The draft lives here rather than in the sheet so a redraw cannot lose what someone typed, and
 /// so a blank title is refused before it becomes a round trip.
 ///
-/// The title is seeded at construction from what the reader searched for. Reaching this sheet
-/// means the board was searched and did not answer, so that text is the request — retyping it
-/// would be the price of having looked first.
+/// One store, opened again for each request rather than built again. ``begin(title:)`` is what
+/// starts a composer and the only thing that clears the last one: the sheet showing it is
+/// dismissed and re-presented, and a store rebuilt alongside it would be a draft lost to a
+/// redraw.
 ///
 /// Main-actor isolated and observable.
 @MainActor
@@ -23,7 +24,7 @@ final class SubmitStore {
   // MARK: - State
 
   /// What is being asked for, in one line.
-  var title: String
+  var title: String = ""
 
   /// The detail, which the server accepts empty.
   var body: String = ""
@@ -40,15 +41,28 @@ final class SubmitStore {
 
   // MARK: - Init
 
-  /// - Parameters:
-  ///   - client: The client the write goes through.
-  ///   - title: What the reader searched for, as the opening title.
-  init(client: DifferentRequestsClient, title: String) {
+  /// - Parameter client: The client the write goes through.
+  init(client: DifferentRequestsClient) {
     self.client = client
-    self.title = title
   }
 
   // MARK: - Writing
+
+  /// Starts a request, seeded with what the board was searched for.
+  ///
+  /// Reaching a composer from a search means the search did not answer, so that text is already
+  /// the request — retyping it would be the price of having looked first. From an unsearched
+  /// board the title arrives empty, which is the same rule with nothing to carry.
+  ///
+  /// Everything else is cleared, `submitted` included: it is presence, not a flag, and a composer
+  /// opened while it still held the last filed request would look finished before anything was
+  /// typed.
+  func begin(title: String) {
+    self.title = title
+    body = ""
+    submitted = nil
+    submitError = nil
+  }
 
   /// Whether there is enough to file. A blank title is refused by the server, so it is refused
   /// here instead of sent.

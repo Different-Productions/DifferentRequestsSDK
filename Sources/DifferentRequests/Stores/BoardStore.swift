@@ -66,10 +66,27 @@ final class BoardStore {
   /// The failure from the most recent write, cleared when the next write starts.
   var writeError: Error?
 
+  // MARK: - Derived
+
+  /// Whether what is held is the answer to what the search field now says.
+  ///
+  /// The board's search task fires again every time its view is built, and its view is built again
+  /// whenever anything above it redraws. Reading this before reloading is what stops that from
+  /// discarding every page after the first, and the reader's place in them with it.
+  var isShowingQuery: Bool {
+    hasLoaded && query == loadedQuery
+  }
+
   // MARK: - Private state
 
   /// The opaque continuation the previous page handed back.
   private var cursor: String = ""
+
+  /// The query the pages now held were read for.
+  ///
+  /// Kept rather than assumed equal to ``query``: the field moves while a read is suspended, and
+  /// what is on screen answers whichever question was being asked when that read started.
+  private var loadedQuery: String = ""
 
   // MARK: - Init
 
@@ -89,21 +106,28 @@ final class BoardStore {
 
   // MARK: - Loading
 
-  /// Discards everything loaded and fetches the first page.
+  /// Discards everything loaded and fetches the first page for whatever ``query`` now says.
   ///
-  /// Returns immediately when a first-page load is already running.
+  /// Returns immediately when a read is already running — and that read finishes the job, because
+  /// it reads again for any query typed while it was suspended. Returning without that, a search
+  /// entered while the first page was still in flight would be dropped and stay dropped: this
+  /// store outlives the screen that asked, so nothing rebuilds it and asks again.
   func load() async {
     if isLoading { return }
     isLoading = true
-    loadError = nil
-    requests = []
-    cursor = ""
-    hasMore = true
     defer {
       isLoading = false
       hasLoaded = true
     }
-    await fetchPage()
+
+    repeat {
+      loadedQuery = query
+      loadError = nil
+      requests = []
+      cursor = ""
+      hasMore = true
+      await fetchPage()
+    } while loadedQuery != query
   }
 
   /// Appends the next page.

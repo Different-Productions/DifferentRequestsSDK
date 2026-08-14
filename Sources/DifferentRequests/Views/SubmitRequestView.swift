@@ -3,38 +3,41 @@ import SwiftUI
 /// The sheet that files a request.
 ///
 /// Presented, not pushed, so it carries its own `NavigationStack` for the two toolbar actions a
-/// sheet needs. The board opens it with whatever was searched for, already in the title: reaching
-/// here means the search did not answer, and retyping the words would be the price of having
-/// looked first.
+/// sheet needs. The board's own way in seeds the title with whatever was searched for: reaching
+/// here from a search means the search did not answer, and retyping the words would be the price
+/// of having looked first.
+///
+/// A host app offering its own way in opens the composer first, then presents this:
 ///
 /// ```swift
-/// SubmitRequestView(client: client, title: searchText) {
-///   await store.load()
+/// Button("Request a feature") {
+///   requests.beginSubmission()
+///   isComposing = true
+/// }
+/// .sheet(isPresented: $isComposing) {
+///   SubmitRequestView(hub: requests)
 /// }
 /// ```
+///
+/// What is typed here belongs to the hub, so a redraw behind the sheet cannot take it, and the
+/// board is re-read for whoever presented it — the sheet does not know who that was.
 public struct SubmitRequestView: View {
 
   private static let detailLineLimit: ClosedRange<Int> = 3...8
 
-  @Bindable private var store: SubmitStore
+  /// What the write goes through, and what re-reads the board once it lands.
+  private let hub: DifferentRequestsHub
 
-  /// Called once the request is filed, before the sheet closes, so whatever presented it can
-  /// re-read the board the new request is now on.
-  private let onSubmitted: () async -> Void
+  /// Bindable for the two fields, which edit the draft the hub holds.
+  @Bindable private var store: SubmitStore
 
   @Environment(\.dismiss) private var dismiss
 
-  /// - Parameters:
-  ///   - client: The client the write goes through.
-  ///   - title: What the reader searched for, as the opening title.
-  ///   - onSubmitted: Called after a successful write, before the sheet closes.
-  public init(
-    client: DifferentRequestsClient,
-    title: String,
-    onSubmitted: @escaping () async -> Void
-  ) {
-    self._store = Bindable(wrappedValue: SubmitStore(client: client, title: title))
-    self.onSubmitted = onSubmitted
+  /// - Parameter hub: What the host app built once and holds. Call
+  ///   ``DifferentRequestsHub/beginSubmission()`` before presenting this.
+  public init(hub: DifferentRequestsHub) {
+    self.hub = hub
+    self._store = Bindable(hub.submission)
   }
 
   public var body: some View {
@@ -83,9 +86,8 @@ public struct SubmitRequestView: View {
   /// Files it, then closes only if it was filed. A failed write leaves the sheet up with what was
   /// typed still in it — dismissing on a failure would throw the words away.
   private func send() async {
-    await store.submit()
+    await hub.fileRequest()
     if store.submitted == nil { return }
-    await onSubmitted()
     dismiss()
   }
 

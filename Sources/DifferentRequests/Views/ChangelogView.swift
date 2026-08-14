@@ -5,7 +5,7 @@ import SwiftUI
 ///
 /// ```swift
 /// NavigationStack {
-///   ChangelogView(client: client)
+///   ChangelogView(hub: requests)
 /// }
 /// ```
 ///
@@ -16,11 +16,12 @@ public struct ChangelogView: View {
   private static let entrySpacing: CGFloat = 6
   private static let headerSpacing: CGFloat = 8
 
+  /// The hub's changelog state, which outlives this screen and keeps the pages it has read.
   private let store: ChangelogStore
 
-  /// - Parameter client: The client the changelog reads through.
-  public init(client: DifferentRequestsClient) {
-    self.store = ChangelogStore(client: client)
+  /// - Parameter hub: What the host app built once and holds.
+  public init(hub: DifferentRequestsHub) {
+    self.store = hub.changelog
   }
 
   public var body: some View {

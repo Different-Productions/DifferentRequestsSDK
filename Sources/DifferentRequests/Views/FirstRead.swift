@@ -4,11 +4,12 @@ extension View {
 
   /// Reads a surface's first page when its store has not read one yet.
   ///
-  /// Keyed on the store's own flag rather than left as a bare `task`, because a bare one fires
-  /// once per view identity and these stores do not live that long: a SwiftUI view is rebuilt
-  /// whenever whatever presents it redraws, the store it builds alongside itself is rebuilt with
-  /// it, and the identity SwiftUI remembers is unchanged. Keyed this way, a store that has not
-  /// read yet is noticed and read, however it came to be there.
+  /// Keyed on the store's own flag rather than left as a bare `task`, because the store outlives
+  /// the screen: it belongs to the hub the host app holds, and the screen is a value SwiftUI
+  /// throws away and builds again whenever anything above it redraws. A bare `task` fires once per
+  /// appearance and would re-read a page the store already has, clearing it on the way. Keyed this
+  /// way, the read is once per store rather than once per screen — and a store that has never read
+  /// is noticed and read, however it came to be on screen.
   ///
   /// - Parameters:
   ///   - hasLoaded: Whether the store has finished a first read.

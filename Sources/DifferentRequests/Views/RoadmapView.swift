@@ -5,7 +5,7 @@ import SwiftUI
 ///
 /// ```swift
 /// NavigationStack {
-///   RoadmapView(client: client)
+///   RoadmapView(hub: requests)
 /// }
 /// ```
 ///
@@ -19,13 +19,16 @@ public struct RoadmapView: View {
 
   private static let rowSpacing: CGFloat = 12
 
-  private let client: DifferentRequestsClient
+  /// What the screen reads from, and what a push from a column is built against.
+  private let hub: DifferentRequestsHub
+
+  /// The hub's roadmap state, which outlives this screen and keeps what it has read.
   private let store: RoadmapStore
 
-  /// - Parameter client: The client the roadmap reads through.
-  public init(client: DifferentRequestsClient) {
-    self.client = client
-    self.store = RoadmapStore(client: client)
+  /// - Parameter hub: What the host app built once and holds.
+  public init(hub: DifferentRequestsHub) {
+    self.hub = hub
+    self.store = hub.roadmap
   }
 
   public var body: some View {
@@ -70,7 +73,7 @@ public struct RoadmapView: View {
           } else {
             ForEach(column.requests, id: \.id) { request in
               NavigationLink {
-                RequestDetailView(client: client, requestID: request.id)
+                RequestDetailView(hub: hub, requestID: request.id)
               } label: {
                 row(request)
               }

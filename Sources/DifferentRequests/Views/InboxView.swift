@@ -5,7 +5,7 @@ import SwiftUI
 ///
 /// ```swift
 /// NavigationStack {
-///   InboxView(client: client)
+///   InboxView(hub: requests)
 /// }
 /// ```
 ///
@@ -16,13 +16,16 @@ public struct InboxView: View {
   private static let rowSpacing: CGFloat = 12
   private static let summarySpacing: CGFloat = 4
 
-  private let client: DifferentRequestsClient
+  /// What the screen reads from, and what a push from a row is built against.
+  private let hub: DifferentRequestsHub
+
+  /// The hub's inbox state, which outlives this screen and keeps the pages it has read.
   private let store: InboxStore
 
-  /// - Parameter client: The client the inbox reads and writes through.
-  public init(client: DifferentRequestsClient) {
-    self.client = client
-    self.store = InboxStore(client: client)
+  /// - Parameter hub: What the host app built once and holds.
+  public init(hub: DifferentRequestsHub) {
+    self.hub = hub
+    self.store = hub.inbox
   }
 
   public var body: some View {
@@ -93,7 +96,7 @@ public struct InboxView: View {
   private func row(_ notification: DRNotification) -> some View {
     HStack(spacing: Self.rowSpacing) {
       NavigationLink {
-        RequestDetailView(client: client, requestID: destinationID(notification))
+        RequestDetailView(hub: hub, requestID: destinationID(notification))
       } label: {
         summary(notification)
       }
