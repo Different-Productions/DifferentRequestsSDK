@@ -12,8 +12,9 @@ import SwiftUI
 /// }
 /// ```
 ///
-/// Searching and reading the board are the same screen, because they are the same rpc with the
-/// same ranking and the same page shape.
+/// Searching, ranking, filtering and reading the board are all the same screen, because they are
+/// the same rpc with the same page shape. Each of the three narrowings is one query parameter, and
+/// the answer to all of them is a list of requests.
 ///
 /// Asking is reachable from every state the board can be in, the populated one included: a board
 /// full of other people's requests is exactly where someone finds out that theirs is not on it,
@@ -21,6 +22,10 @@ import SwiftUI
 /// back with nothing, is missing at the moment it is most wanted. Whatever is in the search field
 /// goes into the composer with them, because the cheapest moment to catch a duplicate is before it
 /// is written, and a search that did not answer is already the title.
+///
+/// The filter bar is reachable from every state for the same reason turned inside out. It is drawn
+/// above the content rather than within it, so narrowing the board to a status nothing is in leaves
+/// the control that undoes the narrowing exactly where it was.
 public struct DifferentRequestsView: View {
 
   /// How long a search settles before it is sent. Long enough that a typed word is one read
@@ -46,24 +51,29 @@ public struct DifferentRequestsView: View {
   }
 
   public var body: some View {
-    content
-      .navigationTitle("Requests")
-      .searchable(text: $store.query, prompt: "Search requests")
-      .toolbar {
-        ToolbarItem(placement: .primaryAction) {
-          askButton
-            .labelStyle(.iconOnly)
-        }
+    VStack(spacing: 0) {
+      BoardFilterBar(store: store)
+
+      content
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+    .navigationTitle("Requests")
+    .searchable(text: $store.query, prompt: "Search requests")
+    .toolbar {
+      ToolbarItem(placement: .primaryAction) {
+        askButton
+          .labelStyle(.iconOnly)
       }
-      .firstRead(store.read) {
-        await store.load()
-      }
-      .task(id: store.query) {
-        await runSearch()
-      }
-      .sheet(isPresented: $isComposing) {
-        SubmitRequestView(hub: hub)
-      }
+    }
+    .firstRead(store.read) {
+      await store.load()
+    }
+    .task(id: store.query) {
+      await runSearch()
+    }
+    .sheet(isPresented: $isComposing) {
+      SubmitRequestView(hub: hub)
+    }
   }
 
   // MARK: - Searching
@@ -76,8 +86,12 @@ public struct DifferentRequestsView: View {
   /// again, which is why it asks the store what it is already showing first: the board outlives
   /// its own screen now, and reloading it on a redraw would throw away every page after the first
   /// along with where the reader had got to.
+  ///
+  /// Keyed on the search text alone, and only the search text is debounced here. A chip on the
+  /// filter bar is one tap rather than a burst of them, so it sets and re-reads through the store
+  /// in one call and waits for nothing.
   private func runSearch() async {
-    if store.isShowingQuery { return }
+    if store.isCurrent { return }
     if store.query.isEmpty == false {
       do {
         try await Task.sleep(for: Self.searchSettleDelay)
@@ -110,24 +124,30 @@ public struct DifferentRequestsView: View {
     }
   }
 
-  /// Nothing to show, for one of two reasons that lead to the same place: ask for it.
-  @ViewBuilder
+  /// Nothing to show, and four reasons it can be nothing — read off ``BoardNarrowing``, which is
+  /// where the sentence for each of them is written.
+  ///
+  /// A board narrowed to a status has one more thing left to try than a board that is simply
+  /// empty, and it is the more likely of the two to work: the requests are there, behind a control
+  /// the reader set themselves and may have scrolled past since. So widening leads, and asking
+  /// follows it.
   private var empty: some View {
-    if store.query.isEmpty {
-      ContentUnavailableView {
-        Label("No requests yet", systemImage: "tray")
-      } description: {
-        Text("Nobody has asked for anything. Be first.")
-      } actions: {
+    ContentUnavailableView {
+      Label(store.narrowing.emptyTitle, systemImage: store.narrowing.emptyIcon)
+    } description: {
+      Text(store.narrowing.emptyMessage)
+    } actions: {
+      if store.narrowing.isStatusFiltered {
+        AsyncButton {
+          await store.showEveryStatus()
+        } label: {
+          Text("Show every status")
+        }
+        .buttonStyle(.borderedProminent)
+
         askButton
-          .buttonStyle(.borderedProminent)
-      }
-    } else {
-      ContentUnavailableView {
-        Label("Nothing matches", systemImage: "magnifyingglass")
-      } description: {
-        Text("Nobody has asked for this yet.")
-      } actions: {
+          .buttonStyle(.bordered)
+      } else {
         askButton
           .buttonStyle(.borderedProminent)
       }
@@ -159,7 +179,7 @@ public struct DifferentRequestsView: View {
           .buttonStyle(.borderedProminent)
           .frame(maxWidth: .infinity, alignment: .center)
       } footer: {
-        Text(askFooter)
+        Text(store.narrowing.listFooter)
       }
     }
     .listStyle(.plain)
@@ -207,15 +227,6 @@ public struct DifferentRequestsView: View {
     } label: {
       Label("Ask for a feature", systemImage: "plus.bubble")
     }
-  }
-
-  /// Reading a list of matches and reading the board itself are different situations, and only one
-  /// of them has a duplicate waiting in it.
-  private var askFooter: String {
-    if store.query.isEmpty {
-      return "Not on the board? Ask for it."
-    }
-    return "Vote for one of these if it already says it — duplicates split the demand."
   }
 }
 

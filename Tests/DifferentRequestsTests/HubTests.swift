@@ -83,10 +83,10 @@ struct HubTests {
   func nothingIsShownBeforeTheFirstRead() {
     let hub = DifferentRequestsHub(client: .make(appKey: "test-app-key"))
 
-    #expect(hub.board.isShowingQuery == false)
+    #expect(hub.board.isCurrent == false)
 
     hub.board.query = "dark mode"
-    #expect(hub.board.isShowingQuery == false, "an unread board claiming to answer a search")
+    #expect(hub.board.isCurrent == false, "an unread board claiming to answer a search")
   }
 
   @Test("The board the hub builds excludes no status")

@@ -89,8 +89,8 @@ struct FeatureRequestsScreen: View {
 ```
 
 This gives you a full-featured request board with:
-- Sortable list (recent / top)
-- Status filters (open, planned, in progress, shipped, declined)
+- A ranking control — top or new — offering whichever rankings the contract declares
+- Status filter chips, one per status the contract gives a URL spelling, several at a time
 - Pull to refresh and infinite scroll
 - Voting controls
 - Submit new request with duplicate search
