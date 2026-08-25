@@ -48,31 +48,20 @@ struct AudienceTests {
     }
   }
 
-  @Test("Reading the board needs only an app key, so a host app can show it before anyone signs in")
-  func readingTheBoardNeedsOnlyAnAppKey() {
-    let openToAppKey: [DRRequestsServiceRPC] = [
-      .getConfig,
-      .createSession,
-      .listRequests,
-      .getRequest,
-      .listComments,
-      .getRoadmap,
-      .listChangelog,
-    ]
-
-    for method in openToAppKey {
-      #expect(method.audience == .appKey, "\(method.rawValue) should be readable with an app key")
-    }
-  }
-
-  @Test("The table covers the whole surface")
-  func theTableCoversTheWholeSurface() {
-    // Every case is either something acting for a person or something an app key may read.
-    // A new rpc that is neither is a gap in these tests, not a third category.
+  @Test("Everything else needs only an app key, so a host app shows the board before anyone signs in")
+  func everythingElseNeedsOnlyAnAppKey() {
+    // Every case is either something acting for a person or something an app key may read. A new
+    // rpc that is neither is a gap in these tests, not a third category.
+    //
+    // The app-key side is subtracted from the generated table rather than listed. A list of it sat
+    // beside this test naming seven rpcs, and it asserted less: an rpc added to the contract and
+    // gated wrongly was not on the list, so nothing looked at it. Subtracting means every rpc is
+    // looked at, including the ones nobody has written down.
     let accountedFor = Set(ActsForAPerson.methods.map(\.rawValue))
     let appKeyReadable = DRRequestsServiceRPC.allCases
       .filter { accountedFor.contains($0.rawValue) == false }
 
+    #expect(appKeyReadable.isEmpty == false, "every rpc acts for a person, so this test proves nothing")
     for method in appKeyReadable {
       #expect(method.audience == .appKey, "\(method.rawValue) is not covered by either audience")
     }
