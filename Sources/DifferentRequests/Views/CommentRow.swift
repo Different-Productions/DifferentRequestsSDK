@@ -38,18 +38,21 @@ struct CommentRow: View {
     }
   }
 
-  /// A hidden comment arrives with its text already dropped, and the row stays: a thread that
-  /// silently closes over a removed comment reads as if a reply was never written.
+  /// The row stays when a comment is hidden: a thread that silently closes over a removed comment
+  /// reads as if the reply was never written.
   @ViewBuilder
   private var commentText: some View {
-    if comment.isHidden {
+    switch comment.content {
+    case .body(let text):
+      Text(text)
+        .font(.subheadline)
+    case .hidden:
       Text("This comment was removed.")
         .font(.subheadline)
         .italic()
         .foregroundStyle(.secondary)
-    } else {
-      Text(comment.body)
-        .font(.subheadline)
+    case .none:
+      EmptyView()
     }
   }
 
