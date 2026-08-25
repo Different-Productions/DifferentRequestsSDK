@@ -40,7 +40,9 @@ struct SilentWriteTests {
     made.id = id
     made.requestID = "r1"
     made.requestTitle = "Dark mode everywhere"
-    made.kind = .statusChanged
+    var moved = DRStatusChangedNews()
+    moved.newStatus = .planned
+    made.news = .statusChanged(moved)
     return made
   }
 

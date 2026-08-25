@@ -156,26 +156,31 @@ public struct InboxView: View {
     }
   }
 
-  /// A merged request carries where the vote went, and that is the request worth opening — the
-  /// one it was folded into now holds the demand.
+  /// Where a tap lands.
+  ///
+  /// Only merge news names somewhere else, and it names it on its own arm — so a tap can no longer
+  /// be routed by a merge target that arrived on news that was never about a merge.
   private func destinationID(_ notification: DRNotification) -> String {
-    if notification.mergedIntoRequestID.isEmpty == false {
-      return notification.mergedIntoRequestID
+    switch notification.news {
+    case .requestMerged(let folded):
+      // The request it was folded into now holds the demand, so that is the one worth opening.
+      return folded.intoRequestID
+    case .statusChanged, .commentAdded, .none:
+      return notification.requestID
     }
-    return notification.requestID
   }
 
-  /// A kind this SDK version does not know still says something happened, rather than rendering
-  /// an empty row: the request title underneath is what the reader recognises anyway.
+  /// News this SDK version does not know still says something happened, rather than rendering an
+  /// empty row: the request title underneath is what the reader recognises anyway.
   private func headline(_ notification: DRNotification) -> String {
-    switch notification.kind {
-    case .statusChanged:
-      return "Now \(notification.newStatus.badgeLabel)"
+    switch notification.news {
+    case .statusChanged(let moved):
+      return "Now \(moved.newStatus.badgeLabel)"
     case .commentAdded:
       return "New comment"
     case .requestMerged:
       return "Folded into another request"
-    case .unspecified, .UNRECOGNIZED:
+    case .none:
       return "Updated"
     }
   }
