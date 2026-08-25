@@ -20,7 +20,7 @@ import SwiftProtobuf
 public actor DifferentRequestsClient {
 
   /// Both directions carry protobuf. The same content type BacklogServer and the CMS speak.
-  private static let protobufContentType = "application/x-protobuf"
+  private static let protobufContentType = DRMediaType.protobuf.rawValue
 
   private let appKey: String
   private let baseURL: URL
@@ -333,14 +333,20 @@ public actor DifferentRequestsClient {
 
     var request = URLRequest(url: url)
     request.httpMethod = Self.httpMethod(for: rpc)
-    request.setValue(Self.protobufContentType, forHTTPHeaderField: "Accept")
-    request.setValue(appKey, forHTTPHeaderField: "X-App-Key")
+    request.setValue(Self.protobufContentType, forHTTPHeaderField: DRHTTPHeaderName.accept.rawValue)
+    request.setValue(appKey, forHTTPHeaderField: DRHTTPHeaderName.appKey.rawValue)
     if let sessionToken {
-      request.setValue("Bearer \(sessionToken)", forHTTPHeaderField: "Authorization")
+      request.setValue(
+        "\(DRAuthorizationScheme.bearer.rawValue) \(sessionToken)",
+        forHTTPHeaderField: DRHTTPHeaderName.authorization.rawValue
+      )
     }
     if let body {
       request.httpBody = body
-      request.setValue(Self.protobufContentType, forHTTPHeaderField: "Content-Type")
+      request.setValue(
+        Self.protobufContentType,
+        forHTTPHeaderField: DRHTTPHeaderName.contentType.rawValue
+      )
     }
 
     let data: Data

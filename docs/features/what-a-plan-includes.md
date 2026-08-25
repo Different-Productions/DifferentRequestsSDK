@@ -12,7 +12,7 @@ their rpc, and got `PLAN_REQUIRED` back. `GetRoadmap` and `ListChangelog` are th
 server refuses on plan, and both of them are behind those two screens.
 
 What made that worse than an ordinary failure is who the refusal is written for. The contract is
-explicit: `ERROR_CODE_PLAN_REQUIRED` is "distinct from PERMISSION_DENIED because the remedy is a
+explicit: the `planRequired` reason is "distinct from PermissionDenied because the remedy is a
 purchase, not a different account, and only the host developer can act on it — never surfaced to an
 end user." The person looking at the screen did not choose the plan and cannot change it. Everything
 this SDK can honestly say to them is a sentence about what is there instead, and it can only say it

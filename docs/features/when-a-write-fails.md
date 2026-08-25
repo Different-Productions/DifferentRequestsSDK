@@ -192,10 +192,13 @@ when nobody knows whether it is. It now shows "Couldn't load" with **Try Again**
 
 **Trigger it.** Call anything.
 
-**What happens.** Unchanged, plus one addition: `isNotFound` says whether the server's answer was
-`DRErrorCode.notFound`, which is the distinction between an outage and an answer. The `message` on
-a `DRApiError` is still written for whoever is debugging and may name internals — no copy in this
-SDK is derived from it.
+**What happens.** Unchanged, plus one addition: `isNotFound` says whether the server's answer
+carried the `notFound` arm of `DRApiError.reason`, which is the distinction between an outage and
+an answer. The `message` on a `DRApiError` is still written for whoever is debugging and may name
+internals — no copy in this SDK is derived from it.
+
+`retryAfterSeconds` reads the seconds off the `rateLimited` arm, so a failure of any other kind has
+no seconds to be asked for and the property answers nil.
 
 ## Expectations
 
@@ -366,8 +369,8 @@ ONE REQUEST — two reads, because they are two rpcs that fail apart
     ├── client.request(id:)
     │     ├── success ──► read = .loaded(answer.request)
     │     └── failure ──► read = ReadState(readFailure: error)
-    │                         .api(code: .notFound) ──► .empty   "This request is gone"
-    │                         anything else         ──► .failed  "Couldn't load"
+    │                         .api(reason: .notFound) ──► .empty   "This request is gone"
+    │                         anything else           ──► .failed  "Couldn't load"
     │                     thread = .unread; page = .done; return
     ├── thread = thread.whileReading; cursor = ""; page = .more
     └── client.comments(requestID:cursor:)
@@ -538,8 +541,8 @@ All hermetic. Two ways of reaching a real failure without a network:
 | `ReadStateTests.appendingCarriesWhatWasAlreadyHeld` | `appending(_:)` from every case, and `held` under each |
 | `ReadStateTests.contentAnswersFromBothStatesThatHoldSomething` | `content` from `loaded` and from `refreshing`, and nil from the four that hold nothing — a store reading only the settled case refuses every write made during a refresh, silently |
 | `ReadStateTests.aWriteAnsweringDuringARefreshDoesNotEndTheRefresh` | `holding(_:)` from every case: a write's answer stays inside a running read rather than reporting it finished |
-| `ReadStateTests.aServerSayingItIsGoneIsNotAFailure` | `init(readFailure:)` — `DRErrorCode.notFound` becomes `.empty`, a plan refusal and an unreachable server become `.failed` |
-| `ReadStateTests.everyOtherCodeIsAFailure` | The same init walked across `DRErrorCode.allCases`, so a code added to the contract is covered by being declared rather than by anyone remembering it |
+| `ReadStateTests.aServerSayingItIsGoneIsNotAFailure` | `init(readFailure:)` — the `notFound` arm becomes `.empty`, a plan refusal and an unreachable server become `.failed` |
+| `ReadStateTests.anyOtherReasonIsAFailure` | The same init under a rate limit, an internal failure, and a refusal carrying no reason this build knows. Not a walk across every reason the contract declares: `isNotFound` matches the `notFound` arm or it does not, so a reason added later cannot change what this asserts — which is what the walk used to be compensating for |
 | `ReadStateTests.replacingFindsTheRowByIdAndLeavesAGoneRowGone` | `replacing(_:identifiedBy:)`, the path a write's answer takes back into a list |
 | `PageStateTests.theServerLeavesTheCursorEmptyOnTheLastPage` | `init(nextCursor:)` → `.done` / `.more` |
 | `PageStateTests.aFailedPageIsNeitherDoneNorReading` | `isDone`, `isReading` and `failure` across every case — what `NextPageRow` and `loadMore()` branch on |
