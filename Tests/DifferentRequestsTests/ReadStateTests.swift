@@ -179,7 +179,7 @@ struct ReadStateTests {
   @Test("A server saying it is gone is an answer, not a failure")
   func aServerSayingItIsGoneIsNotAFailure() {
     var gone = DRApiError()
-    gone.code = .notFound
+    gone.reason = .notFound(DRNotFound())
     gone.message = "request 42 not found in tenant 7"
 
     let answered = ReadState<DRFeatureRequest>(readFailure: DifferentRequestsError.api(gone))
@@ -190,7 +190,7 @@ struct ReadStateTests {
     )
 
     var refused = DRApiError()
-    refused.code = .planRequired
+    refused.reason = .planRequired(DRPlanRequired())
     let broken = ReadState<DRFeatureRequest>(readFailure: DifferentRequestsError.api(refused))
     #expect(broken.failure != nil)
 
@@ -198,19 +198,29 @@ struct ReadStateTests {
     #expect(offline.failure != nil, "an unreachable server is not a request that has gone")
   }
 
-  @Test("Every error code that is not notFound is a failure, read from the contract's own table")
-  func everyOtherCodeIsAFailure() {
-    // Read from the generated table rather than a list written here, so a code added to the
-    // contract is covered by being declared.
-    for code in DRErrorCode.allCases where code != .notFound {
-      var answered = DRApiError()
-      answered.code = code
-      let state = ReadState<DRFeatureRequest>(readFailure: DifferentRequestsError.api(answered))
-      #expect(
-        state.failure != nil,
-        "\(code) is being read as an answer rather than as a failure"
-      )
-    }
+  @Test("A refusal that is not notFound is a failure, whatever reason it carries")
+  func anyOtherReasonIsAFailure() {
+    // Not a loop over every reason the contract declares. `isNotFound` matches the `notFound` arm
+    // or it does not, so a reason added later cannot change what this asserts — the shape carries
+    // the claim that a list used to have to keep making. Two reasons stand in for the rest: one
+    // that is deliberately not a failure, and one that is.
+    var refused = DRApiError()
+    refused.reason = .rateLimited(DRRateLimited())
+    let limited = ReadState<DRFeatureRequest>(readFailure: DifferentRequestsError.api(refused))
+    #expect(limited.failure != nil, "a rate limit is being read as an answer rather than a failure")
+
+    var broken = DRApiError()
+    broken.reason = .internalFailure(DRInternalFailure())
+    let failed = ReadState<DRFeatureRequest>(readFailure: DifferentRequestsError.api(broken))
+    #expect(failed.failure != nil, "an internal failure is being read as an answer")
+
+    var unknown = DRApiError()
+    unknown.message = "a server newer than this build"
+    let unread = ReadState<DRFeatureRequest>(readFailure: DifferentRequestsError.api(unknown))
+    #expect(
+      unread.failure != nil,
+      "a refusal carrying no reason this build knows is being read as an answer"
+    )
   }
 
   @Test("A write's answer replaces the row it names, and a row that has gone is left gone")

@@ -11,7 +11,8 @@ public enum DifferentRequestsError: Error, Sendable, LocalizedError {
   /// call is sent, from the audience the contract declares for it.
   case notAuthenticated(DRRequestsServiceRPC)
 
-  /// The server answered with an error. `error.code` says which.
+  /// The server answered with an error. `error.reason` says which, and carries whatever that
+  /// reason carries.
   case api(DRApiError)
 
   /// A failure response whose body was not a readable `DRApiError`, so there is nothing to
@@ -46,7 +47,7 @@ public enum DifferentRequestsError: Error, Sendable, LocalizedError {
     case .api(let error):
       // The contract states this message is written for a developer reading a log, never
       // for an end user, so it is surfaced here and not into UI copy.
-      return "\(error.code): \(error.message)"
+      return error.refusalDescription
     case .unreadableError(let byteCount):
       return "The server returned a failure with \(byteCount) bytes that were not an ApiError."
     case .decodingFailed(let method, let underlying):
@@ -68,20 +69,21 @@ public enum DifferentRequestsError: Error, Sendable, LocalizedError {
   /// a request that has since gone is not a connection to retry, and a surface that offers
   /// "Try Again" for it sends someone to retry a read that will never succeed.
   public var isNotFound: Bool {
-    guard case .api(let error) = self else {
+    guard case .api(let error) = self, case .notFound = error.reason else {
       return false
     }
-    return error.code == .notFound
+    return true
   }
 
   /// How long to wait before retrying, when the server said to wait.
   ///
-  /// Reads the contract's own field. There is no `Retry-After` header in this protocol to
-  /// disagree with it.
+  /// Reads the contract's own field, which lives on the rate limit itself — so there is no asking
+  /// a failure of some other kind how long to wait, and no `Retry-After` header in this protocol
+  /// to disagree with it either.
   public var retryAfterSeconds: Int? {
-    guard case .api(let error) = self, error.code == .rateLimited else {
+    guard case .api(let error) = self, case .rateLimited(let limited) = error.reason else {
       return nil
     }
-    return Int(error.retryAfterSeconds)
+    return Int(limited.retryAfterSeconds)
   }
 }

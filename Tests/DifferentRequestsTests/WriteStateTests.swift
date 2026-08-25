@@ -55,7 +55,7 @@ struct WriteStateTests {
     // The contract states an ApiError's message is written for whoever is debugging and may name
     // internals. This one does.
     var refused = DRApiError()
-    refused.code = .internal
+    refused.reason = .internalFailure(DRInternalFailure())
     refused.message = "vote_upsert failed: pg_conn refused at shard 4"
 
     let failure = WriteFailure(attempt: .vote, error: DifferentRequestsError.api(refused))
