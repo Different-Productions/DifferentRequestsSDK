@@ -1,3 +1,4 @@
+import DifferentRequestsProtos
 import Foundation
 
 /// What is keeping requests off the board, which is the whole of what an empty board means.
@@ -29,8 +30,8 @@ enum BoardNarrowing: CaseIterable {
 
 extension BoardNarrowing {
 
-  /// What a question is holding back, read off the question itself.
-  init(question: BoardQuestion) {
+  /// What a question is holding back, read off the contract's own request.
+  init(question: DRListRequestsRequest) {
     switch (question.query.isEmpty, question.statuses.isEmpty) {
     case (true, true):
       self = .nothing

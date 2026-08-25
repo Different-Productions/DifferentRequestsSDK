@@ -186,21 +186,30 @@ struct BoardFilterTests {
 
   // MARK: - What an empty board says
 
+  /// The contract's own request, built the way the store builds one.
+  private func asking(
+    statuses: [DRRequestStatus],
+    sort: DRRequestSort,
+    query: String
+  ) -> DRListRequestsRequest {
+    var asked = DRListRequestsRequest()
+    asked.statuses = statuses
+    asked.sort = sort
+    asked.query = query
+    return asked
+  }
+
   @Test("A question knows what it is holding back, and every case is reachable")
   func aQuestionKnowsWhatItIsHoldingBack() throws {
     let store = try board()
     let status = try #require(store.offeredStatuses.first)
     let ranking = try #require(store.offeredSorts.first)
 
-    let expectations: [(question: BoardQuestion, narrowing: BoardNarrowing, filtered: Bool)] = [
-      (BoardQuestion(statuses: [], sort: ranking, query: ""), .nothing, false),
-      (BoardQuestion(statuses: [], sort: ranking, query: "dark mode"), .query, false),
-      (BoardQuestion(statuses: [status], sort: ranking, query: ""), .statuses, true),
-      (
-        BoardQuestion(statuses: [status], sort: ranking, query: "dark mode"),
-        .queryAndStatuses,
-        true
-      ),
+    let expectations: [(question: DRListRequestsRequest, narrowing: BoardNarrowing, filtered: Bool)] = [
+      (asking(statuses: [], sort: ranking, query: ""), .nothing, false),
+      (asking(statuses: [], sort: ranking, query: "dark mode"), .query, false),
+      (asking(statuses: [status], sort: ranking, query: ""), .statuses, true),
+      (asking(statuses: [status], sort: ranking, query: "dark mode"), .queryAndStatuses, true)
     ]
 
     for expectation in expectations {

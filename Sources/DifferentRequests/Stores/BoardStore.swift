@@ -59,9 +59,17 @@ final class BoardStore {
 
   // MARK: - Derived
 
-  /// The whole of what the board is being asked for right now.
-  var question: BoardQuestion {
-    BoardQuestion(statuses: statuses, sort: sort, query: query)
+  /// The whole of what the board is being asked for right now, as the contract's own request.
+  ///
+  /// The cursor is deliberately left empty: it addresses a place inside an answer, not the question
+  /// asked, so leaving it off is what makes `==` between two of these mean "the same board" without
+  /// a comparison written field by field.
+  var question: DRListRequestsRequest {
+    var asking = DRListRequestsRequest()
+    asking.statuses = statuses
+    asking.sort = sort
+    asking.query = query
+    return asking
   }
 
   /// Whether what is held — or what is already being read — answers the question now being asked.
@@ -109,7 +117,7 @@ final class BoardStore {
   ///
   /// Kept rather than assumed equal to ``question``: the controls move while a read is suspended,
   /// and what is on screen answers whichever question was being asked when that read started.
-  private var asked: BoardQuestion
+  private var asked: DRListRequestsRequest
 
   // MARK: - Init
 
@@ -130,7 +138,10 @@ final class BoardStore {
     self.statuses = statuses
     self.sort = sort
     self.query = ""
-    self.asked = BoardQuestion(statuses: statuses, sort: sort, query: "")
+    var asking = DRListRequestsRequest()
+    asking.statuses = statuses
+    asking.sort = sort
+    self.asked = asking
   }
 
   // MARK: - Narrowing
@@ -220,7 +231,7 @@ final class BoardStore {
   }
 
   /// Reads page one of `question` and replaces the board with it.
-  private func readFirstPage(_ question: BoardQuestion) async {
+  private func readFirstPage(_ question: DRListRequestsRequest) async {
     do {
       let answer = try await fetch(question, cursor: "")
       read = ReadState(page: answer.requests)
@@ -233,17 +244,16 @@ final class BoardStore {
   }
 
   /// One page of `question` at `cursor`, or its first when that is empty.
+  ///
+  /// The cursor is set on a copy of the question rather than passed beside it, so what goes over
+  /// the wire is one message the contract declares and not four arguments assembled here.
   private func fetch(
-    _ question: BoardQuestion,
+    _ question: DRListRequestsRequest,
     cursor: String
   ) async throws -> DRListRequestsResponse {
-    let requested: String? = cursor.isEmpty ? nil : cursor
-    return try await client.requests(
-      statuses: question.statuses,
-      sort: question.sort,
-      query: question.query,
-      cursor: requested
-    )
+    var asking = question
+    asking.cursor = cursor
+    return try await client.requests(asking)
   }
 
   // MARK: - Writes

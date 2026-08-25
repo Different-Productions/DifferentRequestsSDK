@@ -137,28 +137,22 @@ public actor DifferentRequestsClient {
 
   // MARK: - The board
 
-  /// A page of the board.
+  /// A page of the board, for the request the contract declares.
   ///
-  /// - Parameters:
-  ///   - statuses: Empty for everything still on the board.
-  ///   - query: Free text over title and body. Also the search-before-submit path — the same ranking
-  ///     and the same page shape, so duplicates are caught while writing rather than in triage.
-  ///   - cursor: What the previous page handed back. Nil for the first page.
-  public func requests(
-    statuses: [DRRequestStatus],
-    sort: DRRequestSort,
-    query: String?,
-    cursor: String?
-  ) async throws -> DRListRequestsResponse {
+  /// Takes `DRListRequestsRequest` whole rather than its four fields: the message is what the
+  /// server, the wire and this client have agreed on, and a caller that spells the fields out is a
+  /// second place they can disagree. Empty is absent throughout, which is what proto3 means by an
+  /// unset scalar — so an empty `query` or `cursor` simply does not become a query item.
+  public func requests(_ asked: DRListRequestsRequest) async throws -> DRListRequestsResponse {
     var items: [URLQueryItem] = []
 
-    if let sortToken = sort.urlToken {
+    if let sortToken = asked.sort.urlToken {
       items.append(URLQueryItem(name: DRListRequestsRequest.Field.sort, value: sortToken))
     }
 
     // Comma-separated, matching what the server reads: a repeated query parameter is spelled three
     // different ways by three different clients and one of them is always wrong.
-    let statusTokens = statuses.compactMap(\.urlToken)
+    let statusTokens = asked.statuses.compactMap(\.urlToken)
     if statusTokens.isEmpty == false {
       items.append(
         URLQueryItem(
@@ -168,11 +162,11 @@ public actor DifferentRequestsClient {
       )
     }
 
-    if let query, query.isEmpty == false {
-      items.append(URLQueryItem(name: DRListRequestsRequest.Field.query, value: query))
+    if asked.query.isEmpty == false {
+      items.append(URLQueryItem(name: DRListRequestsRequest.Field.query, value: asked.query))
     }
-    if let cursor, cursor.isEmpty == false {
-      items.append(URLQueryItem(name: DRListRequestsRequest.Field.cursor, value: cursor))
+    if asked.cursor.isEmpty == false {
+      items.append(URLQueryItem(name: DRListRequestsRequest.Field.cursor, value: asked.cursor))
     }
 
     return try await get(.listRequests, query: items)
