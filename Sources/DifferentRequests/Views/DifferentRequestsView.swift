@@ -253,7 +253,7 @@ private struct RequestSummary: View {
       }
 
       HStack(spacing: Self.metadataSpacing) {
-        StatusBadge(status: request.status)
+        StatusBadge(state: request.state)
 
         if request.commentCount > 0 {
           Label(request.commentCount.formatted(), systemImage: "bubble.left")

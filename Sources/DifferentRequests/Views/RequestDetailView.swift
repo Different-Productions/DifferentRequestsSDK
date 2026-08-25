@@ -162,7 +162,7 @@ public struct RequestDetailView: View {
         .fontWeight(.semibold)
 
       HStack(spacing: Self.metadataSpacing) {
-        StatusBadge(status: request.status)
+        StatusBadge(state: request.state)
 
         Text(authorName(request))
           .font(.caption)
@@ -182,12 +182,20 @@ public struct RequestDetailView: View {
           .font(.body)
       }
 
-      if request.hasDecline {
-        declineNotice(request.decline)
-      }
-
-      if request.mergedIntoRequestID.isEmpty == false {
-        mergedLink(request.mergedIntoRequestID)
+      // One switch over one state. A refusal is drawn only by the arm that carries one, so the
+      // screen that showed a shipped request with a decline notice under it — legal on the wire
+      // until the contract made the state one thing — has nowhere to come from.
+      switch request.state {
+      case .declined(let decline):
+        declineNotice(decline)
+      case .merged(let merged):
+        mergedLink(merged.intoRequestID)
+      case .open, .planned, .inProgress, .shipped:
+        EmptyView()
+      case .none:
+        // Written before the state existed, or by a server newer than this build. The badge above
+        // says so; there is nothing further this version knows how to draw.
+        EmptyView()
       }
 
       HStack(spacing: Self.actionSpacing) {

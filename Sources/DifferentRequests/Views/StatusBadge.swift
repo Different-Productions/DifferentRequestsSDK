@@ -4,20 +4,53 @@ import SwiftUI
 /// Where a request sits in the tenant's process, as a capsule.
 ///
 /// ```swift
-/// StatusBadge(status: request.status)
+/// StatusBadge(state: request.state)
 /// ```
+///
+/// Takes the state rather than a status beside it, so the badge and whatever is drawn underneath it
+/// read one value. A badge saying "Shipped" over a refusal was a screen this took two arguments to
+/// produce.
 public struct StatusBadge: View {
 
   private static let fillOpacity: Double = 0.12
   private static let horizontalPadding: CGFloat = 10
   private static let verticalPadding: CGFloat = 2
 
-  /// The status to render.
-  public let status: DRRequestStatus
+  /// The state to render. Absent for a request written before the state existed, or by a server
+  /// newer than this build.
+  public let state: DRFeatureRequest.OneOf_State?
 
-  /// - Parameter status: The status to render.
-  public init(status: DRRequestStatus) {
-    self.status = status
+  /// - Parameter state: The state to render.
+  public init(state: DRFeatureRequest.OneOf_State?) {
+    self.state = state
+    self.tag = nil
+  }
+
+  /// A status with no request behind it — a roadmap column heading, which *is* a status group and
+  /// has no state to disagree with.
+  ///
+  /// Never reach for this to label a request. A request has a state, and taking the tag separately
+  /// is what let a badge say "Shipped" over a refusal.
+  public init(groupedBy status: DRRequestStatus) {
+    self.state = nil
+    self.tag = status
+  }
+
+  private let tag: DRRequestStatus?
+
+  private var status: DRRequestStatus {
+    if let tag {
+      return tag
+    }
+    switch state {
+    case .open: return .open
+    case .planned: return .planned
+    case .inProgress: return .inProgress
+    case .shipped: return .shipped
+    case .declined: return .declined
+    case .merged: return .merged
+    case .none: return .unspecified
+    }
   }
 
   public var body: some View {

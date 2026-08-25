@@ -112,7 +112,7 @@ public struct RoadmapView: View {
 
   private func header(_ column: DRRoadmapColumn) -> some View {
     HStack {
-      StatusBadge(status: column.status)
+      StatusBadge(groupedBy: column.status)
       Spacer()
       Text(column.totalCount.formatted())
         .font(.caption)
