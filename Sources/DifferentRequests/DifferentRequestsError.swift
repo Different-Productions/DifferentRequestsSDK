@@ -40,6 +40,12 @@ public enum DifferentRequestsError: Error, Sendable, LocalizedError {
   /// The configured base URL cannot have an rpc path resolved against it.
   case invalidBaseURL(URL)
 
+  /// The rpc declares a verb the contract does not spell, so there is nothing to send.
+  ///
+  /// Its own case rather than a default verb: a write sent as a read reaches a route that answers,
+  /// and answers wrongly. A call that does not leave is the smaller failure.
+  case unspellableMethod(DRRequestsServiceRPC)
+
   public var errorDescription: String? {
     switch self {
     case .notAuthenticated(let method):
@@ -60,6 +66,8 @@ public enum DifferentRequestsError: Error, Sendable, LocalizedError {
       return "The transport returned a non-HTTP response."
     case .invalidBaseURL(let url):
       return "Not a usable API base URL: \(url.absoluteString)"
+    case .unspellableMethod(let method):
+      return "\(method.rawValue) declares a verb the contract does not spell, so it was not sent."
     }
   }
 
