@@ -8,8 +8,12 @@ The defect it fixes: this package never called its own `config()`. `DifferentReq
 existed, was documented as "fetch once per launch", and had exactly one caller in this
 repository — the Example app, which used it to decide which tabs to build. No screen in the SDK
 asked. So `RoadmapView` and `ChangelogView` rendered themselves for any app that reached them, read
-their rpc, and got `PLAN_REQUIRED` back. `GetRoadmap` and `ListChangelog` are the only two rpcs the
+their rpc, and got `planRequired` back. `GetRoadmap` and `ListChangelog` are the only two rpcs the
 server refuses on plan, and both of them are behind those two screens.
+
+Which two is not a fact this SDK holds. Each declares `(plan_gate)` in the contract, so
+`DRRequestsServiceRPC.planGate` names the surface a tenant's plan has to include, and an rpc gated
+later arrives here already saying so.
 
 What made that worse than an ordinary failure is who the refusal is written for. The contract is
 explicit: the `planRequired` reason is "distinct from PermissionDenied because the remedy is a
@@ -148,8 +152,8 @@ it rather than approximating it. A call that throws is not remembered, so the ne
 | The config read fails on the roadmap or the changelog | **"Couldn't load"** / "Something went wrong reaching the server. Check your connection and try again." with **Try Again**, which asks for the config again. The surface itself is not read, because whether it exists is not known |
 | The config read fails on a request's composer | **"Couldn't tell whether this app takes comments."** with **Try Again**, in the composer's strip. The request and the thread above it are unaffected — they were read by a different rpc that answered |
 | The config read answers with no `AppConfig` in it | The same "Couldn't load" screen, from `DifferentRequestsError.incompleteResponse(.getConfig)`. Not treated as an answer: every flag on an absent message reads as `false`, and a server that said nothing would otherwise be read as a tenant who bought nothing |
-| The server returns `PLAN_REQUIRED` anyway — a plan that lapsed between the config read and the surface read | **"Couldn't load"** with **Try Again**, from `ReadState(readFailure:)`. The gate is a way to not ask; it is not a promise that an answer cannot change underneath it |
-| The `DRApiError.message` on a plan refusal says something specific | Nobody sees it. The contract states that message is written for whoever is debugging and may name internals, and `PLAN_REQUIRED` in particular is never surfaced to an end user |
+| The server returns `planRequired` anyway — a plan that lapsed between the config read and the surface read | **"Couldn't load"** with **Try Again**, from `ReadState(readFailure:)`. The gate is a way to not ask; it is not a promise that an answer cannot change underneath it |
+| The `DRApiError.message` on a plan refusal says something specific | Nobody sees it. The contract states that message is written for whoever is debugging and may name internals, and `planRequired` in particular is never surfaced to an end user |
 | A reader is shown any of the absent screens | Nothing about a plan, a tier, a price or an upgrade. They did not choose it and cannot change it |
 | The config read fails and the screen is opened again | It asks again. `PlanState.needsReading` is true after a failure, so one outage does not close a surface for the rest of the launch |
 | A surface that is settled — included or excluded — is opened again | It does not ask again. `needsReading` is false, so an excluded screen costs nothing on every appearance |
@@ -207,7 +211,7 @@ A PRO SURFACE — the defect, and where it now stops
     │     ▼
     ├── plan.isIncluded == false ──►  ✗ STOP. client.roadmap() is NOT called.
     │                                   ⟵ this is the whole fix. The call that
-    │                                      returned PLAN_REQUIRED is not made.
+    │                                      returned planRequired is not made.
     └── readColumns()
           ├── read = read.whileReading
           ├── client.roadmap()  ── GET /roadmap
@@ -370,13 +374,13 @@ All hermetic. Two ways of reaching a real failure without a network, both alread
 | Test file / test | The leg it walks |
 | --- | --- |
 | `PlanGatingTests.everySurfaceSaysWhatIsThereInstead` | Walks `PlanSurface.allCases`: each has a title, a description and a symbol, and no two surfaces say the same thing — so a surface added to the enum is covered by being declared |
-| `PlanGatingTests.nothingSaidToAReaderMentionsAPlan` | The same walk, against the words the contract forbids: plan, Pro, Free, upgrade, subscribe, price. `PLAN_REQUIRED` is written for the host developer and is never surfaced to an end user |
+| `PlanGatingTests.nothingSaidToAReaderMentionsAPlan` | The same walk, against the words the contract forbids: plan, Pro, Free, upgrade, subscribe, price. `planRequired` is written for the host developer and is never surfaced to an end user |
 | `PlanGatingTests.eachSurfaceReadsItsOwnFlag` | One config per flag, walked over `allCases`: turning on `roadmapEnabled` includes the roadmap and nothing else, and the same for the other two — the copy-paste that returns the wrong field fails here |
 | `PlanGatingTests.aConfigThatSaysNothingIncludesNothing` | Both ends of `PlanState(surface:response:)`, walked over `allCases`: an all-false `DRAppConfig` excludes every surface and an all-true one includes every surface, so the gate closes and opens rather than only closing |
 | `PlanGatingTests.aResponseWithNoConfigIsAFailureRatherThanAnAnswer` | `PlanState(surface:response:)` on a `DRGetConfigResponse` with `hasConfig == false` → `.failed(.incompleteResponse(.getConfig))`, walked over `allCases`. The defaulted-to-false trap |
 | `PlanGatingTests.anAnsweredPlanIsNotAskedAgainAndAFailedOneIs` | `needsReading` across every `PlanState` case: false once answered either way, true after a failure |
 | `PlanGatingTests.onlyAnIncludedSurfaceIsRead` | `isIncluded` across every case — that an unknown plan is not read as an included one, which is what stops a read being started on a guess |
-| `PlanGatingTests.aRoadmapIsNotReadUntilTheAppSaysItHasOne` | `RoadmapStore.load()` with `plan` seeded `.excluded`: `read` is still `.unread` afterwards, and `plan` was not re-asked. The rpc that answered `PLAN_REQUIRED` is not called |
+| `PlanGatingTests.aRoadmapIsNotReadUntilTheAppSaysItHasOne` | `RoadmapStore.load()` with `plan` seeded `.excluded`: `read` is still `.unread` afterwards, and `plan` was not re-asked. The rpc that answered `planRequired` is not called |
 | `PlanGatingTests.aChangelogIsNotReadUntilTheAppSaysItPublishesOne` | The same for `ChangelogStore`, including that `page` is left alone — a surface the app lacks has no page to ask for |
 | `PlanGatingTests.aPlanThatCouldNotBeReadReadsNothingAndSaysSo` | `RoadmapStore.load()` and `ChangelogStore.load()` against an unusable scheme: `plan.failure` is set and `read` is still `.unread`, because whether the surface exists is not known |
 | `PlanGatingTests.aSurfaceTheAppHasIsRead` | The same two stores with `plan` seeded `.included`: the surface read happens and lands on `read.failure`, so the gate opens as well as closes |
