@@ -63,8 +63,8 @@ final class Session {
   /// after a failure.
   ///
   /// Config is fetched here rather than by each screen because it decides which screens exist at
-  /// all: the roadmap and the changelog are Pro surfaces, and a tab that is shown and then answers
-  /// PLAN_REQUIRED has told the person using the app that something is broken. Asking once, before
+  /// all: the roadmap and the changelog are Pro surfaces, and a tab that is shown and then refused
+  /// has told the person using the app that something is broken. Asking once, before
   /// anything is drawn, is the difference between an absent tab and a dead one.
   func start() async {
     if DemoConfig.isConfigured == false {

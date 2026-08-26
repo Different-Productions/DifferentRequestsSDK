@@ -10,7 +10,7 @@ import Foundation
 ///
 /// What each case carries is what the person is looking at instead. Nothing here says what the
 /// plan is, what the missing surface would cost, or that a plan is involved at all: the contract
-/// states `PLAN_REQUIRED` is written for the host developer, is the one error whose remedy is a
+/// states `planRequired` is written for the host developer, is the one error whose remedy is a
 /// purchase, and is never surfaced to an end user. Someone using a host app did not choose the
 /// plan and cannot change it, so being told about it would be being told about somebody else's
 /// decision.

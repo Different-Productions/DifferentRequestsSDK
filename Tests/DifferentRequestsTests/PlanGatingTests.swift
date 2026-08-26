@@ -6,7 +6,7 @@ import Testing
 
 /// A surface the tenant's plan does not include is not a failure and not an empty surface. It is a
 /// screen that says what is there instead — and the one thing it may never say is why, because the
-/// contract writes `PLAN_REQUIRED` for the host developer and the person looking at the screen
+/// contract writes `planRequired` for the host developer and the person looking at the screen
 /// neither chose the plan nor can change it.
 ///
 /// These walk the two values that decide it, and the stores that read them: that the flags are read
@@ -70,7 +70,7 @@ struct PlanGatingTests {
 
   @Test("Nothing a reader is shown mentions a plan, because a plan is not theirs to act on")
   func nothingSaidToAReaderMentionsAPlan() {
-    // The contract: PLAN_REQUIRED is "distinct from PERMISSION_DENIED because the remedy is a
+    // The contract: planRequired is "distinct from PermissionDenied because the remedy is a
     // purchase, not a different account, and only the host developer can act on it — never
     // surfaced to an end user."
     let notTheirs = ["plan", "pro", "free", "tier", "upgrade", "subscri", "price", "billing"]
@@ -179,7 +179,7 @@ struct PlanGatingTests {
   @Test("A roadmap is not read until the app says it has one")
   func aRoadmapIsNotReadUntilTheAppSaysItHasOne() async throws {
     // GetRoadmap is one of exactly two rpcs the server refuses on plan. This is the whole fix:
-    // the call that answered PLAN_REQUIRED is not made.
+    // the call that answered planRequired is not made.
     let store = RoadmapStore(client: try nowhere())
     store.plan = .excluded
 

@@ -100,7 +100,7 @@ control that was tapped. Nothing fails quietly.
 
 `RoadmapView` and `ChangelogView` are plan-gated, and they gate themselves. Each asks
 `client.config()` before it reads anything, and an app whose plan does not include that surface gets
-a screen saying what is there instead — never a call that comes back `PLAN_REQUIRED`, which is an
+a screen saying what is there instead — never a call that comes back `planRequired`, which is an
 error written for you and not for the person holding the phone. The composer under a request does
 the same on `commentsEnabled`. `config()` is read once and remembered, so however many screens ask,
 it is one round trip.

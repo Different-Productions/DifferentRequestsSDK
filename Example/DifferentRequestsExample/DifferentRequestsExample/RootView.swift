@@ -5,7 +5,7 @@ import SwiftUI
 /// plan includes.
 ///
 /// Which tabs exist comes from `DRAppConfig`, not from this app's own guess. The roadmap and the
-/// changelog are Pro surfaces: a tab that answers `PLAN_REQUIRED` when tapped tells the person using
+/// changelog are Pro surfaces: a tab that is refused when tapped tells the person using
 /// the app that something is broken, when nothing is. An absent tab is the honest rendering of an
 /// absent feature.
 struct RootView: View {

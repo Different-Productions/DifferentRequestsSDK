@@ -14,7 +14,7 @@ import Foundation
 /// Two states: whether this app has a roadmap at all, and then what is on it. `GetRoadmap` is one
 /// of exactly two rpcs the server refuses on plan, so a roadmap read by an app that does not have
 /// one is a round trip whose only possible answer is a refusal — and a refusal the person looking
-/// at the screen must never be shown, because the contract writes `PLAN_REQUIRED` for the host
+/// at the screen must never be shown, because the contract writes `planRequired` for the host
 /// developer and the remedy is a purchase only they can make.
 ///
 /// Nothing is written from this surface, and there is no paging: a column is a bounded page the
