@@ -45,7 +45,7 @@ extension PlanState {
   init(surface: PlanSurface, response: DRGetConfigResponse) {
     if response.hasConfig == false {
       self = .failed(DifferentRequestsError.incompleteResponse(.getConfig))
-    } else if surface.isIncluded(in: response.config) {
+    } else if response.config.includes(surface.theSurfaceTheContractNames) {
       self = .included
     } else {
       self = .excluded

@@ -98,15 +98,16 @@ struct PlanGatingTests {
 
     for surface in PlanSurface.allCases {
       #expect(
-        surface.isIncluded(in: onlyRoadmap.config) == (surface == .roadmap),
+        onlyRoadmap.config.includes(surface.theSurfaceTheContractNames) == (surface == .roadmap),
         "\(surface) reads roadmapEnabled when it should not"
       )
       #expect(
-        surface.isIncluded(in: onlyChangelog.config) == (surface == .changelog),
+        onlyChangelog.config.includes(surface.theSurfaceTheContractNames)
+          == (surface == .changelog),
         "\(surface) reads changelogEnabled when it should not"
       )
       #expect(
-        surface.isIncluded(in: onlyComments.config) == (surface == .comments),
+        onlyComments.config.includes(surface.theSurfaceTheContractNames) == (surface == .comments),
         "\(surface) reads commentsEnabled when it should not"
       )
     }

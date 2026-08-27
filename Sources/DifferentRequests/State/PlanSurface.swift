@@ -28,19 +28,19 @@ enum PlanSurface: CaseIterable {
 
 extension PlanSurface {
 
-  /// Whether `config` says this app has it.
+  /// This surface as the contract names it, which is what `DRAppConfig.includes(_:)` answers for.
   ///
-  /// The three flags are read here rather than at each surface, so a screen asks what it is
-  /// rather than which field to look at, and a fourth gated surface is one case rather than one
-  /// more `if` spread through the views.
-  func isIncluded(in config: DRAppConfig) -> Bool {
+  /// Every case here is drawable and so has a name in the contract. The contract's own enum also
+  /// carries `unspecified` and `UNRECOGNIZED`, which name no screen and so are not reachable from
+  /// this side.
+  var theSurfaceTheContractNames: DRPlanSurface {
     switch self {
     case .roadmap:
-      return config.roadmapEnabled
+      return .roadmap
     case .changelog:
-      return config.changelogEnabled
+      return .changelog
     case .comments:
-      return config.commentsEnabled
+      return .comments
     }
   }
 

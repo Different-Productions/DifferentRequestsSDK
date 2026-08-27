@@ -35,7 +35,7 @@ Three things carry it:
 
 | Value | Where | What it answers |
 | --- | --- | --- |
-| `PlanSurface` | `State/PlanSurface.swift` | Which config flag a surface is, and what is said in its place |
+| `PlanSurface` | `State/PlanSurface.swift` | Which surface the contract names, and what is said in its place |
 | `PlanState` | `State/PlanState.swift` | How far the asking got: `unread`, `reading`, `failed`, `excluded`, `included` |
 | `configuration` | `DifferentRequestsClient.swift` | The answer, kept, so that three screens asking cost one round trip |
 
@@ -165,8 +165,9 @@ it rather than approximating it. A call that throws is not remembered, so the ne
                   │  State/  — the two values this feature is made of           │
                   ├────────────────────────────────────────────────────────────┤
  PlanSurface.swift│  roadmap · changelog · comments        (CaseIterable)       │
-                  │    .isIncluded(in: DRAppConfig) ← the ONLY place a config   │
-                  │                                   flag is read              │
+                  │    .theSurfaceTheContractNames ──► DRPlanSurface            │
+                  │       ↑ the contract's own DRAppConfig.includes(_:) reads   │
+                  │         the flag. Both sides read the same one.             │
                   │    .absentTitle · .absentDescription · .absentSymbol        │
                   │       ↑ copy about what IS there. Never about a plan.       │
  PlanState.swift  │  unread · reading · failed(Error) · excluded · included     │
@@ -375,7 +376,7 @@ All hermetic. Two ways of reaching a real failure without a network, both alread
 | --- | --- |
 | `PlanGatingTests.everySurfaceSaysWhatIsThereInstead` | Walks `PlanSurface.allCases`: each has a title, a description and a symbol, and no two surfaces say the same thing — so a surface added to the enum is covered by being declared |
 | `PlanGatingTests.nothingSaidToAReaderMentionsAPlan` | The same walk, against the words the contract forbids: plan, Pro, Free, upgrade, subscribe, price. `planRequired` is written for the host developer and is never surfaced to an end user |
-| `PlanGatingTests.eachSurfaceReadsItsOwnFlag` | One config per flag, walked over `allCases`: turning on `roadmapEnabled` includes the roadmap and nothing else, and the same for the other two — the copy-paste that returns the wrong field fails here |
+| `PlanGatingTests.eachSurfaceReadsItsOwnFlag` | One config per flag, walked over `allCases`: turning on `roadmapEnabled` includes the roadmap and nothing else, and the same for the other two — a surface handed the contract's wrong name fails here |
 | `PlanGatingTests.aConfigThatSaysNothingIncludesNothing` | Both ends of `PlanState(surface:response:)`, walked over `allCases`: an all-false `DRAppConfig` excludes every surface and an all-true one includes every surface, so the gate closes and opens rather than only closing |
 | `PlanGatingTests.aResponseWithNoConfigIsAFailureRatherThanAnAnswer` | `PlanState(surface:response:)` on a `DRGetConfigResponse` with `hasConfig == false` → `.failed(.incompleteResponse(.getConfig))`, walked over `allCases`. The defaulted-to-false trap |
 | `PlanGatingTests.anAnsweredPlanIsNotAskedAgainAndAFailedOneIs` | `needsReading` across every `PlanState` case: false once answered either way, true after a failure |
