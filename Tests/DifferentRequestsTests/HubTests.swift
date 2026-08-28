@@ -1,14 +1,15 @@
 import DifferentRequestsProtos
+import Foundation
 import Testing
 @testable import DifferentRequests
 
 /// The hub is what makes a screen's state older than the screen. A SwiftUI view is a value that is
 /// thrown away and built again on every redraw above it, so anything it constructs is gone with it;
-/// these assert the two things that stop that — the same store for the same request, and one
-/// composer that is opened rather than rebuilt.
+/// these assert the things that stop that — the same store for the same request, one composer that
+/// is opened rather than rebuilt, and a board read before the screen showing it exists.
 ///
-/// Nothing here touches the network. A client is built because the stores need one to hold, and no
-/// method that would call through it is invoked.
+/// Hermetic, and not by pretending. Where a read has to be provoked, the client is pointed at a
+/// scheme `URLSession` cannot open, which fails without a lookup and without a connection.
 @MainActor
 struct HubTests {
 
@@ -101,5 +102,41 @@ struct HubTests {
         "\(status.rawValue) is filtered out of the board the hub builds"
       )
     }
+  }
+
+  // MARK: - Reading the board early
+
+  private func nowhere() throws -> DifferentRequestsClient {
+    let base = try #require(URL(string: "differentrequests-nowhere://api.invalid"))
+    return .make(appKey: "test-app-key", baseURL: base)
+  }
+
+  private func request(id: String) -> DRFeatureRequest {
+    var made = DRFeatureRequest()
+    made.id = id
+    made.title = "Dark mode everywhere"
+    return made
+  }
+
+  @Test("Warming an unread board reads it, so the screen it opens does not have to")
+  func warmingAnUnreadBoardReadsIt() async throws {
+    let hub = DifferentRequestsHub(client: try nowhere())
+    #expect(hub.board.read.hasRead == false)
+
+    await hub.readTheBoardBeforeItIsShown()
+
+    #expect(hub.board.read.hasRead, "an unwarmed board makes .firstRead read again on presentation")
+  }
+
+  @Test("A board already read is not read a second time by being warmed")
+  func aBoardAlreadyReadIsNotReadAgain() async throws {
+    let hub = DifferentRequestsHub(client: try nowhere())
+    hub.board.read = .loaded([request(id: "req-1")])
+
+    await hub.readTheBoardBeforeItIsShown()
+
+    // This client reaches nothing, so a second read would replace the page with a failure.
+    #expect(hub.board.read.content?.count == 1, "warming took away the page the board already held")
+    #expect(hub.board.read.failure == nil)
   }
 }

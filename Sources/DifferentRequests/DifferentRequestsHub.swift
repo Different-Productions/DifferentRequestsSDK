@@ -80,6 +80,23 @@ public final class DifferentRequestsHub {
     self.details = RequestDetailStores(client: client)
   }
 
+  // MARK: - Reading the board early
+
+  /// Reads the board's first page before a screen asks for it.
+  ///
+  /// The first page is a round trip. A board that starts one when it appears shows a spinner for
+  /// the length of it, and the reader waits having already decided to look. Called while they are
+  /// still somewhere else — a settings list, a screen carrying a button that opens this — the page
+  /// is held by the time the board is presented, and it draws rows on the first frame.
+  ///
+  /// Callable as often as a host likes. A board already read is not read again, and a read already
+  /// in flight is not started twice, so a button that warms on every appearance costs one round
+  /// trip rather than one per appearance.
+  public func readTheBoardBeforeItIsShown() async {
+    if board.read.hasRead { return }
+    await board.load()
+  }
+
   // MARK: - Filing a request
 
   /// Opens the composer on whatever the board was searched for.

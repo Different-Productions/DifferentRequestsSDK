@@ -232,7 +232,22 @@ DifferentRequestsView
        ├── query non-empty  ──► Task.sleep(300ms)   ← typing is debounced
        └── store.load()                             ← a capsule tap is not
   .firstRead(store.read)  ──► FirstRead.swift ──► store.load()   once per store
+       └── skipped when read.hasRead, which is what a warmed board already is
 ```
+
+The first page is a round trip, and a screen that starts it on appearance shows a spinner for the
+length of one. A host that knows the board is about to be opened can pay it earlier:
+
+```
+Host app — on a screen carrying the button, before the board exists
+  DifferentRequestsHub.readTheBoardBeforeItIsShown()   DifferentRequestsHub.swift:95
+       ├── board.read.hasRead ──► return               ← a warm board is not read again
+       └── board.load()                                ← and load() drops a read in flight
+```
+
+Callable on every appearance: the guard makes it one round trip rather than one per appearance.
+The board draws its rows on the first frame when it was warmed, and behaves exactly as below when
+it was not.
 
 ## The screens
 
@@ -345,6 +360,13 @@ what is asserted is what was asked and what the store did with it, not what a se
 | `everyNarrowingSaysSomethingDifferent` | Walks `BoardNarrowing.allCases`: every case has a non-empty title, message and footer, and no two cases share any of the three. A blank empty state and a copy-pasted one are the same bug |
 | `anEmptyBoardDescribesTheReadThatEmptiedIt` | `narrowing` reads the question the last read was started for, not what the capsules say now — so the sentence under an empty board is about the read that produced it |
 | `aFilterChangeAsksAgainRatherThanPagingOn` | `show(sort:)` and `toggle(status:)` read again rather than only setting a property: the board ends up current for the new question, and the rows read under the old one are replaced rather than paged onto |
+
+`Tests/DifferentRequestsTests/HubTests.swift`, same unreachable base URL, for the early read:
+
+| Test | The leg it walks |
+| --- | --- |
+| `warmingAnUnreadBoardReadsIt` | `readTheBoardBeforeItIsShown()` on a board still `.unread` leaves it `hasRead`, which is the whole point — an unwarmed board makes `.firstRead` read again on presentation |
+| `aBoardAlreadyReadIsNotReadAgain` | The guard. A board seeded `.loaded` keeps its page and its `failure` stays nil, which it could not if a second read had run against a client that reaches nothing |
 
 Not walked here, and why:
 

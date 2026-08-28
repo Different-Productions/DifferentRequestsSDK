@@ -69,6 +69,22 @@ The same `externalID` returns the same person on a new device, which is what car
 across a reinstall. `Example/DifferentRequestsExample/DifferentRequestsExample/Session.swift` is
 this, with the failure shown on screen instead of logged.
 
+## Open It Without The Wait
+
+The board's first page is a round trip, so a board that starts one when it appears shows a spinner
+for the length of it. If you know it is about to be opened — a settings row, a button pinned to a
+screen — read it while the reader is still looking at something else:
+
+```swift
+override func viewDidLoad() {
+  super.viewDidLoad()
+  Task { await requests.readTheBoardBeforeItIsShown() }
+}
+```
+
+It draws rows on the first frame after that. Call it as often as you like: a board already read is
+not read again, so a button that warms on every appearance costs one round trip, not one each time.
+
 ## Get Your App Key
 
 Sign up at [app.differentrequests.com](https://app.differentrequests.com), create an organization,
