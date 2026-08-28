@@ -102,7 +102,7 @@ your app owns — that stack is what gives them a title bar, a search field, and
   straight from a notification or a deep link
 - **`RoadmapView(hub:)`** — Planned, building, shipped, as a section per column
 - **`ChangelogView(hub:)`** — What shipped, newest first
-- **`InboxView(hub:)`** — Status changes, replies and merges on what someone follows
+- **`InboxView(hub:)`** — Status changes, replies and duplicates on what someone follows
 - **`SubmitRequestView(hub:)`** — The composer sheet, if you want your own way in to it. Call
   `hub.beginSubmission()` before presenting it
 - **`VoteControl(voteCount:voted:isWriting:toggle:)`** — The vote button on its own, for your own

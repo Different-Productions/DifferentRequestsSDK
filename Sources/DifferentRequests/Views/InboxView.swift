@@ -1,7 +1,7 @@
 import DifferentRequestsProtos
 import SwiftUI
 
-/// What a reader has been told: status changes, replies, and merges on requests they follow.
+/// What a reader has been told: status changes, replies, and duplicates on requests they follow.
 ///
 /// ```swift
 /// NavigationStack {
@@ -158,13 +158,13 @@ public struct InboxView: View {
 
   /// Where a tap lands.
   ///
-  /// Only merge news names somewhere else, and it names it on its own arm — so a tap can no longer
-  /// be routed by a merge target that arrived on news that was never about a merge.
+  /// Only duplicate news names somewhere else, and it names it on its own arm — so a tap can no
+  /// longer be routed by a target that arrived on news that was never about a duplicate.
   private func destinationID(_ notification: DRNotification) -> String {
     switch notification.news {
-    case .requestMerged(let folded):
-      // The request it was folded into now holds the demand, so that is the one worth opening.
-      return folded.intoRequestID
+    case .requestDuplicated(let folded):
+      // The request it duplicates now holds the demand, so that is the one worth opening.
+      return folded.duplicateOfRequestID
     case .statusChanged, .commentAdded, .none:
       return notification.requestID
     }
@@ -178,8 +178,8 @@ public struct InboxView: View {
       return "Now \(moved.newStatus.badgeLabel)"
     case .commentAdded:
       return "New comment"
-    case .requestMerged:
-      return "Folded into another request"
+    case .requestDuplicated:
+      return "Already on the board"
     case .none:
       return "Updated"
     }

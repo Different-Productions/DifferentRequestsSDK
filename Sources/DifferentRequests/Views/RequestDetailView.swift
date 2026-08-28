@@ -11,7 +11,7 @@ import SwiftUI
 /// }
 /// ```
 ///
-/// A merged request answers here rather than 404ing, and says where the vote went — someone
+/// A duplicate answers here rather than 404ing, and says where the vote went — someone
 /// holding a link to it is owed that instead of a dead end. A request that has actually gone says
 /// so, which is a different screen from one that could not be reached: there is nothing to retry.
 ///
@@ -188,8 +188,8 @@ public struct RequestDetailView: View {
       switch request.state {
       case .declined(let decline):
         declineNotice(decline)
-      case .merged(let merged):
-        mergedLink(merged.intoRequestID)
+      case .duplicate(let duplicate):
+        theRequestThisDuplicates(duplicate.duplicateOfRequestID)
       case .open, .planned, .inProgress, .shipped:
         EmptyView()
       case .none:
@@ -245,12 +245,12 @@ public struct RequestDetailView: View {
     }
   }
 
-  private func mergedLink(_ requestID: String) -> some View {
+  private func theRequestThisDuplicates(_ requestID: String) -> some View {
     NavigationLink {
       RequestDetailView(hub: hub, requestID: requestID)
     } label: {
       Label(
-        "Folded into another request — your vote went with it",
+        "This was already asked for — your vote went there",
         systemImage: "arrow.triangle.merge"
       )
       .font(.subheadline)

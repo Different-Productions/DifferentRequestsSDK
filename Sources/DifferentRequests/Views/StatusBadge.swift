@@ -48,7 +48,7 @@ public struct StatusBadge: View {
     case .inProgress: return .inProgress
     case .shipped: return .shipped
     case .declined: return .declined
-    case .merged: return .merged
+    case .duplicate: return .duplicate
     case .none: return .unspecified
     }
   }
@@ -81,7 +81,7 @@ extension DRRequestStatus {
     case .inProgress: return "In Progress"
     case .shipped: return "Shipped"
     case .declined: return "Declined"
-    case .merged: return "Merged"
+    case .duplicate: return "Duplicate"
     case .unspecified, .UNRECOGNIZED: return "Unknown"
     }
   }
@@ -93,7 +93,7 @@ extension DRRequestStatus {
     case .inProgress: return .orange
     case .shipped: return .green
     case .declined: return .red
-    case .merged: return .gray
+    case .duplicate: return .gray
     case .unspecified, .UNRECOGNIZED: return .secondary
     }
   }
