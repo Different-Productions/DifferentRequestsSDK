@@ -1,66 +1,61 @@
 # ``DifferentRequests``
 
-Feature request management for iOS apps.
+A feature request board, inside your app.
 
 ## Overview
 
-DifferentRequests lets your users submit, vote on, and browse feature requests
-directly inside your app. The SDK provides both a networking client for full
-control and drop-in SwiftUI views for quick integration.
+Your users ask for things, vote on what other people asked for, and read what
+shipped — without leaving your app and without making an account. You build one
+``DifferentRequestsHub`` at launch, hold it, and hand it to the screens.
 
-### Quick Start
+Every type this SDK sends and receives is generated from the wire contract, so
+the board here and the board your API serves cannot describe different things.
+
+### Quick start
 
 ```swift
 import DifferentRequests
+import SwiftUI
 
-let client = DifferentRequestsClient(apiKey: "your-api-key")
+@main
+struct MyApp: App {
+  // Built once, held for the life of the app. A SwiftUI view is rebuilt on
+  // every redraw above it, and the board's page cannot be.
+  private let requests = DifferentRequestsHub(client: .make(appKey: "your-app-key"))
 
-let user = try await client.authenticate(
-  externalUserId: "user-123",
-  displayName: "Jane",
-  avatarUrl: nil,
-  email: nil,
-  traits: nil
-)
-print("Signed in as \(user.displayName)")
-
-DifferentRequestsView(client: client)
+  var body: some Scene {
+    WindowGroup {
+      // The NavigationStack is yours. Every screen here needs one.
+      NavigationStack {
+        DifferentRequestsView(hub: requests)
+      }
+    }
+  }
+}
 ```
+
+Reading the board needs only your app key. Voting, asking and commenting act on
+behalf of a person, so they need a session — see <doc:GettingStarted>.
 
 ## Topics
 
 ### Essentials
 
 - <doc:GettingStarted>
+- ``DifferentRequestsHub``
 - ``DifferentRequestsClient``
 - ``DifferentRequestsError``
 
-### Views
+### Screens
 
 - ``DifferentRequestsView``
 - ``RequestDetailView``
 - ``SubmitRequestView``
-- ``VoteControl``
+- ``RoadmapView``
+- ``ChangelogView``
+- ``InboxView``
+
+### Pieces
+
 - ``StatusBadge``
-
-### Models
-
-- ``Request``
-- ``PaginatedRequests``
-- ``User``
-- ``VoteResult``
-- ``Vote``
-- ``DeclineReason``
-
-### Enums
-
-- ``SortOrder``
-- ``RequestStatus``
-- ``RequestSource``
-- ``VoteValue``
-
-### State
-
-- ``RequestListModel``
-- ``RequestDetailModel``
-- ``SubmitRequestModel``
+- ``VoteControl``
