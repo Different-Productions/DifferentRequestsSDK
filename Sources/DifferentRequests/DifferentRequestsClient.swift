@@ -364,10 +364,7 @@ public actor DifferentRequestsClient {
     // The status says only whether the body is the answer or a failure. Which failure is in the
     // body, because a status code cannot distinguish "upgrade to Pro" from "not your request".
     guard (200..<300).contains(http.statusCode) else {
-      guard let apiError = try? DRApiError(serializedBytes: [UInt8](data)) else {
-        throw DifferentRequestsError.unreadableError(byteCount: data.count)
-      }
-      throw DifferentRequestsError.api(apiError)
+      throw DifferentRequestsError(failureBody: data)
     }
 
     do {
