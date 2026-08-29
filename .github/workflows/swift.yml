@@ -8,13 +8,10 @@ on:
 
 jobs:
   build:
-    # The arvis pool, like every other repository in this org. This was on macos-latest, which is
-    # both billed and billed at ten times the Linux rate — for a build two macOS machines we own
-    # were sitting idle to run.
-    #
-    # `arvis-pool` is both of them. `backlog-serial` is the label that serializes, and only arvis-2
-    # carries it, so nothing here queues behind the lane it was written to avoid.
-    runs-on: [self-hosted, macOS, ARM64, arvis-pool]
+    # This repository is public, so it cannot run on the machines we own: anyone may open a pull
+    # request, and a self-hosted runner would execute it. Standard GitHub-hosted runners are free
+    # for public repositories, so there is nothing to weigh.
+    runs-on: macos-latest
 
     steps:
     # v4 runs on Node 20, which the runners no longer provide and now force onto Node 24 with a
