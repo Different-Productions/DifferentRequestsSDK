@@ -52,12 +52,20 @@ public struct DifferentRequestsView: View {
 
   public var body: some View {
     VStack(spacing: 0) {
+      PoweredByBadge(badge: hub.badge)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal)
+        .padding(.bottom, 6)
+
       BoardFilterBar(store: store)
 
       content
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
     .navigationTitle("Requests")
+    .task {
+      await hub.badge.load()
+    }
     .searchable(text: $store.query, prompt: "Search requests")
     .toolbar {
       ToolbarItem(placement: .primaryAction) {

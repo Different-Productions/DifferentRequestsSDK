@@ -59,6 +59,11 @@ public final class DifferentRequestsHub {
   /// it is dismissed and re-presented rather than kept.
   let submission: SubmitStore
 
+  /// Whether the screens carry "Powered by Different Requests". One store rather than a flag on
+  /// each screen that draws it, because two of them do and a second copy is a second thing to keep
+  /// in step.
+  let badge: BadgeStore
+
   /// One store per request opened, so a pushed screen keeps its thread and its half-written
   /// comment when whatever pushed it redraws.
   let details: RequestDetailStores
@@ -77,6 +82,7 @@ public final class DifferentRequestsHub {
     self.changelog = ChangelogStore(client: client)
     self.inbox = InboxStore(client: client)
     self.submission = SubmitStore(client: client)
+    self.badge = BadgeStore(client: client)
     self.details = RequestDetailStores(client: client)
   }
 

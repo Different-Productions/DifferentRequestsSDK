@@ -29,8 +29,19 @@ public struct InboxView: View {
   }
 
   public var body: some View {
-    content
+    VStack(spacing: 0) {
+      PoweredByBadge(badge: hub.badge)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal)
+        .padding(.bottom, 6)
+
+      content
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
       .navigationTitle("Inbox")
+      .task {
+        await hub.badge.load()
+      }
       .toolbar {
         if store.unreadCount > 0 {
           ToolbarItem(placement: .primaryAction) {
