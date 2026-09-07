@@ -10,9 +10,9 @@ import SwiftUI
 /// Nothing is drawn until the configuration has answered. See ``BadgeState``.
 struct PoweredByBadge: View {
 
-  /// Whether this app pays. Read rather than passed as a `Bool`, so the badge appears the moment
+  /// What this app includes. Read rather than passed as a `Bool`, so the badge appears the moment
   /// the configuration answers without the screen arranging it.
-  let badge: BadgeStore
+  let appConfig: AppConfigStore
 
   /// Where a tap goes. On iOS it opens over the app and returns the reader where they were; on
   /// macOS there is no such thing, and opening the browser is what a Mac app does.
@@ -22,7 +22,7 @@ struct PoweredByBadge: View {
   @Environment(\.openURL) private var openURL
 
   var body: some View {
-    if badge.state.isCarried, let home = Self.home {
+    if appConfig.badge.isCarried, let home = Self.home {
       Button {
         #if os(iOS)
           isShowingHome = true
@@ -44,22 +44,22 @@ struct PoweredByBadge: View {
     }
   }
 
-  /// The mark and the words. The mark is drawn rather than shipped as an asset: at this size it is
-  /// a chevron on the accent, and an asset catalog would be a second place the icon lives.
+  /// The mark and the words. The mark is drawn rather than shipped as an asset, and it is a filled
+  /// square rather than a chevron: a chevron here is the vote control's own glyph, and a badge
+  /// wearing it reads as something votable.
   private var label: some View {
     HStack(spacing: 4) {
-      Image(systemName: "chevron.up")
-        .font(.system(size: 7, weight: .black))
-        .foregroundStyle(.white)
+      RoundedRectangle(cornerRadius: 3, style: .continuous)
+        .fill(Color.accentColor)
         .frame(width: 12, height: 12)
-        .background(
-          RoundedRectangle(cornerRadius: 3, style: .continuous)
-            .fill(Color.accentColor)
-        )
-      Text("Powered by ")
-        .foregroundStyle(.tertiary)
-        + Text("Different Requests")
-        .foregroundStyle(.secondary)
+      // Two `Text`s in a stack of their own, holding the word space between them rather than the
+      // stack's spacing. `Text + Text` said this in one run and is gone in 26.
+      HStack(spacing: 0) {
+        Text("Powered by ")
+          .foregroundStyle(.tertiary)
+        Text("Different Requests")
+          .foregroundStyle(.secondary)
+      }
     }
     .font(.caption2)
   }

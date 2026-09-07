@@ -4,13 +4,22 @@ import SwiftUI
 /// The board: what people have asked for, ranked by demand, and the way in to asking for
 /// something new.
 ///
-/// Drop into a `NavigationStack` the host app owns, reading from the hub the host built once:
+/// Presented over the host app rather than embedded in it, reading from the hub the host built
+/// once:
 ///
 /// ```swift
-/// NavigationStack {
+/// .sheet(isPresented: $isShowingRequests) {
 ///   DifferentRequestsView(hub: requests)
 /// }
 /// ```
+///
+/// It brings its own `NavigationStack`, so the screen is ours from the title down: the chrome
+/// reads the same in every app that ships it, and neither the bar it draws into nor the space its
+/// search field needs is shared with anything the host put there.
+///
+/// The other surfaces are reached from the menu in its toolbar and pushed onto the same stack. A
+/// surface this app does not include is not in the menu — an entry that is refused when tapped
+/// tells the person using the app that something is broken, when nothing is.
 ///
 /// Searching, ranking, filtering and reading the board are all the same screen, because they are
 /// the same rpc with the same page shape. Each of the three narrowings is one query parameter, and
@@ -34,6 +43,11 @@ public struct DifferentRequestsView: View {
 
   private static let rowSpacing: CGFloat = 12
 
+  /// How wide the empty board's buttons run. Wide enough to be the thing on the screen rather than
+  /// a pill under a paragraph, and short of the edges so they still read as buttons.
+  private static let callToActionWidth: CGFloat = 260
+  private static let callToActionInset: CGFloat = 32
+
   /// What the screen reads from, and what its pushes and its sheet are built against.
   private let hub: DifferentRequestsHub
 
@@ -44,6 +58,9 @@ public struct DifferentRequestsView: View {
   /// Whether the composer is up.
   @State private var isComposing: Bool = false
 
+  /// Closes the sheet the host presented this in.
+  @Environment(\.dismiss) private var dismiss
+
   /// - Parameter hub: What the host app built once and holds. The board's state lives on it.
   public init(hub: DifferentRequestsHub) {
     self.hub = hub
@@ -51,26 +68,40 @@ public struct DifferentRequestsView: View {
   }
 
   public var body: some View {
-    VStack(spacing: 0) {
-      PoweredByBadge(badge: hub.badge)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal)
-        .padding(.bottom, 6)
+    NavigationStack {
+      board
+    }
+    .searchable(text: $store.query, prompt: "Search requests")
+    .tint(.primary)
+  }
 
+  /// The board itself, inside the stack this view owns.
+  private var board: some View {
+    VStack(spacing: 0) {
       BoardFilterBar(store: store)
 
       content
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
+    .safeAreaInset(edge: .bottom, spacing: 0) {
+      PoweredByBadge(appConfig: hub.appConfig)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 6)
+    }
     .navigationTitle("Requests")
     .task {
-      await hub.badge.load()
+      await hub.appConfig.load()
     }
-    .searchable(text: $store.query, prompt: "Search requests")
     .toolbar {
+      ToolbarItem(placement: .cancellationAction) {
+        Button("Done") { dismiss() }
+      }
       ToolbarItem(placement: .primaryAction) {
         askButton
           .labelStyle(.iconOnly)
+      }
+      ToolbarItem(placement: .primaryAction) {
+        everythingElse
       }
     }
     .firstRead(store.read) {
@@ -150,16 +181,25 @@ public struct DifferentRequestsView: View {
           await store.showEveryStatus()
         } label: {
           Text("Show every status")
+            .foregroundStyle(.background)
+            .frame(maxWidth: Self.callToActionWidth)
         }
         .buttonStyle(.borderedProminent)
+        .controlSize(.large)
 
         askButton
+          .labelStyle(.titleOnly)
           .buttonStyle(.bordered)
+          .controlSize(.large)
       } else {
         askButton
+          .labelStyle(.titleOnly)
+          .foregroundStyle(.background)
           .buttonStyle(.borderedProminent)
+          .controlSize(.large)
       }
     }
+    .padding(.horizontal, Self.callToActionInset)
   }
 
   private func list(_ requests: [DRFeatureRequest]) -> some View {
@@ -180,14 +220,6 @@ public struct DifferentRequestsView: View {
         NextPageRow(state: store.page) {
           await store.loadMore()
         }
-      }
-
-      Section {
-        askButton
-          .buttonStyle(.borderedProminent)
-          .frame(maxWidth: .infinity, alignment: .center)
-      } footer: {
-        Text(store.narrowing.listFooter)
       }
     }
     .listStyle(.plain)
@@ -222,18 +254,52 @@ public struct DifferentRequestsView: View {
     }
   }
 
-  /// The way in to the composer: in the bar, and again under the list.
+  /// The way in to the composer.
   ///
-  /// Two places rather than one because they answer different moments. The bar is reachable
-  /// without scrolling and is where someone goes who arrived already knowing what they want; the
-  /// end of the list is where someone lands who has just read everything that is there and found
-  /// nothing of theirs.
+  /// In the toolbar, so it is one tap away in every state the board can be in and takes no room
+  /// from the list. Drawn again in the middle of the empty state, which is the one screen with
+  /// room for it and nothing else to offer.
   private var askButton: some View {
     Button {
       hub.beginSubmission()
       isComposing = true
     } label: {
       Label("Ask for a feature", systemImage: "plus.bubble")
+        .frame(maxWidth: Self.callToActionWidth)
+    }
+  }
+
+  /// Everything this screen can do that is not on the board itself: asking for something, and the
+  /// other surfaces this app includes.
+  ///
+  /// One menu rather than a menu beside a button. The surfaces are built from the configuration,
+  /// so one the app does not have is absent rather than present and refused when tapped.
+  private var everythingElse: some View {
+    Menu {
+      Button {
+        hub.beginSubmission()
+        isComposing = true
+      } label: {
+        Label("Ask for a feature", systemImage: "plus.bubble")
+      }
+
+      Divider()
+
+      NavigationLink { InboxView(hub: hub) } label: {
+        Label("Inbox", systemImage: "bell")
+      }
+      if hub.appConfig.config.roadmapEnabled {
+        NavigationLink { RoadmapView(hub: hub) } label: {
+          Label("Roadmap", systemImage: "map")
+        }
+      }
+      if hub.appConfig.config.changelogEnabled {
+        NavigationLink { ChangelogView(hub: hub) } label: {
+          Label("What's New", systemImage: "sparkles")
+        }
+      }
+    } label: {
+      Label("More", systemImage: "ellipsis")
     }
   }
 }

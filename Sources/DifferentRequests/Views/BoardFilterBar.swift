@@ -21,6 +21,7 @@ struct BoardFilterBar: View {
   private static let groupSpacing: CGFloat = 12
   private static let verticalPadding: CGFloat = 8
   private static let dividerHeight: CGFloat = 20
+  private static let dividerWidth: CGFloat = 1
 
   /// What the bar reads its selection from and writes its taps to. Owned by the hub, so a redraw
   /// above the board cannot reset the filter someone set.
@@ -28,21 +29,17 @@ struct BoardFilterBar: View {
 
   var body: some View {
     VStack(spacing: 0) {
-      HStack(spacing: Self.groupSpacing) {
-        ScrollView(.horizontal) {
-          HStack(spacing: Self.chipSpacing) {
-            sortChips
-            Divider()
-              .frame(height: Self.dividerHeight)
-            statusChips
-          }
-          .padding(.horizontal)
+      HStack(alignment: .top, spacing: Self.groupSpacing) {
+        ChipFlow(spacing: Self.chipSpacing, lineSpacing: Self.chipSpacing) {
+          sortChips
+          // Drawn rather than a `Divider`, which takes its orientation from an enclosing stack and
+          // has none here: inside a layout it lies down and reads as a stray dash between chips.
+          Rectangle()
+            .fill(.separator)
+            .frame(width: Self.dividerWidth, height: Self.dividerHeight)
+          statusChips
         }
-        .scrollIndicators(.hidden)
-        // Sized to its capsules vertically rather than left flexible. A `ScrollView` stacked above
-        // the board's list is a second greedy child, and two greedy children split the screen
-        // between them — which would draw a strip of chips down half of it.
-        .fixedSize(horizontal: false, vertical: true)
+        .padding(.leading)
 
         reading
           .padding(.trailing)

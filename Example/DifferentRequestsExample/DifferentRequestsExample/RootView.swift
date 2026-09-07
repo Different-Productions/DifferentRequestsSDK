@@ -1,13 +1,11 @@
 import DifferentRequests
 import SwiftUI
 
-/// The app's root. Gates on the sign-in phase and, once ready, presents the SDK surfaces this app's
-/// plan includes.
+/// The app's root: a host app with somewhere to open feedback from.
 ///
-/// Which tabs exist comes from `DRAppConfig`, not from this app's own guess. The roadmap and the
-/// changelog are Pro surfaces: a tab that is refused when tapped tells the person using
-/// the app that something is broken, when nothing is. An absent tab is the honest rendering of an
-/// absent feature.
+/// This is what an integration looks like. The SDK is not the app — it is a screen presented over
+/// one, reached from a row a host puts wherever it makes sense. Everything inside that screen,
+/// including which surfaces are reachable, belongs to the SDK.
 struct RootView: View {
   private let session: Session
   private let pushDelegate: PushRegistrationDelegate
@@ -19,6 +17,9 @@ struct RootView: View {
   /// outside those screens asks the API for the count, which is one read and exactly what the count
   /// route exists for.
   @State private var unreadCount = 0
+
+  /// Whether the SDK's screen is up.
+  @State private var isShowingRequests = false
 
   init(session: Session, pushDelegate: PushRegistrationDelegate) {
     self.session = session
@@ -67,49 +68,43 @@ struct RootView: View {
       }
 
     case .ready(let signedIn):
-      tabs(for: signedIn)
+      home(for: signedIn)
     }
   }
 
-  // MARK: - Tabs
+  // MARK: - The host app
 
-  /// Every tab is its own `NavigationStack`, which the SDK's screens require and none of them
-  /// carries: a navigation stack belongs to the app that arranges the screens, not to a package
-  /// dropped inside one. Without it a tap on a row pushes nothing, the board's title and its way in
-  /// to the composer have no bar to sit in, and the search field has nowhere to appear.
-  ///
-  /// One stack per tab rather than one around the whole `TabView`, so each tab keeps its own
-  /// history and switching tabs does not pop anyone out of what they were reading.
-  private func tabs(for signedIn: Session.SignedIn) -> some View {
-    TabView {
-      Tab("Requests", systemImage: "list.bullet") {
-        NavigationStack {
-          DifferentRequestsView(hub: session.hub)
-        }
-      }
-
-      if signedIn.config.roadmapEnabled {
-        Tab("Roadmap", systemImage: "map") {
-          NavigationStack {
-            RoadmapView(hub: session.hub)
+  /// A settings screen with one row on it, which is the whole integration.
+  private func home(for signedIn: Session.SignedIn) -> some View {
+    NavigationStack {
+      List {
+        Section {
+          Button {
+            isShowingRequests = true
+          } label: {
+            HStack {
+              Label("Feature requests", systemImage: "list.bullet")
+              Spacer()
+              if unreadCount > 0 {
+                Text("\(unreadCount)")
+                  .font(.caption)
+                  .foregroundStyle(.white)
+                  .padding(.horizontal, 7)
+                  .padding(.vertical, 2)
+                  .background(Capsule().fill(.red))
+              }
+            }
           }
+        } header: {
+          Text("Your app")
+        } footer: {
+          Text("Everything the SDK draws is behind this row, presented over the app.")
         }
       }
-
-      if signedIn.config.changelogEnabled {
-        Tab("What's New", systemImage: "sparkles") {
-          NavigationStack {
-            ChangelogView(hub: session.hub)
-          }
-        }
-      }
-
-      Tab("Inbox", systemImage: "bell") {
-        NavigationStack {
-          InboxView(hub: session.hub)
-        }
-      }
-      .badge(unreadCount)
+      .navigationTitle("Example")
+    }
+    .sheet(isPresented: $isShowingRequests) {
+      DifferentRequestsView(hub: session.hub)
     }
     .task {
       await refreshUnreadCount()

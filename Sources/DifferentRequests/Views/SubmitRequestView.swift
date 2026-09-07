@@ -43,6 +43,14 @@ public struct SubmitRequestView: View {
   public var body: some View {
     NavigationStack {
       Form {
+        if let warning = hub.board.narrowing.composerWarning {
+          Section {
+            Label(warning, systemImage: "line.3.horizontal.decrease.circle")
+              .font(.footnote)
+              .foregroundStyle(.secondary)
+          }
+        }
+
         Section {
           TextField("Title", text: $store.title)
         } header: {

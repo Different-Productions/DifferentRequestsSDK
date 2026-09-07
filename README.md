@@ -184,9 +184,14 @@ be told 401.
 
 ## Requirements
 
-- iOS 18+
-- macOS 15+
-- Swift 6.0+
+- iOS 26+
+- macOS 26+
+- Swift 6.2+
+
+This floor is deliberate, not an oversight. The SDK is built against the current
+SwiftUI, and an app that has to support an older iPhone is not one this can serve
+today. If that rules your app out, say so on the board — the number moves if
+enough people ask.
 
 ## Example App
 

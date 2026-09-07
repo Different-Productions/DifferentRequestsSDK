@@ -61,7 +61,7 @@ extension BoardNarrowing {
   var emptyIcon: String {
     switch self {
     case .nothing:
-      return "tray"
+      return "lightbulb.max"
     case .query, .queryAndStatuses:
       return "magnifyingglass"
     case .statuses:
@@ -73,7 +73,7 @@ extension BoardNarrowing {
   var emptyTitle: String {
     switch self {
     case .nothing:
-      return "No requests yet"
+      return "What should we build?"
     case .query:
       return "Nothing matches"
     case .statuses:
@@ -89,7 +89,7 @@ extension BoardNarrowing {
   var emptyMessage: String {
     switch self {
     case .nothing:
-      return "Nobody has asked for anything. Be first."
+      return "Nobody has asked for anything yet. Tell us what you want and everyone can vote on it."
     case .query:
       return "Nobody has asked for this yet."
     case .statuses:
@@ -99,21 +99,22 @@ extension BoardNarrowing {
     }
   }
 
-  /// The line under the way in to the composer, at the end of a board that does have rows on it.
+  /// What the composer says above the title field, when the board behind it was narrowed.
   ///
-  /// Both filtered cases warn before they invite. The composer exists to catch a duplicate before
-  /// it is written, and a status filter can hide the very request that would have caught it — the
-  /// duplicate is on the board, it is just `shipped` and the reader is looking at `open`.
-  var listFooter: String {
+  /// Nil on an unnarrowed board, where there is nothing to warn about. A status filter can hide
+  /// the very request that would have caught a duplicate — it is on the board, it is just
+  /// `shipped` and the reader is looking at `open` — so the warning belongs at the moment the
+  /// duplicate would be written rather than on the list it is missing from.
+  var composerWarning: String? {
     switch self {
     case .nothing:
-      return "Not on the board? Ask for it."
+      return nil
     case .query:
-      return "Vote for one of these if it already says it — duplicates split the demand."
+      return "Vote for a request that already says this — duplicates split the demand."
     case .statuses:
-      return "This is one slice of the board. Show every status before asking, or you may be asking twice."
+      return "You are looking at one slice of the board. Show every status before asking, or you may be asking twice."
     case .queryAndStatuses:
-      return "These matches are from one slice of the board. Show every status before asking, or you may be asking twice."
+      return "You are looking at one slice of the board. Show every status before asking, or you may be asking twice."
     }
   }
 }

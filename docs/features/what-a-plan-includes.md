@@ -12,7 +12,7 @@ their rpc, and got `planRequired` back. `GetRoadmap` and `ListChangelog` are the
 server refuses on plan, and both of them are behind those two screens.
 
 Which two is not a fact this SDK holds. Each declares `(plan_gate)` in the contract, so
-`DRRequestsServiceRPC.planGate` names the surface a tenant's plan has to include, and an rpc gated
+`DRRequestsServiceRPC.planGate` names the surface an app's plan has to include, and an rpc gated
 later arrives here already saying so.
 
 What made that worse than an ordinary failure is who the refusal is written for. The contract is
@@ -26,7 +26,7 @@ The composer under a request is the same question with a different answer. `AppC
 says whether an app takes comments, and `RequestDetailView` rendered `CommentComposer` without
 consulting it. **This half is a contract inconsistency rather than an outage anyone is hitting**: the
 server's `SurfaceRepository` hardcodes `comments_enabled = true` and `CreateComment` is not gated, so
-today every app reports comments on and every comment posts. The flag is the tenant's to turn off and
+today every app reports comments on and every comment posts. The flag is the developer's to turn off and
 the schema says so; a client that renders a composer without reading it is a client that will be
 wrong the day it is turned off, not one that is wrong now. It is handled here because it is the same
 sentence in the same place, not because anyone is stuck.
@@ -46,7 +46,7 @@ have to enumerate, including the four that are not gated at all.
 
 The cache is a plain remembered answer on the actor, and only a successful read lands in it. A read
 that threw leaves it empty so the next ask reaches the server: a config read fails for the same
-reasons any read does, and a plan remembered as unreadable would keep a paying tenant's surfaces shut
+reasons any read does, and a plan remembered as unreadable would keep a paid app's surfaces shut
 for the rest of the launch over one dropped connection. Two asks made before the first has answered
 both read, which costs one extra GET of a route with no side effects.
 
@@ -80,7 +80,7 @@ Every surface this package ships, and what plan gating does to it.
 **Find it.** Wherever the host app puts it. In the Example it is a tab, built only when the config
 says the app has one; reach it in a Free app by building the view directly.
 
-**Trigger it.** Open the screen with an app key belonging to a tenant whose plan does not include
+**Trigger it.** Open the screen with an app key belonging to an app whose plan does not include
 the roadmap.
 
 **What happens.** `.firstRead(store.read)` runs `RoadmapStore.load()`, which asks
@@ -108,7 +108,7 @@ so neither is its paging.
 
 **Trigger it.** Open any request in an app whose `AppConfig.commentsEnabled` is `false`. No app
 reports that today — the server hardcodes it to `true` — so reaching this on a live server means the
-tenant setting behind the flag has started being honoured.
+developer setting behind the flag has started being honoured.
 
 **What happens.** `RequestDetailStore.load()` reads the request, then the thread, then asks the
 config. The composer's slot draws one of four things, and the request and its thread are readable
@@ -123,8 +123,8 @@ that sentence points at.
 **Trigger it.** Call it more than once.
 
 **What happens.** The first call reads. Every call after it returns that answer without a round
-trip, for the life of the client. The contract states config is fetched once per launch, so a tenant
-who upgrades mid-session is seen on the next one — that is the contract's decision and this matches
+trip, for the life of the client. The contract states config is fetched once per launch, so an app
+upgraded mid-session is seen on the next one — that is the contract's decision and this matches
 it rather than approximating it. A call that throws is not remembered, so the next call reads again.
 
 ## Expectations
@@ -139,7 +139,7 @@ it rather than approximating it. A call that throws is not remembered, so the ne
 | Opens the roadmap and then the changelog | One `GET /config` between them. The second is answered from the first |
 | Opens ten requests | No further config reads. The composer's question was answered by whichever screen asked first |
 | Is a host app calling `config()` itself | The same answer the screens use, from the same read. The Example's `Session.start()` and the SDK's own stores share one |
-| Upgrades the tenant to Pro and relaunches | The surfaces are there. `AppConfig` is read fresh on a new client |
+| Upgrades the app to Pro and relaunches | The surfaces are there. `AppConfig` is read fresh on a new client |
 | Opens a request whose app takes comments, while the config read is still in flight | The request and its thread, with a spinner in the composer's strip — never an enabled field that turns out not to be one |
 
 ### Negative
@@ -151,7 +151,7 @@ it rather than approximating it. A call that throws is not remembered, so the ne
 | The app does not take comments | **"Comments are off"** / "This app doesn't take them. Voting is how you say you want this." — in the strip the field would have occupied. The thread above it is still readable, and voting still works |
 | The config read fails on the roadmap or the changelog | **"Couldn't load"** / "Something went wrong reaching the server. Check your connection and try again." with **Try Again**, which asks for the config again. The surface itself is not read, because whether it exists is not known |
 | The config read fails on a request's composer | **"Couldn't tell whether this app takes comments."** with **Try Again**, in the composer's strip. The request and the thread above it are unaffected — they were read by a different rpc that answered |
-| The config read answers with no `AppConfig` in it | The same "Couldn't load" screen, from `DifferentRequestsError.incompleteResponse(.getConfig)`. Not treated as an answer: every flag on an absent message reads as `false`, and a server that said nothing would otherwise be read as a tenant who bought nothing |
+| The config read answers with no `AppConfig` in it | The same "Couldn't load" screen, from `DifferentRequestsError.incompleteResponse(.getConfig)`. Not treated as an answer: every flag on an absent message reads as `false`, and a server that said nothing would otherwise be read as an app nobody paid for |
 | The server returns `planRequired` anyway — a plan that lapsed between the config read and the surface read | **"Couldn't load"** with **Try Again**, from `ReadState(readFailure:)`. The gate is a way to not ask; it is not a promise that an answer cannot change underneath it |
 | The `DRApiError.message` on a plan refusal says something specific | Nobody sees it. The contract states that message is written for whoever is debugging and may name internals, and `planRequired` in particular is never surfaced to an end user |
 | A reader is shown any of the absent screens | Nothing about a plan, a tier, a price or an upgrade. They did not choose it and cannot change it |

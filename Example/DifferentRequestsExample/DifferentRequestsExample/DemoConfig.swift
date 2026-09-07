@@ -36,6 +36,29 @@ enum DemoConfig {
     appKey != placeholderAppKey
   }
 
+  /// Points the example at a staging endpoint instead of production.
+  ///
+  /// Set alongside the key when the app being demonstrated lives in development. Unset — which is
+  /// the normal case — the client uses the production URL baked into the SDK.
+  static let baseURLEnvironmentVariable = "DIFFERENT_REQUESTS_BASE_URL"
+
+  /// The staging endpoint to use, if one was named and is a URL.
+  static var baseURL: URL? {
+    let environment = ProcessInfo.processInfo.environment
+    guard let stated = environment[baseURLEnvironmentVariable], stated.isEmpty == false else {
+      return nil
+    }
+    return URL(string: stated)
+  }
+
+  /// The client this example runs on: production unless a staging endpoint was named.
+  static var client: DifferentRequestsClient {
+    if let baseURL {
+      return .make(appKey: appKey, baseURL: baseURL)
+    }
+    return .make(appKey: appKey)
+  }
+
   /// Your app's own stable identifier for the signed-in person.
   ///
   /// The dedupe key: the same value on a new device is the same person, which is what carries their

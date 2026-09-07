@@ -30,7 +30,7 @@ public struct InboxView: View {
 
   public var body: some View {
     VStack(spacing: 0) {
-      PoweredByBadge(badge: hub.badge)
+      PoweredByBadge(appConfig: hub.appConfig)
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal)
         .padding(.bottom, 6)
@@ -40,7 +40,7 @@ public struct InboxView: View {
     }
       .navigationTitle("Inbox")
       .task {
-        await hub.badge.load()
+        await hub.appConfig.load()
       }
       .toolbar {
         if store.unreadCount > 0 {

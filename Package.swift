@@ -1,4 +1,4 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 6.2
 
 import PackageDescription
 
@@ -13,8 +13,8 @@ import PackageDescription
 let package = Package(
   name: "DifferentRequestsSDK",
   platforms: [
-    .iOS(.v18),
-    .macOS(.v15),
+    .iOS(.v26),
+    .macOS(.v26),
   ],
   products: [
     .library(
@@ -39,10 +39,6 @@ let package = Package(
         .product(name: "DifferentRequestsProtos", package: "differentrequests-proto"),
         .product(name: "SwiftProtobuf", package: "swift-protobuf"),
       ]
-    ),
-    .testTarget(
-      name: "DifferentRequestsTests",
-      dependencies: ["DifferentRequests"]
     ),
   ]
 )

@@ -15,7 +15,7 @@ import DifferentRequests
 struct DifferentRequestsExampleApp: App {
   @UIApplicationDelegateAdaptor(PushRegistrationDelegate.self) private var pushDelegate
 
-  private let session = Session(hub: DifferentRequestsHub(client: .make(appKey: DemoConfig.appKey)))
+  private let session = Session(hub: DifferentRequestsHub(client: DemoConfig.client))
 
   var body: some Scene {
     WindowGroup {

@@ -17,7 +17,6 @@ struct FilterChip: View {
 
   private static let horizontalPadding: CGFloat = 12
   private static let verticalPadding: CGFloat = 6
-  private static let activeFillOpacity: Double = 0.15
 
   /// What the chip says.
   let label: String
@@ -49,16 +48,19 @@ struct FilterChip: View {
     .accessibilityAddTraits(isActive ? [.isButton, .isSelected] : [.isButton])
   }
 
+  /// Filled when on, tinted when off — the pattern every native filter strip uses, and the only
+  /// one that survives a palette with no colour in it. A tinted-on state reads as off beside a
+  /// tinted-off state.
   private var foreground: AnyShapeStyle {
     if isActive {
-      return AnyShapeStyle(Color.accentColor)
+      return AnyShapeStyle(BackgroundStyle.background)
     }
     return AnyShapeStyle(HierarchicalShapeStyle.primary)
   }
 
   private var fill: AnyShapeStyle {
     if isActive {
-      return AnyShapeStyle(Color.accentColor.opacity(Self.activeFillOpacity))
+      return AnyShapeStyle(HierarchicalShapeStyle.primary)
     }
     return AnyShapeStyle(HierarchicalShapeStyle.quaternary)
   }

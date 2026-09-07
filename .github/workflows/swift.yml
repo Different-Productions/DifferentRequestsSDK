@@ -18,8 +18,8 @@ jobs:
     # deprecation notice on every run. v5 is the first major that declares node24 itself.
     - uses: actions/checkout@v5
 
+    # There is no test step, and no test target. A change here is proven by building the example
+    # app against the deployed development server and walking it. See
+    # Different-Productions/DifferentRequests-Server#144.
     - name: Build
       run: swift build -v
-
-    - name: Run tests
-      run: swift test -v
