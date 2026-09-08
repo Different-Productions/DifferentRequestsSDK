@@ -38,7 +38,10 @@ let package = Package(
       dependencies: [
         .product(name: "DifferentRequestsProtos", package: "differentrequests-proto"),
         .product(name: "SwiftProtobuf", package: "swift-protobuf"),
-      ]
+      ],
+      // Copied rather than processed. Xcode adds a customer's App Store privacy report up from
+      // the manifests of their app and every SDK inside it, and it has to arrive verbatim.
+      resources: [.copy("PrivacyInfo.xcprivacy")]
     ),
   ]
 )
