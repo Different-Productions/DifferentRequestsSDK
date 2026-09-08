@@ -182,17 +182,20 @@ public struct InboxView: View {
   }
 
   /// News this SDK version does not know still says something happened, rather than rendering an
-  /// empty row: the request title underneath is what the reader recognises anyway.
+  /// empty row: the request title underneath is what the reader recognizes anyway.
+  ///
+  /// The words come off the contract. The server writes a push alert about this same row, and a
+  /// push disagreeing with the row it opens is one event told two ways.
   private func headline(_ notification: DRNotification) -> String {
     switch notification.news {
     case .statusChanged(let moved):
-      return "Now \(moved.newStatus.badgeLabel)"
+      return "\(DRNotificationHeadline.statusChanged.label) \(moved.newStatus.label)"
     case .commentAdded:
-      return "New comment"
+      return DRNotificationHeadline.commentAdded.label
     case .requestDuplicated:
-      return "Already on the board"
+      return DRNotificationHeadline.requestDuplicated.label
     case .none:
-      return "Updated"
+      return DRNotificationHeadline.unspecified.label
     }
   }
 }

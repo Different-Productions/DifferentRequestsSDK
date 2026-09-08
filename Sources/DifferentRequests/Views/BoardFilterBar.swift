@@ -80,8 +80,8 @@ struct BoardFilterBar: View {
 
     ForEach(store.offeredStatuses, id: \.self) { status in
       FilterChip(
-        label: status.badgeLabel,
-        spokenLabel: status.badgeLabel,
+        label: status.label,
+        spokenLabel: status.label,
         isActive: store.statuses.contains(status)
       ) {
         await store.toggle(status: status)

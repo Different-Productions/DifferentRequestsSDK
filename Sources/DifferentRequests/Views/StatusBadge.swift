@@ -54,7 +54,7 @@ public struct StatusBadge: View {
   }
 
   public var body: some View {
-    Text(status.badgeLabel)
+    Text(status.label)
       .font(.caption)
       .fontWeight(.semibold)
       .padding(.horizontal, Self.horizontalPadding)
@@ -66,25 +66,14 @@ public struct StatusBadge: View {
 
 // MARK: - Presentation
 
-/// How a status reads and colours on these surfaces.
+/// What color a status takes on these surfaces.
 ///
-/// Prefixed rather than named `label` and `tint`, so a member the contract adds to the enum later
-/// cannot collide with one of these and silently change what a badge says.
+/// The word it reads as is not here. `label` comes off the contract, because the server writes a
+/// push alert about the same status this badge draws and two hand-written lists would eventually
+/// disagree. A color has no second writer, so it stays an SDK decision.
+///
+/// Prefixed `badge`, so a member the contract adds to the enum later cannot collide with it.
 extension DRRequestStatus {
-
-  /// A status this SDK version does not know reads as unknown rather than being hidden: an app
-  /// built before a status existed should say it cannot name the state, not imply there is none.
-  var badgeLabel: String {
-    switch self {
-    case .open: return "Open"
-    case .planned: return "Planned"
-    case .inProgress: return "In Progress"
-    case .shipped: return "Shipped"
-    case .declined: return "Declined"
-    case .duplicate: return "Duplicate"
-    case .unspecified, .UNRECOGNIZED: return "Unknown"
-    }
-  }
 
   var badgeTint: Color {
     switch self {
