@@ -1,13 +1,13 @@
 {
-  "originHash" : "f731676463ac262ee4f4296bb3330e3665cb15df8c39bf993bf0d6744badb5aa",
+  "originHash" : "cfa0c6a5214213f79ac72ad03e5e5ead86ee27facac90b15a0a3344209175524",
   "pins" : [
     {
       "identity" : "differentrequests-proto",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Different-Productions/differentrequests-proto.git",
       "state" : {
-        "revision" : "47dd04c8bcd27341e0ba186fb33faad86136169d",
-        "version" : "0.29.0"
+        "revision" : "45fcc451e8afc10a453a2460b75d50780c8884f2",
+        "version" : "0.30.0"
       }
     },
     {

@@ -22,8 +22,10 @@ public actor DifferentRequestsClient {
   /// Both directions carry protobuf. The same content type BacklogServer and the CMS speak.
   private static let protobufContentType = DRMediaType.protobuf.rawValue
 
-  private let appKey: String
-  private let baseURL: URL
+  // Internal rather than private so `DifferentRequestsClient+Describe` can read them. Still not
+  // public: `describeIntegration()` is the only way out, and it elides the key.
+  let appKey: String
+  let baseURL: URL
   private let session: URLSession
 
   private var sessionToken: String?
@@ -34,10 +36,14 @@ public actor DifferentRequestsClient {
   /// next reaches the server: a config read fails for the same reasons any read does, and a plan
   /// remembered as unreadable would keep every gated surface shut for the whole launch over one
   /// dropped connection.
-  private var configuration: DRGetConfigResponse?
+  var configuration: DRGetConfigResponse?
 
   /// The signed-in person, once a session has been created.
   public private(set) var currentUser: DREndUser?
+
+  /// What happened on the last call, so ``describeIntegration()`` can say whether anything has left
+  /// the device at all.
+  public private(set) var lastCall: LastCall = .none
 
   // MARK: - Creation
 
@@ -335,6 +341,7 @@ public actor DifferentRequestsClient {
     request.httpMethod = try Self.httpMethod(for: rpc)
     request.setValue(Self.protobufContentType, forHTTPHeaderField: DRHTTPHeaderName.accept.rawValue)
     request.setValue(appKey, forHTTPHeaderField: DRHTTPHeaderName.appKey.rawValue)
+    request.setValue(SDKClient.header, forHTTPHeaderField: DRHTTPHeaderName.client.rawValue)
     if let sessionToken {
       request.setValue(
         "\(DRAuthorizationScheme.bearer.rawValue) \(sessionToken)",
@@ -354,24 +361,39 @@ public actor DifferentRequestsClient {
     do {
       (data, response) = try await session.data(for: request)
     } catch {
+      record(rpc, "network — \(error.localizedDescription)")
       throw DifferentRequestsError.networkError(underlying: error)
     }
 
     guard let http = response as? HTTPURLResponse else {
+      record(rpc, "not an HTTP response")
       throw DifferentRequestsError.notAnHTTPResponse
     }
 
     // The status says only whether the body is the answer or a failure. Which failure is in the
     // body, because a status code cannot distinguish "upgrade to Pro" from "not your request".
     guard (200..<300).contains(http.statusCode) else {
-      throw DifferentRequestsError(failureBody: data)
+      let refusal = DifferentRequestsError(failureBody: data)
+      record(rpc, "\(http.statusCode) — \(refusal.localizedDescription)")
+      throw refusal
     }
 
     do {
-      return try Answer(serializedBytes: [UInt8](data))
+      let answer = try Answer(serializedBytes: [UInt8](data))
+      record(rpc, "\(http.statusCode)")
+      return answer
     } catch {
+      record(rpc, "\(http.statusCode), but the body did not decode")
       throw DifferentRequestsError.decodingFailed(rpc, underlying: error)
     }
+  }
+
+  /// Remembers what just happened, for ``describeIntegration()``.
+  ///
+  /// Every exit from the send path passes through here, including the ones that throw — a call that
+  /// failed is the one worth being able to describe.
+  private func record(_ rpc: DRRequestsServiceRPC, _ outcome: String) {
+    lastCall = .made(rpc: rpc.rawValue, outcome: outcome, at: Date())
   }
 
   /// The verb this rpc is sent with, as the contract spells it.
