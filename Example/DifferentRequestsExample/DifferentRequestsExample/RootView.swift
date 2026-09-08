@@ -3,35 +3,21 @@ import SwiftUI
 
 /// The app's root: a host app with somewhere to open feedback from.
 ///
-/// This is what an integration looks like. The SDK is not the app — it is a screen presented over
-/// one, reached from a row a host puts wherever it makes sense. Everything inside that screen,
-/// including which surfaces are reachable, belongs to the SDK.
+/// This is what an integration looks like. The SDK is not the app — it is a set of screens
+/// presented over one, reached from rows a host puts wherever they make sense.
+///
+/// Nothing here decides anything. Which rows exist, what the badge says, and which screen is up are
+/// all read off ``Session``; this draws them and navigates.
 struct RootView: View {
   private let session: Session
-  private let pushDelegate: PushRegistrationDelegate
 
-  /// The inbox badge.
-  ///
-  /// Read through the client rather than from the SDK's own inbox store, because that store is
-  /// internal — the SDK exposes screens, not the state behind them. A host app that wants a badge
-  /// outside those screens asks the API for the count, which is one read and exactly what the count
-  /// route exists for.
-  @State private var unreadCount = 0
-
-  /// Whether the SDK's screen is up.
-  @State private var isShowingRequests = false
-
-  init(session: Session, pushDelegate: PushRegistrationDelegate) {
+  init(session: Session) {
     self.session = session
-    self.pushDelegate = pushDelegate
   }
 
   var body: some View {
     phaseContent
       .task {
-        pushDelegate.tokenHandler = { tokenData in
-          Task { await session.registerDevice(tokenData: tokenData) }
-        }
         await session.start()
       }
   }
@@ -67,60 +53,108 @@ struct RootView: View {
         }
       }
 
-    case .ready(let signedIn):
-      home(for: signedIn)
+    case .ready:
+      home
     }
   }
 
   // MARK: - The host app
 
-  /// A settings screen with one row on it, which is the whole integration.
-  private func home(for signedIn: Session.SignedIn) -> some View {
+  /// A settings list with one row per surface, which is the whole integration.
+  private var home: some View {
     NavigationStack {
       List {
         Section {
-          Button {
-            isShowingRequests = true
-          } label: {
-            HStack {
-              Label("Feature requests", systemImage: "list.bullet")
-              Spacer()
-              if unreadCount > 0 {
-                Text("\(unreadCount)")
-                  .font(.caption)
-                  .foregroundStyle(.white)
-                  .padding(.horizontal, 7)
-                  .padding(.vertical, 2)
-                  .background(Capsule().fill(.red))
-              }
-            }
+          ForEach(session.screens) { screen in
+            row(for: screen)
           }
         } header: {
           Text("Your app")
         } footer: {
-          Text("Everything the SDK draws is behind this row, presented over the app.")
+          Text(
+            "Everything below this line is drawn by the SDK and presented over your app. "
+              + "Nothing about how it looks is written here."
+          )
         }
       }
       .navigationTitle("Example")
     }
-    .sheet(isPresented: $isShowingRequests) {
-      DifferentRequestsView(hub: session.hub)
-    }
-    .task {
-      await refreshUnreadCount()
+    .sheet(item: showing) { screen in
+      presented(screen)
     }
   }
 
-  /// Reads the badge count once when the tabs appear.
+  /// One row: what it is, what it gives you, and the badge where a badge belongs.
   ///
-  /// A failure leaves the count where it was and says nothing: a badge is the least important thing
-  /// on screen, and an alert about one would interrupt someone to tell them about a number they had
-  /// not looked at.
-  private func refreshUnreadCount() async {
-    do {
-      unreadCount = Int(try await session.client.unreadCount().unreadCount)
-    } catch {
-      NSLog("Unread count unavailable: %@", error.localizedDescription)
+  /// `.plain` so the row reads as a settings row rather than four lines of tinted text — a button's
+  /// style tints every label inside it, including the explanation, which is not a link.
+  private func row(for screen: ExampleScreen) -> some View {
+    Button {
+      session.show(screen)
+    } label: {
+      HStack(alignment: .firstTextBaseline, spacing: 12) {
+        Image(systemName: screen.symbol)
+          .foregroundStyle(.tint)
+          .frame(width: 22)
+        VStack(alignment: .leading, spacing: 3) {
+          Text(screen.title)
+          Text(screen.explanation)
+            .font(.caption)
+            .foregroundStyle(.secondary)
+        }
+        Spacer()
+        if screen == .inbox, session.unreadCount > 0 {
+          Text("\(session.unreadCount)")
+            .font(.caption)
+            .foregroundStyle(.white)
+            .padding(.horizontal, 7)
+            .padding(.vertical, 2)
+            .background(Capsule().fill(.red))
+        }
+        Image(systemName: "chevron.right")
+          .font(.caption.weight(.semibold))
+          .foregroundStyle(.tertiary)
+      }
+      .contentShape(Rectangle())
     }
+    .buttonStyle(.plain)
+  }
+
+  /// The SDK screen for a row, each one presented exactly as its documentation shows.
+  @ViewBuilder
+  private func presented(_ screen: ExampleScreen) -> some View {
+    switch screen {
+    case .requests:
+      DifferentRequestsView(hub: session.hub)
+    case .inbox:
+      NavigationStack { InboxView(hub: session.hub) }
+    case .roadmap:
+      NavigationStack { RoadmapView(hub: session.hub) }
+    case .changelog:
+      NavigationStack { ChangelogView(hub: session.hub) }
+    case .diagnostics:
+      NavigationStack { DiagnosticsView(session: session) }
+    }
+  }
+
+  /// What the sheet is bound to.
+  ///
+  /// A binding rather than a flag per screen: what is open is one fact, and two booleans can both
+  /// be true.
+  ///
+  /// Both directions are recorded. A setter that answered only nil would leave SwiftUI holding one
+  /// screen and the store holding another, and the sheet would then re-present whichever it
+  /// remembered rather than the row that was tapped.
+  private var showing: Binding<ExampleScreen?> {
+    Binding(
+      get: { session.showing },
+      set: { screen in
+        if let screen {
+          session.show(screen)
+        } else {
+          Task { await session.dismissedWhatWasShowing() }
+        }
+      }
+    )
   }
 }

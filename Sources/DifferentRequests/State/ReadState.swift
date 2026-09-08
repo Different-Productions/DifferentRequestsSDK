@@ -127,9 +127,14 @@ extension ReadState {
   /// different screens: someone who followed a link to a request that has since gone is owed
   /// "it is not here" rather than "check your connection", which would send them to retry a
   /// read that will never succeed.
+  /// A read that was called off is not a read that failed, so it lands back where it started rather
+  /// than on an error with a retry under it. The next `.task` reads again on its own, and until it
+  /// does the screen says it is still reading — which is what is true.
   init(readFailure: any Error) {
     if let known = readFailure as? DifferentRequestsError, known.isNotFound {
       self = .empty
+    } else if readFailure.isCancellation {
+      self = .unread
     } else {
       self = .failed(readFailure)
     }

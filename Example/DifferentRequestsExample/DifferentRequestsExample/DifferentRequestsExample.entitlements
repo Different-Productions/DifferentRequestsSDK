@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Which APNs environment a token minted for this build belongs to. Without it
+	     registerForRemoteNotifications fails and no token ever arrives, so the SDK's
+	     registerDevice is never reached. Xcode rewrites this to production for a
+	     TestFlight or App Store build; the value here is what a build run from Xcode
+	     onto a device uses, and it must match what DemoConfig.pushEnvironment says. -->
+	<key>aps-environment</key>
+	<string>development</string>
+</dict>
+</plist>

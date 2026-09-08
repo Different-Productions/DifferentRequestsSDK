@@ -23,6 +23,21 @@ final class Session {
   struct SignedIn {
     let user: DREndUser
     let config: DRAppConfig
+
+    /// Whether this app carries that surface.
+    ///
+    /// The two paid ones are answered by the config the server sent, so what the rows offer and
+    /// what the rpcs behind them allow cannot disagree.
+    func carries(_ screen: ExampleScreen) -> Bool {
+      switch screen {
+      case .requests, .inbox, .diagnostics:
+        return true
+      case .roadmap:
+        return config.roadmapEnabled
+      case .changelog:
+        return config.changelogEnabled
+      }
+    }
   }
 
   /// Where the app is in the sign-in flow.
@@ -41,9 +56,38 @@ final class Session {
 
   // MARK: - State
 
-  var phase: Phase = .creatingSession
+  private(set) var phase: Phase = .creatingSession
+
+  /// How many notifications this reader has not opened.
+  ///
+  /// Read through the client rather than from the SDK's own inbox store, because that store is
+  /// internal — the SDK exposes screens, not the state behind them. A host app that wants a badge
+  /// outside those screens asks the API for the count, which is one read and exactly what the count
+  /// route exists for.
+  private(set) var unreadCount = 0
+
+  /// Which SDK screen is presented, or none.
+  ///
+  /// Held here rather than as a flag per screen on the view, because what is open is one fact and
+  /// two booleans can both be true.
+  private(set) var showing: ExampleScreen?
 
   // MARK: - Derived
+
+  /// The rows this app offers, which is every surface the server says this app carries.
+  ///
+  /// A Free app has no roadmap and no changelog, so those rows are absent rather than present and
+  /// refused when tapped — the same rule the SDK's own menu follows.
+  var screens: [ExampleScreen] {
+    switch phase {
+    case .ready(let signedIn):
+      return ExampleScreen.allCases.filter { screen in
+        signedIn.carries(screen)
+      }
+    case .unconfigured, .creatingSession, .failed:
+      return []
+    }
+  }
 
   /// The client the hub was built with — the same one the screens call through, so a session
   /// created here is the session they act under.
@@ -83,9 +127,43 @@ final class Session {
       let configured = try await client.config()
       phase = .ready(SignedIn(user: session.user, config: configured.config))
       await requestPushAuthorization()
+      await refreshUnreadCount()
+      // The board's first page is a round trip. Started here, while the person is still looking at
+      // the settings list, it is held by the time they open the board.
+      await hub.readTheBoardBeforeItIsShown()
     } catch {
       phase = .failed(error.localizedDescription)
     }
+  }
+
+  // MARK: - What the screens say
+
+  /// Re-reads the badge.
+  ///
+  /// A failure leaves the count where it was and says nothing: a badge is the least important thing
+  /// on screen, and an alert about one would interrupt somebody to tell them about a number they had
+  /// not looked at.
+  func refreshUnreadCount() async {
+    do {
+      unreadCount = Int(try await client.unreadCount().unreadCount)
+    } catch {
+      NSLog("Unread count unavailable: %@", error.localizedDescription)
+    }
+  }
+
+  // MARK: - Which screen is up
+
+  func show(_ screen: ExampleScreen) {
+    showing = screen
+  }
+
+  /// Called when the presented screen goes away.
+  ///
+  /// The badge is re-read here rather than on a timer: the one thing that changes it is somebody
+  /// reading their inbox, and they just closed it.
+  func dismissedWhatWasShowing() async {
+    showing = nil
+    await refreshUnreadCount()
   }
 
   /// Asks for push permission, keeping denial — a normal `false` — distinct from a request that
