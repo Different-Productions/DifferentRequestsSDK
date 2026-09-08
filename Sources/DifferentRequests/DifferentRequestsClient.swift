@@ -48,9 +48,12 @@ public actor DifferentRequestsClient {
   // MARK: - Creation
 
   /// Assigns what it is given and nothing more. Use ``make(appKey:)`` for the ordinary case.
-  public init(appKey: String, baseURL: URL, session: URLSession) {
+  ///
+  /// Takes a ``SecureBaseURL`` rather than a `URL`, so a plaintext address is refused where it is
+  /// written rather than on the first call that carries a key over it.
+  public init(appKey: String, baseURL: SecureBaseURL, session: URLSession) {
     self.appKey = appKey
-    self.baseURL = baseURL
+    self.baseURL = baseURL.url
     self.session = session
     self.sessionToken = nil
     self.currentUser = nil
@@ -60,14 +63,14 @@ public actor DifferentRequestsClient {
   ///
   /// - Parameter appKey: Your app key, from the DifferentRequests console.
   public static func make(appKey: String) -> DifferentRequestsClient {
-    make(appKey: appKey, baseURL: productionBaseURL)
+    make(appKey: appKey, baseURL: .production)
   }
 
   /// A client pointed at `baseURL`, for a staging endpoint.
   ///
   /// Owns its own `URLSession` so it does not entangle with a host app's, with timeouts short enough
   /// that a board tab does not hang on a stalled connection.
-  public static func make(appKey: String, baseURL: URL) -> DifferentRequestsClient {
+  public static func make(appKey: String, baseURL: SecureBaseURL) -> DifferentRequestsClient {
     let configuration = URLSessionConfiguration.ephemeral
     configuration.timeoutIntervalForRequest = 15
     configuration.timeoutIntervalForResource = 20
