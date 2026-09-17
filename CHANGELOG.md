@@ -3,6 +3,19 @@
 Every released version, newest first. Versions are tags on the public repository,
 `Different-Productions/DifferentRequestsSDK`.
 
+## 0.10.0 — 2026-09-17
+
+**One source change to make: `createSession` takes a `proof`.** Pass `nil` until you ask for a
+signing secret; nothing else about signing somebody in changes.
+
+- Your own backend can vouch for a person. Give your app a signing secret in the console, sign the
+  identifier and an expiry with it, and hand the app what comes back — `DRIdentityProof(signature:
+  expiresAt:)` is what carries it. Once an app has a secret, every session for it needs a proof.
+- A refused sign-in is written where a developer reads it and drawn nowhere: the reasons are all the
+  integration's, and the board still reads with the app key alone.
+- The example app signs its own proof from `DIFFERENT_REQUESTS_SIGNING_SECRET`, standing in for a
+  backend, and carries on with nobody signed in when the server refuses.
+
 ## 0.9.0 — 2026-09-17
 
 **One source change to make: `DifferentRequestsHub(client:)` is now

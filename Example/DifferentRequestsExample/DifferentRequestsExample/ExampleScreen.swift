@@ -1,3 +1,4 @@
+import DifferentRequests
 import SwiftUI
 
 /// A surface the SDK draws, as a row this example offers.
@@ -65,14 +66,15 @@ enum ExampleScreen: String, Identifiable, CaseIterable {
     }
   }
 
-  /// Whether this is one of the two surfaces a Free app does not carry.
+  /// Whether this app carries this screen.
   ///
-  /// The answer is not here — it is on the config the server sent, and `Session` reads it. This
-  /// only says which two questions to ask.
-  var isPaidSurface: Bool {
+  /// The two paid surfaces are answered by the config the server sent, so what the rows offer and
+  /// what the rpcs behind them allow cannot disagree.
+  func isCarried(by config: DRAppConfig) -> Bool {
     switch self {
-    case .requests, .inbox, .diagnostics: return false
-    case .roadmap, .changelog: return true
+    case .requests, .inbox, .diagnostics: return true
+    case .roadmap: return config.roadmapEnabled
+    case .changelog: return config.changelogEnabled
     }
   }
 }

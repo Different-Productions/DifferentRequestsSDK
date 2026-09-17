@@ -39,14 +39,14 @@ struct RootView: View {
         )
       }
 
-    case .creatingSession:
-      ProgressView("Signing in…")
+    case .reading:
+      ProgressView("Starting…")
 
-    case .failed(let message):
+    case .configUnreadable:
       ContentUnavailableView {
-        Label("Sign-in failed", systemImage: "person.crop.circle.badge.exclamationmark")
+        Label("Can't reach Different Requests", systemImage: "wifi.exclamationmark")
       } description: {
-        Text(message)
+        Text("What this app offers could not be read. The log says what the server answered.")
       } actions: {
         Button("Try Again") {
           Task { await session.start() }

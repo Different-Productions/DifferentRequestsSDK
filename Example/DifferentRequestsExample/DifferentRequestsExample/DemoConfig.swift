@@ -76,14 +76,36 @@ enum DemoConfig {
     return .make(appKey: appKey)
   }
 
-  /// Your app's own stable identifier for the signed-in person.
+  /// Your app's own stable identifier for the signed-in person, when the environment names none.
   ///
   /// The dedupe key: the same value on a new device is the same person, which is what carries their
   /// votes across a reinstall.
   static let externalUserID = "demo-user"
 
-  /// Shown on requests and comments they author.
+  /// Names a different person to sign in as.
+  static let externalUserIDEnvironmentVariable = "DIFFERENT_REQUESTS_EXTERNAL_ID"
+
+  /// Shown on requests and comments they author, when the environment names none.
   static let displayName = "Demo User"
+
+  /// Names the person differently.
+  static let displayNameEnvironmentVariable = "DIFFERENT_REQUESTS_DISPLAY_NAME"
+
+  /// Carries the app's signing secret, which in a real integration never leaves the developer's own
+  /// backend.
+  static let signingSecretEnvironmentVariable = "DIFFERENT_REQUESTS_SIGNING_SECRET"
+
+  /// The secret ``DemoBackend`` signs a proof with, or nothing when the environment names none.
+  ///
+  /// Read from the environment for the same reason the app key is: a placeholder in a tracked file
+  /// is what eventually gets committed with a live credential in it.
+  static var signingSecret: String? {
+    let environment = ProcessInfo.processInfo.environment
+    guard let secret = environment[signingSecretEnvironmentVariable], secret.isEmpty == false else {
+      return nil
+    }
+    return secret
+  }
 
   /// Host-app attributes a triager sees next to a request.
   static let traits: [String: String] = ["platform": "ios", "tier": "demo"]

@@ -15,48 +15,17 @@ import UserNotifications
 @MainActor
 final class Session {
 
-  /// A signed-in person and what their app offers them.
-  ///
-  /// One value rather than two associated with the case: which surfaces exist is as much a part of
-  /// being signed in as who is signed in, and a screen that had one without the other would render
-  /// a tab it cannot serve.
-  struct SignedIn {
-    let user: DREndUser
-    let config: DRAppConfig
-
-    /// Whether this app carries that surface.
-    ///
-    /// The two paid ones are answered by the config the server sent, so what the rows offer and
-    /// what the rpcs behind them allow cannot disagree.
-    func carries(_ screen: ExampleScreen) -> Bool {
-      switch screen {
-      case .requests, .inbox, .diagnostics:
-        return true
-      case .roadmap:
-        return config.roadmapEnabled
-      case .changelog:
-        return config.changelogEnabled
-      }
-    }
-  }
-
-  /// Where the app is in the sign-in flow.
-  enum Phase {
-    /// No app key was supplied, so there is nothing to sign in to.
-    case unconfigured
-    case creatingSession
-    case ready(SignedIn)
-    case failed(String)
-  }
-
   // MARK: - Inputs
 
   /// What every SDK screen in this app reads from, and what holds their state between redraws.
   let hub: DifferentRequestsHub
 
+  /// What signs a proof for the person being signed in, standing in for a developer's own backend.
+  let backend: DemoBackend
+
   // MARK: - State
 
-  private(set) var phase: Phase = .creatingSession
+  private(set) var phase: LaunchPhase = .reading
 
   /// How many notifications this reader has not opened.
   ///
@@ -80,11 +49,11 @@ final class Session {
   /// refused when tapped — the same rule the SDK's own menu follows.
   var screens: [ExampleScreen] {
     switch phase {
-    case .ready(let signedIn):
+    case .ready(let config):
       return ExampleScreen.allCases.filter { screen in
-        signedIn.carries(screen)
+        screen.isCarried(by: config)
       }
-    case .unconfigured, .creatingSession, .failed:
+    case .unconfigured, .reading, .configUnreadable:
       return []
     }
   }
@@ -97,14 +66,14 @@ final class Session {
 
   // MARK: - Init
 
-  init(hub: DifferentRequestsHub) {
+  init(hub: DifferentRequestsHub, backend: DemoBackend) {
     self.hub = hub
+    self.backend = backend
   }
 
   // MARK: - Signing in
 
-  /// Creates the session, reads what the app offers, then sets up push. Safe to call again to retry
-  /// after a failure.
+  /// Signs the person in, reads what the app offers, then sets up push. Safe to call again to retry.
   ///
   /// Config is fetched here rather than by each screen because it decides which screens exist at
   /// all: the roadmap and the changelog are Pro surfaces, and a tab that is shown and then refused
@@ -116,23 +85,44 @@ final class Session {
       return
     }
 
-    phase = .creatingSession
+    phase = .reading
+    await signIn()
+
     do {
-      let session = try await client.createSession(
-        externalID: DemoConfig.externalUserID,
-        email: nil,
-        displayName: DemoConfig.displayName,
-        traits: DemoConfig.traits
-      )
       let configured = try await client.config()
-      phase = .ready(SignedIn(user: session.user, config: configured.config))
-      await requestPushAuthorization()
-      await refreshUnreadCount()
-      // The board's first page is a round trip. Started here, while the person is still looking at
-      // the settings list, it is held by the time they open the board.
-      await hub.readTheBoardBeforeItIsShown()
+      phase = .ready(configured.config)
     } catch {
-      phase = .failed(error.localizedDescription)
+      NSLog("What this app offers could not be read: %@", error.localizedDescription)
+      phase = .configUnreadable
+      return
+    }
+
+    await requestPushAuthorization()
+    await refreshUnreadCount()
+    // The board's first page is a round trip. Started here, while the person is still looking at
+    // the settings list, it is held by the time they open the board.
+    await hub.readTheBoardBeforeItIsShown()
+  }
+
+  /// Creates the session for the demo person, carrying a proof when this app has a signing secret.
+  ///
+  /// A refusal is written where a developer reads it and drawn nowhere. The reasons are all the
+  /// integration's — no proof, an expired one, a secret that has been replaced, a retired app key —
+  /// and none of them is something the person holding the phone can act on. The board still reads,
+  /// and asking, voting and commenting are not offered until somebody is signed in.
+  private func signIn() async {
+    let externalID = ProcessInfo.processInfo.demoExternalUserID
+    do {
+      let signedIn = try await client.createSession(
+        externalID: externalID,
+        email: nil,
+        displayName: ProcessInfo.processInfo.demoDisplayName,
+        traits: DemoConfig.traits,
+        proof: backend.vouchFor(externalID: externalID)
+      )
+      NSLog("Signed in as %@", signedIn.user.id)
+    } catch {
+      NSLog("Sign-in refused: %@", error.localizedDescription)
     }
   }
 

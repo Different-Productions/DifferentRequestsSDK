@@ -21,7 +21,7 @@ Or in `Package.swift`:
 dependencies: [
   .package(
     url: "https://github.com/Different-Productions/DifferentRequestsSDK",
-    from: "0.9.0"
+    from: "0.10.0"
   ),
 ]
 ```
@@ -79,7 +79,7 @@ build ships, which is what the trap at launch reports. Where the address
 arrives at runtime instead, ``SecureBaseURL/init(_:)`` throws and you handle it.
 
 Your app key is not a secret. It ships inside your binary and identifies the
-app, not a person — which is what ``DifferentRequestsClient/createSession(externalID:email:displayName:traits:)``
+app, not a person — which is what ``DifferentRequestsClient/createSession(externalID:email:displayName:traits:proof:)``
 is for.
 
 ## Sign your person in
@@ -95,7 +95,8 @@ do {
     externalID: currentUser.id,
     email: currentUser.email,
     displayName: currentUser.name,
-    traits: ["plan": currentUser.plan]
+    traits: ["plan": currentUser.plan],
+    proof: nil
   )
   logger.info("DifferentRequests: signed in as \(signedIn.user.id)")
 } catch {
@@ -109,6 +110,55 @@ optional: pass `nil` for either and the board still works, with requests from
 that person rendering as anonymous.
 
 The session token is held by the client and sent on every call that needs one.
+
+**A refusal here is yours to read, never your user's.** The message says what to
+fix — a missing proof, an expired one, a key that has been replaced — and none
+of it is something the person holding the phone can act on. Log it. The board
+still reads with the app key alone, and asking, voting and commenting are not
+offered until somebody is signed in.
+
+## Vouch for a person
+
+`proof: nil` is right until you ask for a signing secret. Your app key names
+your app, not a person: it ships inside your binary, so anybody who installs
+your app can read it and ask for a session as anyone whose identifier they can
+guess.
+
+Give your app a signing secret — Console, your app, Key — and your own backend
+says who each person is. **Once an app has a secret, every session for it needs
+a proof**, the people who already have accounts included.
+
+Sign the identifier and an expiry with the secret, **on your backend**, and hand
+the app what comes back. Anywhere that can do HMAC-SHA256 can do this:
+
+```swift
+let expiresAt = Int(Date().addingTimeInterval(300).timeIntervalSince1970)
+let signature = HMAC<SHA256>.authenticationCode(
+  for: Data("\(externalID)\n\(expiresAt)".utf8),
+  using: SymmetricKey(data: Data(signingSecret.utf8))
+)
+```
+
+Spell those bytes URL-safe base64 — standard base64 with `-` for `+`, `_` for
+`/`, and the padding dropped — and send both halves down to the app, which
+carries them as they are:
+
+```swift
+let signedIn = try await requests.client.createSession(
+  externalID: currentUser.id,
+  email: currentUser.email,
+  displayName: currentUser.name,
+  traits: ["plan": currentUser.plan],
+  proof: DRIdentityProof(
+    signature: vouched.signature,
+    expiresAt: Date(timeIntervalSince1970: TimeInterval(vouched.expiresAt))
+  )
+)
+```
+
+A proof lasts as long as you say, up to an hour. Sign a fresh one when somebody
+opens your app rather than storing one on the device: the secret never reaches
+the device, so the app cannot make one and nothing on it is worth stealing.
 
 ## Show a screen
 

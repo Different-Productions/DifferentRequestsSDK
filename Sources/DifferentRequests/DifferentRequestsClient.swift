@@ -14,9 +14,9 @@ import SwiftProtobuf
 /// makes is addressed exactly as the server registered it.
 ///
 /// Calls that act for a person need a session first; see
-/// ``createSession(externalID:email:displayName:traits:)``. Which calls those are is not a rule to
-/// remember: each rpc carries its audience, and one that needs a session is refused here before it
-/// reaches the network.
+/// ``createSession(externalID:email:displayName:traits:proof:)``. Which calls those are is not a
+/// rule to remember: each rpc carries its audience, and one that needs a session is refused here
+/// before it reaches the network.
 public actor DifferentRequestsClient {
 
   /// Both directions carry protobuf. The same content type BacklogServer and the CMS speak.
@@ -120,11 +120,17 @@ public actor DifferentRequestsClient {
   ///
   /// Upsert: the same `externalID` returns the same person with the other fields refreshed, which is
   /// what lets someone reinstall and keep their votes.
+  ///
+  /// - Parameter proof: Your backend vouching for this person, made with your app's signing secret
+  ///   and built with ``DRIdentityProof/init(signature:expiresAt:)``. An app that has a signing
+  ///   secret refuses every session without one, including for people it has seen before. `nil` for
+  ///   an app that has none, which is every app until its developer asks for one.
   public func createSession(
     externalID: String,
     email: String?,
     displayName: String?,
-    traits: [String: String]?
+    traits: [String: String]?,
+    proof: DRIdentityProof?
   ) async throws -> DRCreateSessionResponse {
     var body = DRCreateSessionRequest()
     body.externalID = externalID
@@ -136,6 +142,9 @@ public actor DifferentRequestsClient {
     }
     if let traits {
       body.traits = traits
+    }
+    if let proof {
+      body.proof = proof
     }
 
     let response: DRCreateSessionResponse = try await send(.createSession, body: body)

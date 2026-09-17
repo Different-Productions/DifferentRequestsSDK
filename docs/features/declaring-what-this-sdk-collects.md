@@ -45,6 +45,11 @@ company's apps, and nothing goes to a data broker. `NSPrivacyTrackingDomains` is
 **`NSPrivacyAccessedAPITypes` is empty**, and that is checkable: this package reads no
 required-reason API.
 
+**A proof declares nothing new.** `createSession` takes an optional `DRIdentityProof`, which is a
+signature over the `external_id` already declared above and the instant it stops being accepted. It
+carries no attribute of the person, and it is made on the host developer's own backend rather than
+read off the device. So the manifest is the same with a proof as without one.
+
 ## `traits`, declared generically
 
 **`traits` is an open `[String: String]`**, and a manifest can only name what we can name.
@@ -101,8 +106,9 @@ rpcs rather than from intent.
 What the manifest must agree with, and where each line comes from:
 
 ```
-  createSession(externalID:email:displayName:traits:) ..... UserID, EmailAddress, Name,
+  createSession(externalID:email:displayName:traits:proof:) UserID, EmailAddress, Name,
                                                             OtherDataTypes (traits)
+                                                            proof declares nothing: see below
   submit(title:body:) / comment(requestID:body:) .......... OtherUserContent
   registerDevice(token:) .................................. DeviceID
   everything else ......................................... reads only
