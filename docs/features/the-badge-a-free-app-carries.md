@@ -122,12 +122,17 @@ board is its own from the title down.
 This is the first platform conditional in the package. It is here because the platforms genuinely
 differ, not because one of them was awkward.
 
-## Tests that walk this
+## Which tests walk the chart
 
-| Test | What of the path it walks |
+There is no test target — see the server's #144. Walked in the example app on a simulator, against
+development.
+
+The walk, and what it answered:
+
+| Step | Answer |
 |---|---|
-| `BadgeTests.aFreeAppCarriesIt` | `showBadge: true` → drawn |
-| `BadgeTests.aPayingAppDoesNot` | `showBadge: false` → not drawn |
-| `BadgeTests.nothingIsDrawnUntilTheAnswerArrives` | `.unread`, `.reading` and `.failed` all draw nothing — the one that protects a paying customer |
-| `BadgeTests.onlyAFailedReadIsRetried` | A failure is asked again; an answer is not |
-| `BadgeTests.aFailedReadDrawsNothing` | A real `BadgeStore` against an unreachable base URL: no badge, still retryable |
+| Open a Free app's board | "Powered by Different Requests" under the title, words only |
+| Move that app to Pro with `Entitle` and relaunch | Nothing is drawn |
+| Open the board with the network down | Nothing is drawn — an answer that never came is not a Free app |
+| Tap the badge on iOS | The site opens over the app and returns where it was |
+

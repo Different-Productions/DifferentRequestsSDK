@@ -41,6 +41,12 @@ public final class DifferentRequestsHub {
   /// second copy of a number the server already answers.
   public let client: DifferentRequestsClient
 
+  /// What the screens are drawn in: the host app's own accent and font.
+  ///
+  /// Held here because every screen reads it and none of them may choose one, and handed over at
+  /// `init` because it is the host app's look rather than something to fetch.
+  public let appearance: Appearance
+
   // MARK: - The screens' state
 
   /// The board's page, its paging cursor, and the text in its search field.
@@ -67,6 +73,13 @@ public final class DifferentRequestsHub {
   /// comment when whatever pushed it redraws.
   let details: RequestDetailStores
 
+  /// When each request was last heard to have changed, so a screen holding an old copy re-reads it
+  /// instead of drawing what it read before the change.
+  let news: NewsAboutRequests
+
+  /// Who the host app signed in. Read by every screen that offers a control acting for a person.
+  let whoIsHere: WhoIsHere
+
   // MARK: - Init
 
   /// - Parameter client: The client every screen reads and writes through. Build it with
@@ -74,12 +87,19 @@ public final class DifferentRequestsHub {
   ///
   /// This is the SDK's composition root: the one place its long-lived objects are built, each
   /// exactly once and in dependency order. Nothing else in the package constructs a store.
-  public init(client: DifferentRequestsClient) {
+  /// - Parameters:
+  ///   - client: The client every screen reads and writes through.
+  ///   - appearance: What the screens are drawn in. ``Appearance/standard`` is the SDK's own look,
+  ///     named rather than defaulted so an app that has not thought about it says so.
+  public init(client: DifferentRequestsClient, appearance: Appearance) {
     self.client = client
+    self.appearance = appearance
     self.board = BoardStore(client: client, statuses: [], sort: .top)
     self.roadmap = RoadmapStore(client: client)
     self.changelog = ChangelogStore(client: client)
-    self.inbox = InboxStore(client: client)
+    self.news = NewsAboutRequests()
+    self.whoIsHere = WhoIsHere(client: client)
+    self.inbox = InboxStore(client: client, news: news)
     self.submission = SubmitStore(client: client)
     self.appConfig = AppConfigStore(client: client)
     self.details = RequestDetailStores(client: client)
@@ -133,5 +153,33 @@ public final class DifferentRequestsHub {
   /// The store behind one request's screen — the same one every time that request is asked for.
   func detail(requestID: String) -> RequestDetailStore {
     details.store(requestID: requestID)
+  }
+
+  // MARK: - News from outside
+
+  /// Tell the SDK that a push about a request landed, so the screen for it reads again rather than
+  /// drawing the copy it had before the change.
+  ///
+  /// Call it from wherever your app receives a notification. The payload carries `requestID`, which
+  /// is the id to hand over; a push exists only because that request changed, so the copy anybody
+  /// is holding is out of date by definition.
+  ///
+  /// ```swift
+  /// func userNotificationCenter(
+  ///   _ center: UNUserNotificationCenter,
+  ///   didReceive response: UNNotificationResponse
+  /// ) async {
+  ///   let payload = response.notification.request.content.userInfo
+  ///   if let requestID = payload["requestID"] as? String {
+  ///     requests.heardThatARequestChanged(requestID: requestID)
+  ///   }
+  /// }
+  /// ```
+  ///
+  /// The inbox does the same for itself: every notification it reads says its request changed when
+  /// that notification was written, so a reader who opens the inbox instead of the push is served
+  /// the same way without your app doing anything.
+  public func heardThatARequestChanged(requestID: String) {
+    news.heard(aboutRequest: requestID, at: Date())
   }
 }

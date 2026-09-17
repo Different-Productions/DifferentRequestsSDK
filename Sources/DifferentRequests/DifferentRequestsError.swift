@@ -83,6 +83,27 @@ public enum DifferentRequestsError: Error, Sendable, LocalizedError {
     return true
   }
 
+  /// Whether the server refused what was written, rather than failing to receive it.
+  ///
+  /// The difference a person can act on: a call that did not arrive is worth sending again, and a
+  /// call the server read and refused is not — the same words refused once are refused every time.
+  /// Read off the reason the contract carries, never off a status code.
+  ///
+  /// Rate limiting is not one of these. It is a refusal that *does* pass with time, and it carries
+  /// its own wait in ``retryAfterSeconds``.
+  public var isARefusalOfWhatWasWritten: Bool {
+    guard case .api(let error) = self else {
+      return false
+    }
+    switch error.reason {
+    case .invalidArgument, .malformed, .failedPrecondition, .conflict, .permissionDenied,
+         .planRequired, .notFound:
+      return true
+    case .unauthenticated, .rateLimited, .internalFailure, .none:
+      return false
+    }
+  }
+
   /// How long to wait before retrying, when the server said to wait.
   ///
   /// Reads the contract's own field, which lives on the rate limit itself — so there is no asking

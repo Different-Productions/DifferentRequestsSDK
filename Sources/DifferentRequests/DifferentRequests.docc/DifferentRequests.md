@@ -21,7 +21,10 @@ import SwiftUI
 struct MyApp: App {
   // Built once, held for the life of the app. A SwiftUI view is rebuilt on
   // every redraw above it, and the board's page cannot be.
-  private let requests = DifferentRequestsHub(client: .make(appKey: "your-app-key"))
+  private let requests = DifferentRequestsHub(
+    client: .make(appKey: "your-app-key"),
+    appearance: .standard
+  )
 
   var body: some Scene {
     WindowGroup {
@@ -59,3 +62,8 @@ behalf of a person, so they need a session — see <doc:GettingStarted>.
 
 - ``StatusBadge``
 - ``VoteControl``
+
+### Pointing it somewhere
+
+- ``SecureBaseURL``
+- ``LastCall``

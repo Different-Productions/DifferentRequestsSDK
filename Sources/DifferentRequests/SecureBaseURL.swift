@@ -29,4 +29,19 @@ public struct SecureBaseURL: Sendable, Equatable {
     }
     self.url = url
   }
+
+  /// A staging address written as a literal in your own source.
+  ///
+  /// SwiftUI's `App` requires a non-throwing `init()`, and that is where a host app builds the
+  /// objects it holds — so a throwing initializer cannot be reached from the one place a base URL
+  /// has to be named. A literal is a constant the developer typed, not data arriving at runtime:
+  /// a bad one is a mistake to fix before the build ships, which is what a trap at launch reports.
+  ///
+  /// - Parameter literal: An `https` address, spelled in source.
+  public init(literal: StaticString) {
+    guard let url = URL(string: "\(literal)"), url.scheme?.lowercased() == "https" else {
+      preconditionFailure("DifferentRequests: \(literal) is not an https URL.")
+    }
+    self.url = url
+  }
 }

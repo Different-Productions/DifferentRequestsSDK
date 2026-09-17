@@ -182,7 +182,7 @@ still in the fields — with a **Dismiss** beside it now, and drawn by the same
 **Trigger it.** Either, against a server that refuses.
 
 **What happens.** The changelog behaves as the board does. The roadmap has one deliberate change of
-behaviour: columns held from a previous read used to survive a failed refresh, and a roadmap left
+behavior: columns held from a previous read used to survive a failed refresh, and a roadmap left
 on screen after a refresh that could not reach the server is a roadmap presenting itself as current
 when nobody knows whether it is. It now shows "Couldn't load" with **Try Again**.
 
@@ -231,7 +231,7 @@ no seconds to be asked for and the property answers nil.
 | Any write is attempted with no end-user session | The same sentence for that write. `DifferentRequestsError.notAuthenticated(rpc)` is thrown from the audience the contract declares, before anything reaches the network, and it reaches the developer through `store.write.failure?.error` |
 | A second control is tapped while a write is in flight | It does not respond, and it is visibly dim — `disabled(write.isWriting)` plus a stated tertiary tint, because `.buttonStyle(.plain)` draws a disabled button exactly like an enabled one |
 | A first read fails | "Couldn't load" / "Something went wrong reaching the server. Check your connection and try again." with **Try Again** |
-| A refresh of a loaded list fails | The same screen. The stale list is not left up: on the roadmap that was the old behaviour, and it presented columns as current when nobody knew whether they were |
+| A refresh of a loaded list fails | The same screen. The stale list is not left up: on the roadmap that was the old behavior, and it presented columns as current when nobody knew whether they were |
 | A further page fails | **"Couldn't load any more."** with **Try Again**, in place of the spinner. Everything already read stays on screen, and the cursor stays where it was so the retry asks for that page rather than skipping it |
 | The thread on a request fails to load | **"Couldn't load the discussion."** with **Try Again** under the Discussion heading. The request above it is still readable |
 | A request id the server does not have | **"This request is gone"** / "It was removed, or the link that got you here is out of date." No **Try Again**: there is nothing to try again for |
@@ -410,7 +410,7 @@ DifferentRequestsView — a vote that did not land
   in flight (write = .writing) : EVERY ⌃ on the board is .disabled and drawn .tertiary.
                                  One vote at a time is the store's rule; a tap it refuses
                                  in silence is the same defect in miniature.
-  idle, voted                  : ⌃ filled, accent colour, "Remove your vote"
+  idle, voted                  : ⌃ filled, accent color, "Remove your vote"
   idle, not voted              : ⌃ outline, secondary,   "Vote for this"
 
   first read in flight   → centred spinner; nav bar and [ ⊕ ] still there
@@ -481,7 +481,7 @@ InboxView — a stamp that did not land
 
 SubmitRequestView — unchanged in copy, moved to the shared component
 ┌──────────────────────────────────────────────┐
-│ Cancel      Ask for a feature        Submit  │ ← greyed while the title is blank, and
+│ Cancel      Ask for a feature        Submit  │ ← grayed while the title is blank, and
 │  WHAT DO YOU WANT?                           │   again while the write is in flight
 │ ┌──────────────────────────────────────────┐ │
 │ │ dark mode                                │ │ ← still exactly as typed
@@ -502,7 +502,7 @@ RoadmapView / ChangelogView
 ## Platform differences
 
 - **iOS 18+ and macOS 15+.** `Package.swift` declares no other platform, so there is no watchOS,
-  tvOS or visionOS behaviour to describe.
+  tvOS or visionOS behavior to describe.
 - **The copy says "try it again", never "tap".** The same sentence has to read correctly under a
   finger and under a cursor, and it is the same string on both platforms.
 - **Disabled buttons.** `VoteControl` and the inbox dot both use `.buttonStyle(.plain)`, which
@@ -520,59 +520,18 @@ RoadmapView / ChangelogView
 - **The stack around it all.** The host app owns it on every platform. The SDK ships no
   `NavigationStack` of its own except inside the composer sheet.
 
-## Tests that walk this
+## Which tests walk the chart
 
-All hermetic. Two ways of reaching a real failure without a network:
+There is no test target — see the server's #144. Walked in the example app on a simulator, against
+development.
 
-1. **The audience gate.** An rpc the contract marks `END_USER` is refused by
-   `DifferentRequestsClient.perform` before anything is sent when no session exists. That is every
-   write in this SDK, so every write's failure path is walked exactly as a host app that forgot
-   `createSession` would walk it.
-2. **A scheme `URLSession` will not open.** A client built against a base URL with an unusable
-   scheme fails inside `URLSession.data(for:)` without a lookup or a connection, which is how the
-   `APP_KEY` reads are reached.
+The walk, and what it answered:
 
-| Test file / test | The leg it walks |
-| --- | --- |
-| `ReadStateTests.theFourOutcomesAreFourDifferentStates` | `unread`/`reading` vs `empty` vs `loaded` vs `failed` — that a read which found nothing is not the same value as one still running |
-| `ReadStateTests.hasReadIsFalseOnlyUntilTheFirstAnswer` | `hasRead` across every case: what `firstRead` keys its task on, and why a read in flight cannot cancel itself |
-| `ReadStateTests.aRefreshKeepsWhatIsAlreadyHeld` | `whileReading` from each case: `loaded(h)`/`refreshing(h)` → `refreshing(h)`, everything else → `reading` |
-| `ReadStateTests.anEmptyPageIsEmptyAndAPageIsLoaded` | `init(page:)` — the one place the empty/loaded distinction is drawn |
-| `ReadStateTests.appendingCarriesWhatWasAlreadyHeld` | `appending(_:)` from every case, and `held` under each |
-| `ReadStateTests.contentAnswersFromBothStatesThatHoldSomething` | `content` from `loaded` and from `refreshing`, and nil from the four that hold nothing — a store reading only the settled case refuses every write made during a refresh, silently |
-| `ReadStateTests.aWriteAnsweringDuringARefreshDoesNotEndTheRefresh` | `holding(_:)` from every case: a write's answer stays inside a running read rather than reporting it finished |
-| `ReadStateTests.aServerSayingItIsGoneIsNotAFailure` | `init(readFailure:)` — the `notFound` arm becomes `.empty`, a plan refusal and an unreachable server become `.failed` |
-| `ReadStateTests.anyOtherReasonIsAFailure` | The same init under a rate limit, an internal failure, and a refusal carrying no reason this build knows. Not a walk across every reason the contract declares: `isNotFound` matches the `notFound` arm or it does not, so a reason added later cannot change what this asserts — which is what the walk used to be compensating for |
-| `ReadStateTests.replacingFindsTheRowByIdAndLeavesAGoneRowGone` | `replacing(_:identifiedBy:)`, the path a write's answer takes back into a list |
-| `PageStateTests.theServerLeavesTheCursorEmptyOnTheLastPage` | `init(nextCursor:)` → `.done` / `.more` |
-| `PageStateTests.aFailedPageIsNeitherDoneNorReading` | `isDone`, `isReading` and `failure` across every case — what `NextPageRow` and `loadMore()` branch on |
-| `WriteStateTests.everyWriteHasSomethingToSay` | Walks `WriteAttempt.allCases`: each has a non-empty `failureMessage`, and no two share one |
-| `WriteStateTests.aFailureIsReadableAndAWriteInFlightIsNot` | `isWriting` and `failure` across every `WriteState` case |
-| `WriteStateTests.theSentenceIsNeverTheServers` | `WriteFailure.message` is `attempt.failureMessage` and carries nothing from a `DRApiError` that names a shard and a connection pool. The error is still on the failure, for whoever is debugging |
-| `WriteStateTests.aVoteAndAnUnvoteAreDifferentWrites` | The three pairs that are one control in two directions say different things when they fail |
-| `SilentWriteTests.aBoardVoteThatFailsSaysSo` | `BoardStore.toggleVote` → `.notAuthenticated(.vote)` → `write.failure`, attempt `.vote`, and the row unchanged |
-| `SilentWriteTests.aBoardUnvoteThatFailsSaysWhichDirectionItWas` | The same with `viewer.voted` set: attempt `.clearVote` |
-| `SilentWriteTests.aVoteOnOneRequestThatFailsSaysSo` | `RequestDetailStore.toggleVote` → `write.failure`, attempt `.vote`, `read` still `.loaded` |
-| `SilentWriteTests.aFollowThatFailsSaysSo` | `RequestDetailStore.toggleFollow` → attempt `.follow`; and `.unfollow` from a followed request |
-| `SilentWriteTests.aCommentThatFailsKeepsWhatWasWritten` | `RequestDetailStore.postComment` → attempt `.comment`, and `draft` untouched |
-| `SilentWriteTests.markingOneReadThatFailsSaysSo` | `InboxStore.markRead` → attempt `.markRead`, the row unchanged and `unreadCount` unmoved |
-| `SilentWriteTests.markingEverythingReadThatFailsSaysSo` | `InboxStore.markAllRead` → attempt `.markEverythingRead` |
-| `SilentWriteTests.filingThatFailsKeepsTheComposer` | `SubmitStore.submit` → attempt `.fileRequest`, `submitted` still nil, title and body untouched |
-| `SilentWriteTests.everyWritingStoreCanBeToldTheNoticeWasSeen` | `acknowledgeWriteFailure()` on all four writing stores returns `write` to `.idle` |
-| `SilentWriteTests.oneWriteAtATimeIsNotASecondFailure` | A write already in flight leaves `write` on `.writing` rather than replacing it with a failure nobody caused |
-| `SilentWriteTests.aWriteDuringARefreshIsStillAttempted` | A vote on the board, a vote on one request and a stamp in the inbox, each made while its surface is `refreshing`: attempted and reported, not dropped |
-| `SilentWriteTests.aVoteForARowTheBoardDoesNotHoldDoesNothing` | A reload between the tap and the store reading it leaves nothing to toggle, which is not a failure and says nothing |
-| `StoreReadTests.aFirstReadThatFailsLandsOnTheState` | `BoardStore` / `RoadmapStore` / `ChangelogStore` / `InboxStore` / `RequestDetailStore` `load()` against an unusable scheme: `read` is `.failed`, `hasRead` is true so `firstRead` does not loop |
-| `StoreReadTests.aPageThatFailsDoesNotTakeTheListWithIt` | `loadMore()` on a seeded, loaded store: `page` is `.failed`, `read` is still `.loaded` with every row on it — the defect that made the spinner spin forever |
-| `StoreReadTests.aReadAlreadyRunningIsNotStartedTwice` | `load()` while `read.isReading` returns without touching anything |
-| `StoreReadTests.theInboxReadsItsBadgeWithItsPage` | A failed inbox read leaves `unreadCount` where it was rather than publishing a page beside a count nobody answered for |
-| `StoreReadTests.aThreadThatFailsLeavesTheRequestReadable` | A thread page that fails lands on `page` and leaves `RequestDetailStore.read` loaded — the two rpcs fail apart, and so do the two states |
+| Step | Answer |
+|---|---|
+| Vote with the network down | "Your vote didn't go through. Try it again." beside the control that was tapped |
+| Bring the network back and press it again | The vote lands, and the notice is gone |
+| Write a comment past its limit and send | A refusal that says to change it, not to try again |
+| Spend the write allowance, then write once more | "Too many writes." and the wait the server stated |
+| Dismiss a notice | It goes, the draft stays, and nothing was sent |
 
-Not walked here, and why:
-
-- **Anything that needs a 2xx protobuf answer** — a successful vote replacing a row, the badge
-  dropping by one, a page appending. Those need a server or a stubbed transport; what they depend
-  on (`ReadState.replacing`, `appending`, `init(page:)`) is walked directly as values instead.
-- **The SwiftUI legs** — that `WriteFailureNotice` is on screen, that a disabled `VoteControl` is
-  visibly dim, that `NextPageRow` stops asking. They need a host app; the Example is that host app,
-  and the owner verifies it by running it.

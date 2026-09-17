@@ -17,7 +17,7 @@ import UserNotifications
 final class RemoteNotificationDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
 
   /// Everything this app reads and writes through. Built here and nowhere else.
-  let session = Session(hub: DifferentRequestsHub(client: DemoConfig.client))
+  let session = Session(hub: DifferentRequestsHub(client: DemoConfig.client, appearance: .standard))
 
   /// Where the server puts the request id. Its own key beside `aps`, because `aps` belongs to Apple
   /// and everything else in the payload belongs to the app.

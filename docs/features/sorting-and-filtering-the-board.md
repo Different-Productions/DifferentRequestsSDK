@@ -6,7 +6,7 @@ The bar above the board that decides two things about what is on it: how the req
 and which statuses they are drawn from. Together with the search field they are the three narrowings
 the list rpc takes, and each of them is one query parameter on the same call.
 
-Three things ship together here, because they are one behaviour:
+Three things ship together here, because they are one behavior:
 
 1. **A bar that offers what the contract can send, and only that.** What appears on it is
    `DRRequestSort.allCases` and `DRRequestStatus.allCases` filtered to the values that have a
@@ -128,7 +128,7 @@ in the scheme, or it never reaches the board at all.
 | The board is narrowed to statuses nothing is in | "Nothing in this filter" / "No request is in the statuses you picked. Others are on the board — show every status to see them." with **Show every status** and **Ask for a feature** |
 | A search inside a status filter matches nothing | "No matches in this filter" / "Nothing in the statuses you picked matches that search. Show every status to search the whole board." with the same two buttons |
 | A search on an unfiltered board matches nothing | "Nothing matches" / "Nobody has asked for this yet." with **Ask for a feature** |
-| The whole board is empty and nothing is narrowing it | "No requests yet" / "Nobody has asked for anything. Be first." with **Ask for a feature** |
+| The whole board is empty and nothing is narrowing it | "What should we build?" / "Nobody has asked for anything yet. Tell us what you want and everyone can vote on it." with **Ask for a feature**, where somebody is signed in |
 | The read a capsule started does not answer | "Couldn't load" / "Something went wrong reaching the server. Check your connection and try again." with **Try Again**. The bar stays above it with the tapped capsule highlighted, so the filter can be changed or undone without a successful read first |
 | A further page of a filtered board fails | "Couldn't load any more." with **Try Again** under the last row. The rows already read stay, and so does the filter |
 | A vote fails on a filtered board | "Your vote didn't go through. Try it again." — the filter is untouched and the notice sits above the rows |
@@ -312,8 +312,9 @@ DifferentRequestsView — loaded, nothing narrowing
                            server. Check your connection and try again." + [Try Again].
                            The capsules are live; a filter can be changed without a good read first
   first read in flight   → the bar, then a centred spinner
-  loaded, unfiltered,    → the bar, then "No requests yet" + "Nobody has asked for anything.
-  board empty              Be first." + [ ⊕ Ask for a feature ] (prominent, and alone)
+  loaded, unfiltered,    → the bar, then "What should we build?" + "Nobody has asked for
+  board empty              anything yet." + [ ⊕ Ask for a feature ] (prominent, and alone,
+                           and only where a person is signed in)
   searched, no filter,   → the bar, then "Nothing matches" + "Nobody has asked for this yet."
   no matches               + [ ⊕ Ask for a feature ]
   searched inside a      → the bar, then "No matches in this filter" + "Nothing in the statuses
@@ -327,56 +328,32 @@ DifferentRequestsView — loaded, nothing narrowing
 ## Platform differences
 
 - **iOS 18+ and macOS 15+.** `Package.swift` declares no other platform, so there is no watchOS,
-  tvOS or visionOS behaviour to describe.
+  tvOS or visionOS behavior to describe.
 - **The bar is the view's own content, not a toolbar item.** It draws identically on both platforms
   and does not compete with `.primaryAction` for toolbar room, which on macOS is a window toolbar
   shared with whatever the host app put there.
 - **Horizontal scrolling.** Touch-drag on iOS, trackpad scroll or shift-scroll on macOS.
   `.scrollIndicators(.hidden)` is stated so the strip reads as a row of capsules on both rather than
   growing a bar on one.
-- **Colours.** The capsules use `Color.accentColor` and `HierarchicalShapeStyle.quaternary`, both of
+- **Colors.** The capsules use `Color.accentColor` and `HierarchicalShapeStyle.quaternary`, both of
   which resolve against the host app's accent and the platform's own materials. No `UIColor` or
   `NSColor` is named, so there is nothing here that compiles on one platform and not the other.
 - **The search field beside it.** `.searchable` is a field under the title on iOS and a toolbar
   search field on macOS. Both write the same `BoardStore.query`, and the bar sits under both.
 
-## Tests that walk this
+## Which tests walk the chart
 
-`Tests/DifferentRequestsTests/BoardFilterTests.swift`, all hermetic. The reads go to a base URL
-whose scheme `URLSession` cannot open, so every `load()` fails inside `URLSession.data(for:)` without
-a lookup and without a connection — which is enough to walk the store's whole state machine, because
-what is asserted is what was asked and what the store did with it, not what a server answered.
+There is no test target — see the server's #144. Walked in the example app on a simulator, against
+development.
 
-| Test | The leg it walks |
-| --- | --- |
-| `theBarOffersExactlyWhatTheContractCanSend` | `offeredSorts` and `offeredStatuses` against `DRRequestSort.allCases` and `DRRequestStatus.allCases` — every value with a `urlToken` is offered, and every offered value has one. Walks the generated tables in both directions rather than checking a list written here |
-| `theZeroSentinelIsNeverOffered` | `unspecified` has no `urlToken` in either table, and so is on neither strip. This is the one that keeps a `0` out of a query string |
-| `aStatusGoesOnAndComesOffAgain` | `toggle(status:)` both ways, and `All` lighting up again when the last one comes off |
-| `statusesAreSpelledInTheOrderTheContractDeclaresThem` | `toggle(status:)` tapped in reverse order still leaves `statuses` in `offeredStatuses` order, so one set is one URL |
-| `showEveryStatusLeavesTheSearchAlone` | `showEveryStatus()` clears the statuses and not `query` — two narrowings undone one at a time |
-| `showingARankingReplacesTheOneBefore` | `show(sort:)` over every value in `offeredSorts`, so a ranking added to the contract is covered by being declared |
-| `everyNarrowingIsCurrentOnlyForItsOwnQuestion` | `isCurrent` against each of the three properties moved on its own — the staleness check that a per-property comparison would have let a fourth property slip past |
-| `aQuestionKnowsWhatItIsHoldingBack` | `BoardNarrowing(question:)` over all four combinations of empty/non-empty query and statuses, checked against `BoardNarrowing.allCases` so no case is left unreached |
-| `everyNarrowingSaysSomethingDifferent` | Walks `BoardNarrowing.allCases`: every case has a non-empty title, message and footer, and no two cases share any of the three. A blank empty state and a copy-pasted one are the same bug |
-| `anEmptyBoardDescribesTheReadThatEmptiedIt` | `narrowing` reads the question the last read was started for, not what the capsules say now — so the sentence under an empty board is about the read that produced it |
-| `aFilterChangeAsksAgainRatherThanPagingOn` | `show(sort:)` and `toggle(status:)` read again rather than only setting a property: the board ends up current for the new question, and the rows read under the old one are replaced rather than paged onto |
+The walk, and what it answered:
 
-`Tests/DifferentRequestsTests/HubTests.swift`, same unreachable base URL, for the early read:
+| Step | Answer |
+|---|---|
+| Open the board with nothing chosen | Most-wanted first, every status shown |
+| Switch to New | Newest first, and the same page size |
+| Pick one status, then a second | Only those statuses, and the union of the two |
+| Search a word in a body, then one in a title | Each found, whatever the case |
+| Search something nothing matches | "Nothing matches", with the way back to every status |
+| Read the filter bar | Open, Planned, In Progress, Shipped, Declined — no Duplicate, which a board never shows |
 
-| Test | The leg it walks |
-| --- | --- |
-| `warmingAnUnreadBoardReadsIt` | `readTheBoardBeforeItIsShown()` on a board still `.unread` leaves it `hasRead`, which is the whole point — an unwarmed board makes `.firstRead` read again on presentation |
-| `aBoardAlreadyReadIsNotReadAgain` | The guard. A board seeded `.loaded` keeps its page and its `failure` stays nil, which it could not if a second read had run against a client that reaches nothing |
-
-Not walked here, and why:
-
-- **The URL itself** — `?sort=new&statuses=open,shipped`. Building it is
-  `DifferentRequestsClient.requests(statuses:sort:query:cursor:)`, which was already there and
-  unchanged; asserting the string needs a stubbed transport, and the client's own query-building is
-  covered by the tokens it reads from the generated table.
-- **The `while asked != question` re-read** — a question changed *during* a suspended read. Reaching
-  it needs a transport that can be held open mid-call, which a required lane cannot have without a
-  live network.
-- **The SwiftUI legs** — the capsule tap, the horizontal scroll, `AsyncButton`'s disabled window, the
-  spinner's opacity. They need a host app; the Example is that host app, and the owner verifies it by
-  running it.

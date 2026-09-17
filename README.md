@@ -1,201 +1,25 @@
 # DifferentRequests SDK
 
-Feature request management for iOS and macOS apps. Let your users submit, vote on, and browse
-feature requests directly inside your app.
+A feature request board that lives inside your iOS app. Your users ask for things, vote on what
+other people asked for, follow what they care about, and read what shipped — without leaving your
+app and without making another account. You build one object at launch and hand it to a SwiftUI
+view.
 
-## Installation
-
-Add the package in Xcode: **File > Add Package Dependencies**
-
-```
-https://github.com/Different-Productions/DifferentRequestsSDK
-```
-
-Or in `Package.swift`:
+**The documentation is at [differentrequests.com/docs](https://differentrequests.com/docs).** Start
+there: install, the quick start, every screen, push notifications, what Free includes and what Pro
+adds, errors, limits, privacy, and upgrading. It is one page per topic, and signing in fills in
+which of them your own app includes.
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/Different-Productions/DifferentRequestsSDK", branch: "master"),
-]
+  .package(url: "https://github.com/Different-Productions/DifferentRequestsSDK", from: "0.9.0"),
+],
 ```
 
-`master` speaks protobuf to the current API and is not tagged yet. The newest tag, `0.6.2`, is the
-JSON client that came before it and does not talk to that API.
+Requires iOS 26 or macOS 26, and Swift 6.2.
 
-## Quick Start
-
-Build one hub where your app builds everything else it keeps, and hand it to the screens. The
-screens hold no state of their own — SwiftUI throws them away and rebuilds them on every redraw, and
-the board, the search text and the half-typed request have to survive that.
-
-```swift
-import DifferentRequests
-import SwiftUI
-
-@main
-struct MyApp: App {
-  // 1. Built once, held for the life of the app.
-  private let requests = DifferentRequestsHub(client: .make(appKey: "your-app-key"))
-
-  var body: some Scene {
-    WindowGroup {
-      // 2. The NavigationStack is yours. Every SDK screen needs one.
-      NavigationStack {
-        DifferentRequestsView(hub: requests)
-      }
-    }
-  }
-}
-```
-
-Reading the board needs only the app key. Voting, asking and commenting act on behalf of a person,
-so they need a session — exchange your own identifier for one at launch:
-
-```swift
-do {
-  let signedIn = try await requests.client.createSession(
-    externalID: currentUser.id,
-    email: currentUser.email,
-    displayName: currentUser.name,
-    traits: ["tier": currentUser.tier]
-  )
-  logger.info("DifferentRequests: signed in as \(signedIn.user.id)")
-} catch {
-  logger.error("DifferentRequests: \(error.localizedDescription)")
-}
-```
-
-The same `externalID` returns the same person on a new device, which is what carries someone's votes
-across a reinstall. `Example/DifferentRequestsExample/DifferentRequestsExample/Session.swift` is
-this, with the failure shown on screen instead of logged.
-
-## Open It Without The Wait
-
-The board's first page is a round trip, so a board that starts one when it appears shows a spinner
-for the length of it. If you know it is about to be opened — a settings row, a button pinned to a
-screen — read it while the reader is still looking at something else:
-
-```swift
-override func viewDidLoad() {
-  super.viewDidLoad()
-  Task { await requests.readTheBoardBeforeItIsShown() }
-}
-```
-
-It draws rows on the first frame after that. Call it as often as you like: a board already read is
-not read again, so a button that warms on every appearance costs one round trip, not one each time.
-
-## Get Your App Key
-
-Sign up at [app.differentrequests.com](https://app.differentrequests.com), create an organization,
-and copy your app key. It identifies your app to the API — it is not a per-person credential, which
-is what `createSession` is for.
-
-## Drop-in Views
-
-Every one of these takes the hub you built, and every one of them belongs inside a `NavigationStack`
-your app owns — that stack is what gives them a title bar, a search field, and somewhere to push to.
-
-- **`DifferentRequestsView(hub:)`** — The board: ranked by demand, searchable, paged, votable, and
-  the way in to asking for something new from every state it can be in
-- **`RequestDetailView(hub:requestID:)`** — One request, its thread, its vote and its follow. Open it
-  straight from a notification or a deep link
-- **`RoadmapView(hub:)`** — Planned, building, shipped, as a section per column
-- **`ChangelogView(hub:)`** — What shipped, newest first
-- **`InboxView(hub:)`** — Status changes, replies and duplicates on what someone follows
-- **`SubmitRequestView(hub:)`** — The composer sheet, if you want your own way in to it. Call
-  `hub.beginSubmission()` before presenting it
-- **`VoteControl(voteCount:voted:isWriting:toggle:)`** — The vote button on its own, for your own
-  rows. `isWriting` is what makes it go inert while a vote is in flight, instead of taking a tap
-  nothing comes of
-
-Every one of these screens draws its four outcomes from one state on its store — reading, failed,
-read-and-empty, read-and-here-it-is — and says so when a write does not land. A vote, a follow, a
-comment or a notification marked read that the server refuses puts a line on screen next to the
-control that was tapped. Nothing fails quietly.
-
-`RoadmapView` and `ChangelogView` are plan-gated, and they gate themselves. Each asks
-`client.config()` before it reads anything, and an app whose plan does not include that surface gets
-a screen saying what is there instead — never a call that comes back `planRequired`, which is an
-error written for you and not for the person holding the phone. The composer under a request does
-the same on `commentsEnabled`. `config()` is read once and remembered, so however many screens ask,
-it is one round trip.
-
-Hide the tab anyway where you can. Read `client.config()` at launch and build a tab only where
-`roadmapEnabled` and `changelogEnabled` say so: an absent tab is a better answer than a tab that
-explains itself. The SDK's own gate is the backstop for the ways a screen is reached that a tab bar
-does not cover — a deep link, a settings row, a tab built before the config arrived.
-
-## Client API
-
-For custom UI, use the client directly. Every call takes and returns the contract's own types.
-
-```swift
-// A page of the board — statuses empty means everything still on it
-let page = try await client.requests(statuses: [], sort: .top, query: nil, cursor: nil)
-
-// The next page, from what the last one handed back
-let next = try await client.requests(
-  statuses: [], sort: .top, query: nil, cursor: page.nextCursor
-)
-
-// Search: the same rpc, the same ranking, the same page shape
-let matches = try await client.requests(
-  statuses: [], sort: .top, query: "dark mode", cursor: nil
-)
-
-// One request, and its thread
-let one = try await client.request(id: "abc-123")
-let thread = try await client.comments(requestID: one.request.id, cursor: nil)
-
-// Write
-let filed = try await client.submit(title: "Dark mode", body: "Please add dark mode")
-let voted = try await client.vote(requestID: filed.request.id)
-let followed = try await client.follow(requestID: filed.request.id)
-let posted = try await client.comment(requestID: filed.request.id, body: "Yes please")
-```
-
-## Error Handling
-
-The server's half of a failure is a `DRApiError` carried through unflattened, so `code` is the value
-the server sent rather than a guess made from an HTTP status. That message is written for whoever is
-reading a log and may name internals — the SDK's own screens never show it to anyone, and neither
-should yours.
-
-```swift
-do {
-  let answer = try await client.request(id: "abc-123")
-  show(answer.request)
-} catch let error as DifferentRequestsError {
-  if let seconds = error.retryAfterSeconds {
-    // The server said to wait, and said how long.
-    schedule(after: seconds)
-  }
-  if case .api(let apiError) = error, apiError.code == .planRequired {
-    // This surface is not on the tenant's plan.
-  }
-  logger.error("DifferentRequests: \(error.localizedDescription)")
-}
-```
-
-`notAuthenticated(rpc)` is thrown before anything is sent, from the audience the contract declares
-for that rpc: an rpc that acts for a person is refused locally rather than costing a round trip to
-be told 401.
-
-## Requirements
-
-- iOS 26+
-- macOS 26+
-- Swift 6.2+
-
-This floor is deliberate, not an oversight. The SDK is built against the current
-SwiftUI, and an app that has to support an older iPhone is not one this can serve
-today. If that rules your app out, say so on the board — the number moves if
-enough people ask.
-
-## Example App
-
-See the `Example/` directory for a complete Xcode project showing how to integrate the SDK.
+- Changes between releases: [CHANGELOG.md](CHANGELOG.md)
+- Reference, inside Xcode: the `DifferentRequests` DocC catalog
 
 ## License
 

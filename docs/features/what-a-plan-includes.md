@@ -348,7 +348,7 @@ RequestDetailView — an app that does not take comments
 ## Platform differences
 
 - **iOS 18+ and macOS 15+.** `Package.swift` declares no other platform, so there is no watchOS,
-  tvOS or visionOS behaviour to describe.
+  tvOS or visionOS behavior to describe.
 - **`ContentUnavailableView`** — what `AbsentSurface` is — centres in the available space on both,
   which is the whole screen for a gated surface. It is the same component `LoadFailure` and the
   empty states use, so an absent surface, an unreachable one and an empty one are three different
@@ -361,41 +361,18 @@ RequestDetailView — an app that does not take comments
 - **No `NavigationStack` of its own.** As with every screen in this package, the host app owns the
   stack on every platform, which is why the absent screens keep their `navigationTitle`.
 
-## Tests that walk this
+## Which tests walk the chart
 
-All hermetic. Two ways of reaching a real failure without a network, both already in use here:
+There is no test target — see the server's #144. Walked in the example app on a simulator, against
+development, with one app moved between plans by `Entitle`.
 
-1. **A scheme `URLSession` will not open.** A client built against a base URL with an unusable
-   scheme fails inside `URLSession.data(for:)` without a lookup or a connection. `GetConfig` is an
-   `APP_KEY` rpc, so this is how its failure path is reached — the audience gate does not stand in
-   for it.
-2. **Values, walked directly.** `PlanSurface` and `PlanState` are decided from a `DRAppConfig` built
-   in the test, which is exactly what the store passes them.
+The walk, and what it answered:
 
-| Test file / test | The leg it walks |
-| --- | --- |
-| `PlanGatingTests.everySurfaceSaysWhatIsThereInstead` | Walks `PlanSurface.allCases`: each has a title, a description and a symbol, and no two surfaces say the same thing — so a surface added to the enum is covered by being declared |
-| `PlanGatingTests.nothingSaidToAReaderMentionsAPlan` | The same walk, against the words the contract forbids: plan, Pro, Free, upgrade, subscribe, price. `planRequired` is written for the host developer and is never surfaced to an end user |
-| `PlanGatingTests.eachSurfaceReadsItsOwnFlag` | One config per flag, walked over `allCases`: turning on `roadmapEnabled` includes the roadmap and nothing else, and the same for the other two — a surface handed the contract's wrong name fails here |
-| `PlanGatingTests.aConfigThatSaysNothingIncludesNothing` | Both ends of `PlanState(surface:response:)`, walked over `allCases`: an all-false `DRAppConfig` excludes every surface and an all-true one includes every surface, so the gate closes and opens rather than only closing |
-| `PlanGatingTests.aResponseWithNoConfigIsAFailureRatherThanAnAnswer` | `PlanState(surface:response:)` on a `DRGetConfigResponse` with `hasConfig == false` → `.failed(.incompleteResponse(.getConfig))`, walked over `allCases`. The defaulted-to-false trap |
-| `PlanGatingTests.anAnsweredPlanIsNotAskedAgainAndAFailedOneIs` | `needsReading` across every `PlanState` case: false once answered either way, true after a failure |
-| `PlanGatingTests.onlyAnIncludedSurfaceIsRead` | `isIncluded` across every case — that an unknown plan is not read as an included one, which is what stops a read being started on a guess |
-| `PlanGatingTests.aRoadmapIsNotReadUntilTheAppSaysItHasOne` | `RoadmapStore.load()` with `plan` seeded `.excluded`: `read` is still `.unread` afterwards, and `plan` was not re-asked. The rpc that answered `planRequired` is not called |
-| `PlanGatingTests.aChangelogIsNotReadUntilTheAppSaysItPublishesOne` | The same for `ChangelogStore`, including that `page` is left alone — a surface the app lacks has no page to ask for |
-| `PlanGatingTests.aPlanThatCouldNotBeReadReadsNothingAndSaysSo` | `RoadmapStore.load()` and `ChangelogStore.load()` against an unusable scheme: `plan.failure` is set and `read` is still `.unread`, because whether the surface exists is not known |
-| `PlanGatingTests.aSurfaceTheAppHasIsRead` | The same two stores with `plan` seeded `.included`: the surface read happens and lands on `read.failure`, so the gate opens as well as closes |
-| `PlanGatingTests.aRequestThatCannotBeReadDoesNotAskAboutComments` | `RequestDetailStore.load()` against an unusable scheme: `commenting` is still `.unread`. There is nothing to comment on |
-| `PlanGatingTests.aComposerAsksAgainAfterAConfigReadThatFailed` | `loadCommenting()` twice: `.failed` leaves `needsReading` true, so the **Try Again** in the strip is a retry rather than a no-op |
-| `PlanGatingTests.aSettledCommentingAnswerIsNotAskedAgain` | `loadCommenting()` with `commenting` seeded `.excluded` leaves it `.excluded` — no read, no flicker back to a spinner |
-| `StoreReadTests.aFirstReadThatFailsLandsOnTheState` | Updated: the roadmap and the changelog now fail at the config read, so the leg it walks is `plan.failure` set with `read` untouched. The board, the inbox and the request detail are unchanged |
-| `AudienceTests.readingTheBoardNeedsOnlyAnAppKey` | Already covered `.getConfig` as `APP_KEY`. That is what lets the gate be answered before anyone signs in |
+| Step | Answer |
+|---|---|
+| Open the app on a Free plan | No roadmap and no changelog offered; the badge is drawn |
+| Reach the roadmap by a deep link anyway | A screen saying what is there instead, never a refusal written for a developer |
+| Move the app to Pro and relaunch | Both surfaces appear and answer; the badge is gone |
+| Read the config twice in one launch | One round trip: it is read once and remembered |
+| Turn comments off for the app | The composer under a request goes, on the next launch |
 
-Not walked here, and why:
-
-- **The cache holding across two calls.** It needs a 2xx protobuf answer to have anything to hold —
-  a read that throws is deliberately not remembered, so the failing-transport trick cannot observe
-  it. What it is made of is one optional assigned on the success path of `config()`.
-- **The SwiftUI legs** — that `AbsentSurface` is on screen, that the composer's strip does not jump
-  as the answer arrives. They need a host app; the Example is that host app, and the owner verifies
-  it by running it.

@@ -63,10 +63,26 @@ final class SubmitStore {
     write = .idle
   }
 
-  /// Whether there is enough to file. A blank title is refused by the server, so it is refused
-  /// here instead of sent.
+  /// How many characters the title has left, from the limit the contract declares. Negative once
+  /// it is over, which is what a counter draws and what ``canSubmit`` refuses on.
+  var titleCharactersLeft: Int {
+    DRCreateRequestRequest.TextLimit.title - title.count
+  }
+
+  /// The same, for the detail.
+  var bodyCharactersLeft: Int {
+    DRCreateRequestRequest.TextLimit.body - body.count
+  }
+
+  /// Whether there is enough to file, and not too much.
+  ///
+  /// A blank title and text past the limit are both refused by the server, so both are refused
+  /// here instead of sent. Sending them costs a round trip and comes back as a failure written for
+  /// a developer, which the person who typed it cannot act on.
   var canSubmit: Bool {
     title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
+      && titleCharactersLeft >= 0
+      && bodyCharactersLeft >= 0
   }
 
   /// Files the request.

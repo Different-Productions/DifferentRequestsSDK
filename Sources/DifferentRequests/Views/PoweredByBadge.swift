@@ -44,22 +44,19 @@ struct PoweredByBadge: View {
     }
   }
 
-  /// The mark and the words. The mark is drawn rather than shipped as an asset, and it is a filled
-  /// square rather than a chevron: a chevron here is the vote control's own glyph, and a badge
-  /// wearing it reads as something votable.
+  /// The words, and nothing else.
+  ///
+  /// There was a filled square in front of them, drawn here rather than shipped as an asset. It
+  /// was not a mark of anything — a square says nothing about this product, and on a board full of
+  /// real controls it read as something that had failed to load. The name is the mark.
   private var label: some View {
-    HStack(spacing: 4) {
-      RoundedRectangle(cornerRadius: 3, style: .continuous)
-        .fill(Color.accentColor)
-        .frame(width: 12, height: 12)
-      // Two `Text`s in a stack of their own, holding the word space between them rather than the
-      // stack's spacing. `Text + Text` said this in one run and is gone in 26.
-      HStack(spacing: 0) {
-        Text("Powered by ")
-          .foregroundStyle(.tertiary)
-        Text("Different Requests")
-          .foregroundStyle(.secondary)
-      }
+    // Two `Text`s in a stack of their own, holding the word space between them rather than the
+    // stack's spacing. `Text + Text` said this in one run and is gone in 26.
+    HStack(spacing: 0) {
+      Text("Powered by ")
+        .foregroundStyle(.tertiary)
+      Text("Different Requests")
+        .foregroundStyle(.secondary)
     }
     .font(.caption2)
   }

@@ -37,6 +37,14 @@ extension DifferentRequestsClient {
       lines.append("  plan         \(planLine(config))")
     }
 
+    // The line that answers "why can nobody ask for anything?", which is the one thing about an
+    // integration a screen deliberately says nothing about.
+    if let person = currentUser {
+      lines.append("  signed in    \(person.externalID)")
+    } else {
+      lines.append("  signed in    nobody — call createSession, or asking and voting are hidden")
+    }
+
     lines.append("  last call    \(lastCallLine)")
     return lines.joined(separator: "\n")
   }

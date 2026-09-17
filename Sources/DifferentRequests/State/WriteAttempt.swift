@@ -58,7 +58,34 @@ extension WriteAttempt {
     case .markEverythingRead:
       return "Couldn't mark everything read. Try it again."
     case .fileRequest:
-      return "That didn't send. Try again in a moment."
+      return "That didn't send. It's still written — send it again."
+    }
+  }
+
+  /// What the person is told when the server refused what they wrote, rather than failing to
+  /// receive it.
+  ///
+  /// A separate sentence because "try it again" is a lie here: the same words refused once are
+  /// refused every time, and a person told to retry loses the writing to a loop instead of
+  /// changing the one thing that would work.
+  var refusedMessage: String {
+    switch self {
+    case .vote:
+      return "That vote wasn't allowed."
+    case .clearVote:
+      return "That vote couldn't be taken back."
+    case .follow:
+      return "You can't follow that."
+    case .unfollow:
+      return "You can't unfollow that."
+    case .comment:
+      return "That comment wasn't accepted. It's still written — change it and send it again."
+    case .markRead:
+      return "That couldn't be marked read."
+    case .markEverythingRead:
+      return "Those couldn't be marked read."
+    case .fileRequest:
+      return "That wasn't accepted. It's still written — change it and send it again."
     }
   }
 }

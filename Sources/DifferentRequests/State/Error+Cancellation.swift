@@ -14,7 +14,8 @@ extension Error {
   /// retry for: the screen that comes next reads again on its own.
   ///
   /// Both shapes are checked. Swift's own `CancellationError` is thrown by structured concurrency,
-  /// and `URLSession` throws `URLError.cancelled` instead — and the client wraps whatever the
+  /// and `URLSession` throws `URLError.cancelled` instead — Apple's own spelling, kept as theirs —
+  /// and the client wraps whatever the
   /// session threw, so the wrapper is unwrapped here rather than at each caller.
   var isCancellation: Bool {
     if self is CancellationError {

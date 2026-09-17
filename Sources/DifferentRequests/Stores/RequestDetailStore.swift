@@ -32,6 +32,12 @@ final class RequestDetailStore {
 
   // MARK: - State
 
+  /// When the copy this store holds arrived, so news about the request can be compared with it.
+  ///
+  /// Absent until a read lands. A copy nobody has is not stale; it is missing, which ``read``
+  /// already says.
+  private(set) var readAt: Date?
+
   /// The request itself: where its read got to, and what it found.
   ///
   /// `empty` is a server that says there is no such request. Someone arrives here from a
@@ -99,6 +105,7 @@ final class RequestDetailStore {
     do {
       let answer = try await client.request(id: requestID)
       read = .loaded(answer.request)
+      readAt = Date()
     } catch {
       read = ReadState(readFailure: error)
       thread = .unread

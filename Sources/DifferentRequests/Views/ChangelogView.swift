@@ -19,14 +19,19 @@ public struct ChangelogView: View {
   /// The hub's changelog state, which outlives this screen and keeps the pages it has read.
   private let store: ChangelogStore
 
+  /// What this screen is drawn in: the host app's own accent and font.
+  private let appearance: Appearance
+
   /// - Parameter hub: What the host app built once and holds.
   public init(hub: DifferentRequestsHub) {
+    self.appearance = hub.appearance
     self.store = hub.changelog
   }
 
   public var body: some View {
     content
       .navigationTitle("What's New")
+      .worn(by: appearance)
       .firstRead(store.read) {
         await store.load()
       }
@@ -111,7 +116,7 @@ public struct ChangelogView: View {
       }
 
       if entry.hasPublishedAt {
-        Text(entry.publishedAt.date.formatted(.relative(presentation: .named)))
+        Text(entry.publishedAt.date.ago)
           .font(.caption)
           .foregroundStyle(.tertiary)
       }

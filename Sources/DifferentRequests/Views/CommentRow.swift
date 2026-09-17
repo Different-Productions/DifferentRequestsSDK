@@ -28,7 +28,7 @@ struct CommentRow: View {
         Spacer()
 
         if comment.hasCreatedAt {
-          Text(comment.createdAt.date.formatted(.relative(presentation: .named)))
+          Text(comment.createdAt.date.ago)
             .font(.caption)
             .foregroundStyle(.tertiary)
         }

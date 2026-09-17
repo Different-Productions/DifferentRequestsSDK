@@ -49,7 +49,7 @@ struct FilterChip: View {
   }
 
   /// Filled when on, tinted when off — the pattern every native filter strip uses, and the only
-  /// one that survives a palette with no colour in it. A tinted-on state reads as off beside a
+  /// one that survives a palette with no color in it. A tinted-on state reads as off beside a
   /// tinted-off state.
   private var foreground: AnyShapeStyle {
     if isActive {

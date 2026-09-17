@@ -103,9 +103,15 @@ final class BoardStore {
     DRRequestSort.allCases.filter { $0.urlToken != nil }
   }
 
-  /// Every status the board can be narrowed to, on the same terms and from the same table.
+  /// Every status the board can be narrowed to, from the contract's own list of what a board shows.
+  ///
+  /// Not every spellable status is on a board. A duplicate has left it for the request it was
+  /// folded into, so asking a board for one asks for something that is not there — and the server
+  /// refused that filter every time it was offered. Which statuses a board shows is the contract's
+  /// to say since 0.35.0, so the bar is built from `shownOnABoard` rather than from what happens
+  /// to have a spelling.
   var offeredStatuses: [DRRequestStatus] {
-    DRRequestStatus.allCases.filter { $0.urlToken != nil }
+    DRRequestStatus.shownOnABoard
   }
 
   // MARK: - Private state

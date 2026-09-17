@@ -17,9 +17,15 @@ struct DiagnosticsView: View {
     self.session = session
   }
 
+  /// What the client says about itself, read once when the screen appears.
+  ///
+  /// Held rather than asked for while drawing: the client is an actor, so asking it is a wait, and
+  /// a body cannot wait. Read inline it compiled with a warning and would have stopped compiling.
+  @State private var described = ""
+
   var body: some View {
     ScrollView {
-      Text(session.client.describeIntegration())
+      Text(described)
         .font(.system(.footnote, design: .monospaced))
         .textSelection(.enabled)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -27,5 +33,8 @@ struct DiagnosticsView: View {
     }
     .navigationTitle("Diagnostics")
     .navigationBarTitleDisplayMode(.inline)
+    .task {
+      described = await session.client.describeIntegration()
+    }
   }
 }

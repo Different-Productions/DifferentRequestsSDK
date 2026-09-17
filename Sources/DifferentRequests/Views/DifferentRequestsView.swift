@@ -61,6 +61,9 @@ public struct DifferentRequestsView: View {
   /// Closes the sheet the host presented this in.
   @Environment(\.dismiss) private var dismiss
 
+  /// Whether something presented this screen, which decides whether Done is drawn at all.
+  @Environment(\.isPresented) private var isPresented
+
   /// - Parameter hub: What the host app built once and holds. The board's state lives on it.
   public init(hub: DifferentRequestsHub) {
     self.hub = hub
@@ -72,33 +75,45 @@ public struct DifferentRequestsView: View {
       board
     }
     .searchable(text: $store.query, prompt: "Search requests")
-    .tint(.primary)
+    .worn(by: hub.appearance)
   }
 
   /// The board itself, inside the stack this view owns.
   private var board: some View {
     VStack(spacing: 0) {
+      // Under the title, the same place the inbox draws it. Pinned to the bottom it read as an
+      // advertisement laid over somebody else's app, which is the thing it is not.
+      PoweredByBadge(appConfig: hub.appConfig)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal)
+        .padding(.bottom, 6)
+
       BoardFilterBar(store: store)
 
       content
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
-    .safeAreaInset(edge: .bottom, spacing: 0) {
-      PoweredByBadge(appConfig: hub.appConfig)
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 6)
-    }
     .navigationTitle("Requests")
     .task {
       await hub.appConfig.load()
+      await hub.whoIsHere.read()
     }
     .toolbar {
-      ToolbarItem(placement: .cancellationAction) {
-        Button("Done") { dismiss() }
+      // Only where something presented this. As the root of a host app's own NavigationStack —
+      // which is what the documentation tells a developer to build — Done had nothing to dismiss
+      // and did nothing when pressed.
+      if isPresented {
+        ToolbarItem(placement: .cancellationAction) {
+          Button("Done") { dismiss() }
+        }
       }
-      ToolbarItem(placement: .primaryAction) {
-        askButton
-          .labelStyle(.iconOnly)
+      // Asking acts for a person. With nobody signed in it can only be refused, and a control that
+      // can only fail is worse than one that is not there — see #84.
+      if hub.whoIsHere.somebodyIsHere {
+        ToolbarItem(placement: .primaryAction) {
+          askButton
+            .labelStyle(.iconOnly)
+        }
       }
       ToolbarItem(placement: .primaryAction) {
         everythingElse
@@ -121,7 +136,7 @@ public struct DifferentRequestsView: View {
   /// letting a burst of typing settle.
   ///
   /// SwiftUI cancels and restarts this on every keystroke, which is what makes the wait a
-  /// debounce; a cancelled wait sends nothing. It also runs again every time this view is built
+  /// debounce; a canceled wait sends nothing. It also runs again every time this view is built
   /// again, which is why it asks the store what it is already showing first: the board outlives
   /// its own screen now, and reloading it on a redraw would throw away every page after the first
   /// along with where the reader had got to.
@@ -187,11 +202,13 @@ public struct DifferentRequestsView: View {
         .buttonStyle(.borderedProminent)
         .controlSize(.large)
 
-        askButton
-          .labelStyle(.titleOnly)
-          .buttonStyle(.bordered)
-          .controlSize(.large)
-      } else {
+        if hub.whoIsHere.somebodyIsHere {
+          askButton
+            .labelStyle(.titleOnly)
+            .buttonStyle(.bordered)
+            .controlSize(.large)
+        }
+      } else if hub.whoIsHere.somebodyIsHere {
         askButton
           .labelStyle(.titleOnly)
           .foregroundStyle(.background)
@@ -338,7 +355,7 @@ private struct RequestSummary: View {
         Spacer()
 
         if request.hasCreatedAt {
-          Text(request.createdAt.date.formatted(.relative(presentation: .named)))
+          Text(request.createdAt.date.ago)
             .font(.caption)
             .foregroundStyle(.tertiary)
         }

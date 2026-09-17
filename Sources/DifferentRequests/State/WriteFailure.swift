@@ -16,7 +16,14 @@ struct WriteFailure {
 
   /// What the person who made the write is told. Written against what they did, never derived
   /// from ``error`` — the contract states the server's message may name internals.
+  ///
+  /// Two sentences rather than one, because a write that did not arrive and a write the server
+  /// refused are different things to a person: the first is worth trying again and the second
+  /// never is. Which it was comes from the reason the contract carries, not from a status code.
   var message: String {
-    attempt.failureMessage
+    if let refused = error as? DifferentRequestsError, refused.isARefusalOfWhatWasWritten {
+      return attempt.refusedMessage
+    }
+    return attempt.failureMessage
   }
 }

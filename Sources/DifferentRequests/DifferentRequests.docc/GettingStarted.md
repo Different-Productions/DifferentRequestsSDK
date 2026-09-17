@@ -21,7 +21,7 @@ Or in `Package.swift`:
 dependencies: [
   .package(
     url: "https://github.com/Different-Productions/DifferentRequestsSDK",
-    from: "0.8.0"
+    from: "0.9.0"
   ),
 ]
 ```
@@ -35,24 +35,48 @@ the process.
 ```swift
 import DifferentRequests
 
-let requests = DifferentRequestsHub(client: .make(appKey: "your-app-key"))
+let requests = DifferentRequestsHub(
+  client: .make(appKey: "your-app-key"),
+  appearance: .standard
+)
 ```
+
+``Appearance/standard`` is the SDK's own look. Pass an ``Appearance`` with your
+app's accent and a system font design to have every screen wear your app instead.
 
 A SwiftUI view is a value that is thrown away and rebuilt whenever anything
 above it redraws. A hub built inside a view would take the board's page, the
 search text and a half-written request with it every time.
 
-Pointing at a staging server takes a base URL, built without force-unwrapping so
-a malformed string is a handled error rather than a crash:
+Production is where it points when you say nothing. A staging server takes a
+``SecureBaseURL``, which refuses anything that is not `https` rather than
+letting an app ship talking over plain text:
 
 ```swift
-func makeStagingHub(appKey: String) throws -> DifferentRequestsHub {
-  guard let baseURL = URL(string: "https://staging.example.com") else {
-    throw URLError(.badURL)
+@main
+struct MyApp: App {
+  private let requests = DifferentRequestsHub(
+    client: .make(
+      appKey: "your-app-key",
+      baseURL: SecureBaseURL(literal: "https://staging.example.com")
+    ),
+    appearance: .standard
+  )
+
+  var body: some Scene {
+    WindowGroup {
+      NavigationStack {
+        DifferentRequestsView(hub: requests)
+      }
+    }
   }
-  return DifferentRequestsHub(client: .make(appKey: appKey, baseURL: baseURL))
 }
 ```
+
+The address is a literal because that is where it belongs: `App` requires a
+non-throwing `init()`, and a mistyped constant is a mistake to fix before the
+build ships, which is what the trap at launch reports. Where the address
+arrives at runtime instead, ``SecureBaseURL/init(_:)`` throws and you handle it.
 
 Your app key is not a secret. It ships inside your binary and identifies the
 app, not a person — which is what ``DifferentRequestsClient/createSession(externalID:email:displayName:traits:)``

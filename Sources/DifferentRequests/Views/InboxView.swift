@@ -39,6 +39,7 @@ public struct InboxView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
       .navigationTitle("Inbox")
+      .worn(by: hub.appearance)
       .task {
         await hub.appConfig.load()
       }
@@ -54,7 +55,10 @@ public struct InboxView: View {
           }
         }
       }
-      .firstRead(store.read) {
+      .task {
+        // Every time, not only the first: an inbox is the list of what changed while somebody was
+        // elsewhere, and coming back to it is exactly the moment that list is out of date. A read
+        // already in flight is not started twice, so returning costs one round trip at most.
         await store.load()
       }
   }
@@ -120,6 +124,13 @@ public struct InboxView: View {
     HStack(spacing: Self.rowSpacing) {
       NavigationLink {
         RequestDetailView(hub: hub, requestID: destinationID(notification))
+          // Opening it is reading it. The dot beside the row stays, for marking one read without
+          // opening it, but a person who has read the thing should not have to say so twice.
+          .task {
+            if notification.hasReadAt == false {
+              await store.markRead(notificationID: notification.id)
+            }
+          }
       } label: {
         summary(notification)
       }
@@ -160,7 +171,7 @@ public struct InboxView: View {
         .lineLimit(2)
 
       if notification.hasCreatedAt {
-        Text(notification.createdAt.date.formatted(.relative(presentation: .named)))
+        Text(notification.createdAt.date.ago)
           .font(.caption)
           .foregroundStyle(.tertiary)
       }

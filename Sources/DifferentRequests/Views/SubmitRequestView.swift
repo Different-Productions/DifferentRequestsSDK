@@ -56,7 +56,11 @@ public struct SubmitRequestView: View {
         } header: {
           Text("What do you want?")
         } footer: {
-          Text("One sentence. This is what everyone else votes on.")
+          HStack {
+            Text("One sentence. This is what everyone else votes on.")
+            Spacer()
+            CharactersLeft(left: store.titleCharactersLeft)
+          }
         }
 
         Section {
@@ -64,6 +68,11 @@ public struct SubmitRequestView: View {
             .lineLimit(Self.detailLineLimit)
         } header: {
           Text("Anything else?")
+        } footer: {
+          HStack {
+            Spacer()
+            CharactersLeft(left: store.bodyCharactersLeft)
+          }
         }
 
         if let failure = store.write.failure {
@@ -75,6 +84,7 @@ public struct SubmitRequestView: View {
         }
       }
       .navigationTitle("Ask for a feature")
+      .worn(by: hub.appearance)
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
           Button("Cancel") {

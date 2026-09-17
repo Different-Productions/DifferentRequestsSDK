@@ -24,6 +24,12 @@ final class InboxStore {
   /// The client every call goes through.
   let client: DifferentRequestsClient
 
+  /// Where news about a request is recorded, so a screen holding an old copy re-reads it.
+  ///
+  /// Every notification here exists because a request changed, which makes the inbox the one
+  /// place that learns about changes without being told.
+  let news: NewsAboutRequests
+
   // MARK: - State
 
   /// The inbox itself: where its read got to, and the notifications it found.
@@ -45,9 +51,19 @@ final class InboxStore {
 
   // MARK: - Init
 
-  /// - Parameter client: The client the inbox reads and writes through.
-  init(client: DifferentRequestsClient) {
+  /// - Parameters:
+  ///   - client: The client the inbox reads and writes through.
+  ///   - news: Where what each notification says about its request is recorded.
+  init(client: DifferentRequestsClient, news: NewsAboutRequests) {
     self.client = client
+    self.news = news
+  }
+
+  /// Records what these notifications say: each one is a request that changed when it was written.
+  private func record(_ notifications: [DRNotification]) {
+    for notification in notifications {
+      news.heard(aboutRequest: notification.requestID, at: notification.createdAt.date)
+    }
   }
 
   // MARK: - Loading
@@ -74,6 +90,7 @@ final class InboxStore {
       read = ReadState(page: answer.notifications)
       cursor = answer.nextCursor
       page = PageState(nextCursor: answer.nextCursor)
+      record(answer.notifications)
     } catch {
       read = ReadState(readFailure: error)
       page = .done
@@ -94,6 +111,7 @@ final class InboxStore {
       read = read.appending(answer.notifications)
       cursor = answer.nextCursor
       page = PageState(nextCursor: answer.nextCursor)
+      record(answer.notifications)
     } catch {
       // The cursor is left where it was, so the retry asks for this page rather than skipping it.
       page = .failed(error)

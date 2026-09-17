@@ -72,7 +72,7 @@ public struct VoteControl: View {
     .buttonStyle(.plain)
     .disabled(isWriting)
     .accessibilityLabel(voted ? "Remove your vote" : "Vote for this")
-    .accessibilityValue("\(voteCount) votes")
+    .accessibilityValue(voteCount == 1 ? "1 vote" : "\(voteCount) votes")
   }
 
   /// `.buttonStyle(.plain)` renders its own label, so a disabled plain button looks exactly like

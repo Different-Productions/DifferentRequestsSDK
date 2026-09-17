@@ -115,8 +115,8 @@ in the scheme, or it never signs in and never reaches the board at all.
 
 | What happens | What they see |
 | --- | --- |
-| Title is empty, or only spaces and newlines | **Submit** is greyed out and does nothing. No error text — nothing has been attempted |
-| The write is in flight | **Submit** is greyed out for the duration; a second tap cannot file a second request |
+| Title is empty, or only spaces and newlines | **Submit** is grayed out and does nothing. No error text — nothing has been attempted |
+| The write is in flight | **Submit** is grayed out for the duration; a second tap cannot file a second request |
 | No end-user session exists (`createSession` was never called) | "That didn't send. Try again in a moment." The thrown `DifferentRequestsError.notAuthenticated(.createRequest)` never reaches the network, and reaches the developer through `SubmitStore.write.failure?.error` |
 | The server refuses — plan required, rate limited, anything with a `DRApiError` | "That didn't send. Try again in a moment." The server's own message is written for whoever is debugging and may name internals, so it is not shown |
 | The network is unreachable or times out | "That didn't send. Try again in a moment." |
@@ -147,7 +147,7 @@ Host app (composition root, built once and held)
      ├── .firstRead(store.read)  ──► FirstRead.swift ──► BoardStore.load()   once per store
      ├── .task(id: store.query)  ──► runSearch()
      │        ├── store.isShowingQuery == true  ──► return   (a redraw is not a search)
-     │        ├── query non-empty ──► Task.sleep(300ms)      (cancelled by the next keystroke)
+     │        ├── query non-empty ──► Task.sleep(300ms)      (canceled by the next keystroke)
      │        └── BoardStore.load()
      │              repeat { loadedQuery = query; fetchPage() } while loadedQuery != query
      │                                    └──► DifferentRequestsClient.requests(...)
@@ -242,8 +242,8 @@ DifferentRequestsView — loaded, nothing searched
 
 SubmitRequestView — presented over the board
 ┌──────────────────────────────────────────────┐
-│ Cancel      Ask for a feature        Submit  │ ← Submit greyed while title is blank,
-│                                              │   and greyed again while the write runs
+│ Cancel      Ask for a feature        Submit  │ ← Submit grayed while title is blank,
+│                                              │   and grayed again while the write runs
 │  WHAT DO YOU WANT?                           │
 │ ┌──────────────────────────────────────────┐ │
 │ │ dark mode                                │ │ ← seeded from the search field
@@ -268,7 +268,7 @@ SubmitRequestView — presented over the board
 ## Platform differences
 
 - **iOS 18+ and macOS 15+.** `Package.swift` declares no other platform, so there is no watchOS,
-  tvOS or visionOS behaviour to describe.
+  tvOS or visionOS behavior to describe.
 - **The nav-bar way in.** `ToolbarItem(placement: .primaryAction)` lands at the trailing edge of the
   navigation bar on iOS and in the window toolbar on macOS. `.labelStyle(.iconOnly)` is stated
   rather than left to the platform so the glyph is the same in both, and the label text survives as
@@ -280,26 +280,19 @@ SubmitRequestView — presented over the board
 - **The stack around it all.** The host app owns it on every platform. The SDK ships no
   `NavigationStack` of its own except inside the composer sheet.
 
-## Tests that walk this
+## Which tests walk the chart
 
-`Tests/DifferentRequestsTests/HubTests.swift`, all hermetic — no live network in a required lane, so
-they walk everything on the chart up to the client call and nothing past it.
+There is no test target — see the server's #144. Walked in the example app on a simulator, against
+development.
 
-| Test | The leg it walks |
-| --- | --- |
-| `oneRequestKeepsOneStore` | `hub.detail(requestID:)` → `RequestDetailStores.store(requestID:)` hands back the same store, with the same half-written comment, however many times a rebuilt screen asks |
-| `twoRequestsDoNotShareAStore` | The same call for a different id is a different store, and it starts empty |
-| `theComposerOpensOnWhatWasSearched` | `beginSubmission()` → `SubmitStore.begin(title:)` seeds the title from `BoardStore.query` |
-| `theComposerOpensEmptyFromAnUnsearchedBoard` | The same call with nothing searched, and the previous draft cleared with it |
-| `aBlankTitleCannotBeFiled` | `SubmitStore.canSubmit` — the gate behind **Submit**'s disabled state, for empty and whitespace-only titles |
-| `nothingIsShownBeforeTheFirstRead` | `BoardStore.isShowingQuery` is false before any read, so `runSearch()` does not mistake a never-read board for one already showing the query |
-| `theBoardTheHubBuildsExcludesNoStatus` | Walks `DRRequestStatus.allCases` against the board the hub builds, proving no status is filtered out of it |
+The walk, and what it answered:
 
-Not walked here, and why:
+| Step | Answer |
+|---|---|
+| Open the board with somebody signed in | **Ask for a feature** is offered |
+| Open it with nobody signed in | No ask button anywhere — nothing is offered that can only fail |
+| Type a title past 200 characters | "24 too many" in red, and Submit refused while it is over |
+| Cut it back and press Submit | The sheet dismisses and the row is on the board, one vote, Open |
+| Open the same request again after a redraw of the board | The thread and any half-written comment are still there |
+| Submit with the network down | The composer keeps what was typed and says it did not send |
 
-- **Everything past `client.submit(...)`** — the POST, the audience refusal, the `DRApiError`
-  branch. Those need a server or a stubbed transport; the audience gate itself is covered by
-  `AudienceTests.actingForAPersonRequiresASession`, which asserts `createRequest` requires an
-  end-user session.
-- **The SwiftUI legs** — the toolbar tap, the sheet presentation, the disabled **Submit**. They need
-  a host app; the Example is that host app, and the owner verifies it by running it.

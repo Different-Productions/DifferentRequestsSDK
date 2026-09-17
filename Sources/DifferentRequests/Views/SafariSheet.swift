@@ -10,7 +10,7 @@
   /// were — which matters when the link is one this SDK put inside somebody else's product.
   ///
   /// iOS only. There is no in-app browser on macOS, and a Mac app opening a link in the browser is
-  /// the platform's own behaviour rather than a compromise.
+  /// the platform's own behavior rather than a compromise.
   struct SafariSheet: UIViewControllerRepresentable {
     let url: URL
 

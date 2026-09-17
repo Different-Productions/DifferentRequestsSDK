@@ -34,19 +34,31 @@ public struct RequestDetailView: View {
   /// Bindable for the composer, which edits the draft the store holds.
   @Bindable private var store: RequestDetailStore
 
+  /// Which request this screen is about, so news about it can be asked for by id.
+  private let requestID: String
+
   /// - Parameters:
   ///   - hub: What the host app built once and holds.
   ///   - requestID: Which request to show.
   public init(hub: DifferentRequestsHub, requestID: String) {
     self.hub = hub
+    self.requestID = requestID
     self._store = Bindable(hub.detail(requestID: requestID))
   }
 
   public var body: some View {
     content
       .navigationTitle("Request")
-      .firstRead(store.read) {
-        await store.load()
+      .worn(by: hub.appearance)
+      .task {
+        // Read when there is nothing, and read again when this request changed after the copy
+        // here arrived. An alert exists because it changed, so a screen opened from one would
+        // otherwise draw exactly what the alert came to correct.
+        if store.read.hasRead == false {
+          await store.load()
+        } else if hub.news.hasNews(aboutRequest: requestID, newerThan: store.readAt) {
+          await store.load()
+        }
       }
   }
 
@@ -171,7 +183,7 @@ public struct RequestDetailView: View {
         Spacer()
 
         if request.hasCreatedAt {
-          Text(request.createdAt.date.formatted(.relative(presentation: .named)))
+          Text(request.createdAt.date.ago)
             .font(.caption)
             .foregroundStyle(.tertiary)
         }
