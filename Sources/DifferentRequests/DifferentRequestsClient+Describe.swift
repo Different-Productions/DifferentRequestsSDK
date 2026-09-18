@@ -61,7 +61,9 @@ extension DifferentRequestsClient {
       "roadmap \(config.roadmapEnabled ? "yes" : "no")",
       "changelog \(config.changelogEnabled ? "yes" : "no")",
       "comments \(config.commentsEnabled ? "yes" : "no")",
-      "badge \(config.showBadge ? "shown" : "hidden")"
+      "push \(config.pushEnabled ? "yes" : "no")",
+      "your look \(config.appearanceEnabled ? "yes" : "no")",
+      "badge \(config.badgeRemoved ? "hidden" : "shown")"
     ]
     return "\(config.app.plan)  —  \(surfaces.joined(separator: ", "))"
   }

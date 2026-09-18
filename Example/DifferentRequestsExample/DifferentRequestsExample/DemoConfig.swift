@@ -1,5 +1,6 @@
 import DifferentRequests
 import Foundation
+import SwiftUI
 
 /// Static configuration for the example app.
 ///
@@ -109,6 +110,10 @@ enum DemoConfig {
 
   /// Host-app attributes a triager sees next to a request.
   static let traits: [String: String] = ["platform": "ios", "tier": "demo"]
+
+  /// The example's own look, handed to the hub the way a host app hands over its accent and font.
+  /// Drawn where the app's plan includes it; a Free app is drawn in the SDK's own.
+  static let appearance = Appearance(accent: .purple, font: .rounded)
 
   /// Which APNs environment minted this build's device tokens.
   ///

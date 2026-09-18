@@ -41,10 +41,11 @@ public final class DifferentRequestsHub {
   /// second copy of a number the server already answers.
   public let client: DifferentRequestsClient
 
-  /// What the screens are drawn in: the host app's own accent and font.
+  /// The host app's own accent and font, as it asked for them.
   ///
-  /// Held here because every screen reads it and none of them may choose one, and handed over at
-  /// `init` because it is the host app's look rather than something to fetch.
+  /// Handed over at `init` because it is the host app's look rather than something to fetch. What a
+  /// screen is actually drawn in is ``appearanceDrawn``, because the app's plan decides whether this
+  /// is used.
   public let appearance: Appearance
 
   // MARK: - The screens' state
@@ -103,6 +104,26 @@ public final class DifferentRequestsHub {
     self.submission = SubmitStore(client: client)
     self.appConfig = AppConfigStore(client: client)
     self.details = RequestDetailStores(client: client)
+  }
+
+  // MARK: - The look
+
+  /// What every screen is drawn in: the host app's look where this app's plan includes it, and the
+  /// SDK's own where it does not.
+  ///
+  /// Until the configuration has answered, the host app's look is drawn — the same side the badge
+  /// errs on, so an app paying for its look never sees ours. Read by each screen as it draws, so the
+  /// look follows the configuration the moment it answers.
+  var appearanceDrawn: Appearance {
+    switch appConfig.badge {
+    case .bought, .carried:
+      if appConfig.config.appearanceEnabled {
+        return appearance
+      }
+      return .standard
+    case .unread, .reading, .failed:
+      return appearance
+    }
   }
 
   // MARK: - Reading the board early

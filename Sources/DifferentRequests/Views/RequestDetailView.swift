@@ -49,7 +49,7 @@ public struct RequestDetailView: View {
   public var body: some View {
     content
       .navigationTitle("Request")
-      .worn(by: hub.appearance)
+      .worn(by: hub.appearanceDrawn)
       .task {
         // Read when there is nothing, and read again when this request changed after the copy
         // here arrived. An alert exists because it changed, so a screen opened from one would

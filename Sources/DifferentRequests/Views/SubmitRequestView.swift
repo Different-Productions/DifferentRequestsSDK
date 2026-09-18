@@ -84,7 +84,7 @@ public struct SubmitRequestView: View {
         }
       }
       .navigationTitle("Ask for a feature")
-      .worn(by: hub.appearance)
+      .worn(by: hub.appearanceDrawn)
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
           Button("Cancel") {

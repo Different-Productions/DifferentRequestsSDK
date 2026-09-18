@@ -39,7 +39,7 @@ public struct InboxView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
       .navigationTitle("Inbox")
-      .worn(by: hub.appearance)
+      .worn(by: hub.appearanceDrawn)
       .task {
         await hub.appConfig.load()
       }

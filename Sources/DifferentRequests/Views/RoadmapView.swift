@@ -25,20 +25,16 @@ public struct RoadmapView: View {
   /// The hub's roadmap state, which outlives this screen and keeps what it has read.
   private let store: RoadmapStore
 
-  /// What this screen is drawn in: the host app's own accent and font.
-  private let appearance: Appearance
-
   /// - Parameter hub: What the host app built once and holds.
   public init(hub: DifferentRequestsHub) {
     self.hub = hub
-    self.appearance = hub.appearance
     self.store = hub.roadmap
   }
 
   public var body: some View {
     content
       .navigationTitle("Roadmap")
-      .worn(by: appearance)
+      .worn(by: hub.appearanceDrawn)
       .firstRead(store.read) {
         await store.load()
       }

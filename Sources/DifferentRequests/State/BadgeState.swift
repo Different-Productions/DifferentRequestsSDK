@@ -32,7 +32,7 @@ extension BadgeState {
 
   /// What an answer to `getConfig` says about the badge.
   init(response: DRGetConfigResponse) {
-    self = response.config.showBadge ? .carried : .bought
+    self = response.config.badgeRemoved ? .bought : .carried
   }
 
   /// Whether the screens draw it. Every state that is not a definite yes draws nothing.

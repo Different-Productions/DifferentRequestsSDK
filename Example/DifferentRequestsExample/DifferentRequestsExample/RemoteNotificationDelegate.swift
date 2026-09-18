@@ -18,7 +18,7 @@ final class RemoteNotificationDelegate: NSObject, UIApplicationDelegate, UNUserN
 
   /// Everything this app reads and writes through. Built here and nowhere else.
   let session = Session(
-    hub: DifferentRequestsHub(client: DemoConfig.client, appearance: .standard),
+    hub: DifferentRequestsHub(client: DemoConfig.client, appearance: DemoConfig.appearance),
     backend: DemoBackend(signingSecret: DemoConfig.signingSecret)
   )
 

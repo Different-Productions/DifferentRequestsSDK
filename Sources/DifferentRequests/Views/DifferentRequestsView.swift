@@ -75,7 +75,7 @@ public struct DifferentRequestsView: View {
       board
     }
     .searchable(text: $store.query, prompt: "Search requests")
-    .worn(by: hub.appearance)
+    .worn(by: hub.appearanceDrawn)
   }
 
   /// The board itself, inside the stack this view owns.

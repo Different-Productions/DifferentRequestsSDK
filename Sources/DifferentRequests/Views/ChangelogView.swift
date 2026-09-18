@@ -16,22 +16,22 @@ public struct ChangelogView: View {
   private static let entrySpacing: CGFloat = 6
   private static let headerSpacing: CGFloat = 8
 
+  /// What the screen reads from, the look it is drawn in included.
+  private let hub: DifferentRequestsHub
+
   /// The hub's changelog state, which outlives this screen and keeps the pages it has read.
   private let store: ChangelogStore
 
-  /// What this screen is drawn in: the host app's own accent and font.
-  private let appearance: Appearance
-
   /// - Parameter hub: What the host app built once and holds.
   public init(hub: DifferentRequestsHub) {
-    self.appearance = hub.appearance
+    self.hub = hub
     self.store = hub.changelog
   }
 
   public var body: some View {
     content
       .navigationTitle("What's New")
-      .worn(by: appearance)
+      .worn(by: hub.appearanceDrawn)
       .firstRead(store.read) {
         await store.load()
       }

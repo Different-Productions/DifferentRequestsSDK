@@ -12,7 +12,7 @@ which of them your own app includes.
 
 ```swift
 dependencies: [
-  .package(url: "https://github.com/Different-Productions/DifferentRequestsSDK", from: "0.10.0"),
+  .package(url: "https://github.com/Different-Productions/DifferentRequestsSDK", from: "0.11.0"),
 ],
 ```
 

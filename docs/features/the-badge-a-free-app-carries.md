@@ -26,7 +26,7 @@ watermarking.
 | Inbox (`InboxView`) | **Yes** — under the title |
 | Roadmap, changelog, request detail | **none** — deliberately. Both are Pro surfaces anyway, so a badge there would only ever draw for an app that cannot open them |
 | Composer (`SubmitRequestView`) | **none** — a sheet, and a mark on a form is an advertisement |
-| Server | **none** — `show_badge` was already in the contract and already set. Nothing changed |
+| Server | **Reads it** — since contract 0.38.0 the flag is `badge_removed`, which gates `PLAN_SURFACE_BADGE_REMOVAL` like every other Pro surface; `show_badge` is gone (server #251) |
 | Console | **none** |
 
 ## How to find it, trigger it, and what happens
@@ -62,7 +62,7 @@ the first round trip either screen makes.
 |---|---|---|
 | Drawing on a failed read | Never | The two mistakes are not the same size. A badge missing for a moment costs nothing; one on an app paying to be rid of it is a support ticket from a customer who is right |
 | Leaving the host app on iOS | Never | The sheet is `SFSafariViewController`. `openURL` is the macOS path only |
-| Guessing from `showBadge` alone | Never | ``BadgeState`` carries how far the asking got, not just the answer |
+| Guessing from `badgeRemoved` alone | Never | ``BadgeState`` carries how far the asking got, not just the answer |
 
 ## The code path
 
@@ -77,7 +77,7 @@ DifferentRequestsView / InboxView
   │         ├─ try await client.config()
   │         │    └─ throws → state = .failed(error)   ← draws nothing, retryable
   │         └─ state = BadgeState(response:)
-  │              └─ config.showBadge ? .carried : .bought
+  │              └─ config.badgeRemoved ? .bought : .carried
   │
   └─ PoweredByBadge(badge: hub.badge) ............... Views/PoweredByBadge.swift
        │

@@ -3,6 +3,19 @@
 Every released version, newest first. Versions are tags on the public repository,
 `Different-Productions/DifferentRequestsSDK`.
 
+## 0.11.0 — 2026-09-18
+
+**No source change to make.** What changes is what a Free app is drawn with.
+
+- Your accent and font are a Pro feature. On Free the screens are drawn in the SDK's own look,
+  whatever `Appearance` you pass; on Pro, yours, exactly as before. Until the app's configuration has
+  answered, yours is drawn.
+- The badge reads the contract's `badgeRemoved`, which replaces `showBadge`. **Update from 0.10.0**:
+  0.10.0 reads the old flag, which a server on contract 0.38.0 no longer sends, so it draws no badge
+  on a Free app.
+- `DRAppConfig` names every Pro surface. `pushEnabled` says whether the server will send push
+  notifications, and the example app asks for permission only when it will.
+
 ## 0.10.0 — 2026-09-17
 
 **One source change to make: `createSession` takes a `proof`.** Pass `nil` until you ask for a

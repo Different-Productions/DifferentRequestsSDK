@@ -73,12 +73,16 @@ final class Session {
 
   // MARK: - Signing in
 
-  /// Signs the person in, reads what the app offers, then sets up push. Safe to call again to retry.
+  /// Signs the person in, reads what the app offers, then sets up push where the app's plan sends
+  /// it. Safe to call again to retry.
   ///
   /// Config is fetched here rather than by each screen because it decides which screens exist at
   /// all: the roadmap and the changelog are Pro surfaces, and a tab that is shown and then refused
   /// has told the person using the app that something is broken. Asking once, before
   /// anything is drawn, is the difference between an absent tab and a dead one.
+  ///
+  /// Push permission is asked for only when `pushEnabled`: on a plan that sends no push, asking
+  /// the person is asking for something that never arrives.
   func start() async {
     if DemoConfig.isConfigured == false {
       phase = .unconfigured
@@ -91,13 +95,15 @@ final class Session {
     do {
       let configured = try await client.config()
       phase = .ready(configured.config)
+      if configured.config.pushEnabled {
+        await requestPushAuthorization()
+      }
     } catch {
       NSLog("What this app offers could not be read: %@", error.localizedDescription)
       phase = .configUnreadable
       return
     }
 
-    await requestPushAuthorization()
     await refreshUnreadCount()
     // The board's first page is a round trip. Started here, while the person is still looking at
     // the settings list, it is held by the time they open the board.
