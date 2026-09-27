@@ -38,12 +38,17 @@ import DifferentRequests
 let requests = DifferentRequestsHub(
   client: .make(appKey: "your-app-key"),
   appearance: .standard,
-  emptyBoard: .standard
+  emptyBoard: .standard,
+  notificationPermission: .askedBySDK
 )
 ```
 
 ``Appearance/standard`` is the SDK's own look. Pass an ``Appearance`` with your
 app's accent and a system font design to have every screen wear your app instead.
+
+``NotificationPermission/askedBySDK`` lets the SDK ask for notification permission
+after a person's first vote or follow. If your app asks for permission itself, pass
+``NotificationPermission/askedByApp`` and the SDK never prompts.
 
 A SwiftUI view is a value that is thrown away and rebuilt whenever anything
 above it redraws. A hub built inside a view would take the board's page, the
@@ -62,7 +67,8 @@ struct MyApp: App {
       baseURL: SecureBaseURL(literal: "https://staging.example.com")
     ),
     appearance: .standard,
-    emptyBoard: .standard
+    emptyBoard: .standard,
+    notificationPermission: .askedBySDK
   )
 
   var body: some Scene {

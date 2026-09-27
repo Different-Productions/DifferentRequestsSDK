@@ -24,7 +24,8 @@ struct MyApp: App {
   private let requests = DifferentRequestsHub(
     client: .make(appKey: "your-app-key"),
     appearance: .standard,
-    emptyBoard: .standard
+    emptyBoard: .standard,
+    notificationPermission: .askedBySDK
   )
 
   var body: some Scene {

@@ -9,8 +9,9 @@ import UserNotifications
 /// The "Get told when this changes?" card: offered after a person's first vote or follow, answered
 /// once per phone, and the door to Apple's own notification prompt.
 ///
-/// Offered only where the app's plan sends notifications and Apple has not been asked yet. The
-/// device token Apple hands back reaches the host app's delegate, which registers it through
+/// Offered only where the host app left permission to the SDK, the app's plan sends notifications,
+/// and Apple has not been asked yet. The device token Apple hands back reaches the host app's
+/// delegate, which registers it through
 /// ``DifferentRequestsClient/registerDevice(tokenData:environment:)`` as before.
 @MainActor
 @Observable
@@ -20,6 +21,9 @@ final class NotificationOffer {
   private static let answeredKey = "DifferentRequests.notificationOfferAnswered"
 
   // MARK: - Inputs
+
+  /// Who asks for notification permission, as the host app set it.
+  let permission: NotificationPermission
 
   /// Whether this app's plan sends notifications at all.
   let appConfig: AppConfigStore
@@ -35,9 +39,11 @@ final class NotificationOffer {
   // MARK: - Init
 
   /// - Parameters:
+  ///   - permission: Who asks for notification permission.
   ///   - appConfig: Whether this app's plan sends notifications.
   ///   - defaults: Where the card's answer is remembered.
-  init(appConfig: AppConfigStore, defaults: UserDefaults) {
+  init(permission: NotificationPermission, appConfig: AppConfigStore, defaults: UserDefaults) {
+    self.permission = permission
     self.appConfig = appConfig
     self.defaults = defaults
   }
@@ -49,10 +55,12 @@ final class NotificationOffer {
     state.requestID == requestID
   }
 
-  /// Offers the card under `requestID` after a vote or follow landed there, when it has never been
-  /// answered on this phone, the plan sends notifications, and Apple has not been asked yet.
+  /// Offers the card under `requestID` after a vote or follow landed there, when the host app left
+  /// permission to the SDK, it has never been answered on this phone, the plan sends notifications,
+  /// and Apple has not been asked yet.
   func votedOrFollowed(requestID: String) async {
-    if state.requestID == nil,
+    if permission == .askedBySDK,
+      state.requestID == nil,
       appConfig.config.pushEnabled,
       defaults.bool(forKey: Self.answeredKey) == false {
       let settings = await UNUserNotificationCenter.current().notificationSettings()

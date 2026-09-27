@@ -3,7 +3,15 @@
 Every released version, newest first. Versions are tags on the public repository,
 `Different-Productions/DifferentRequestsSDK`.
 
-## Unreleased
+## 0.13.0 — 2026-09-26
+
+**One source change to make.**
+
+1. `DifferentRequestsHub` takes `notificationPermission:`. Pass `.askedBySDK` to keep the SDK's
+   "Get told when this changes?" card and Apple's prompt, or `.askedByApp` if your app asks for
+   permission itself. With `.askedByApp` the SDK never prompts.
+
+## 0.12.0 — 2026-09-26
 
 **Three source changes to make.**
 

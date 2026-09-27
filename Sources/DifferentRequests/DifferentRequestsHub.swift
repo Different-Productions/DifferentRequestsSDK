@@ -18,7 +18,8 @@ import Foundation
 ///   private let requests = DifferentRequestsHub(
 ///     client: .make(appKey: "…"),
 ///     appearance: .standard,
-///     emptyBoard: .standard
+///     emptyBoard: .standard,
+///     notificationPermission: .askedBySDK
 ///   )
 ///
 ///   var body: some Scene {
@@ -55,6 +56,9 @@ public final class DifferentRequestsHub {
   /// What a board with nothing on it says, as the host app asked for it. What is drawn is
   /// ``emptyBoardDrawn``, because the app's plan decides whether this is used.
   public let emptyBoard: EmptyBoard
+
+  /// Who asks the person for notification permission, as the host app set it.
+  public let notificationPermission: NotificationPermission
 
   // MARK: - The screens' state
 
@@ -108,13 +112,26 @@ public final class DifferentRequestsHub {
   ///     named rather than defaulted so an app that has not thought about it says so.
   ///   - emptyBoard: What a board with nothing on it says. ``EmptyBoard/standard`` is the SDK's own
   ///     words, named for the same reason.
-  public init(client: DifferentRequestsClient, appearance: Appearance, emptyBoard: EmptyBoard) {
+  ///   - notificationPermission: Who asks for notification permission. ``NotificationPermission/askedBySDK``
+  ///     lets the SDK offer its card and Apple's prompt; ``NotificationPermission/askedByApp`` leaves
+  ///     asking to the host app, and the SDK never prompts.
+  public init(
+    client: DifferentRequestsClient,
+    appearance: Appearance,
+    emptyBoard: EmptyBoard,
+    notificationPermission: NotificationPermission
+  ) {
     self.client = client
     self.appearance = appearance
     self.emptyBoard = emptyBoard
+    self.notificationPermission = notificationPermission
     self.news = NewsAboutRequests()
     self.appConfig = AppConfigStore(client: client)
-    self.notificationOffer = NotificationOffer(appConfig: appConfig, defaults: .standard)
+    self.notificationOffer = NotificationOffer(
+      permission: notificationPermission,
+      appConfig: appConfig,
+      defaults: .standard
+    )
     self.firstVoteNote = FirstVoteNote(defaults: .standard)
     self.board = BoardStore(
       client: client,

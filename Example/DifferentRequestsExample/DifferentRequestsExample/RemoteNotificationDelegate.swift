@@ -21,7 +21,8 @@ final class RemoteNotificationDelegate: NSObject, UNUserNotificationCenterDelega
     hub: DifferentRequestsHub(
       client: DemoConfig.client,
       appearance: DemoConfig.appearance,
-      emptyBoard: DemoConfig.emptyBoard
+      emptyBoard: DemoConfig.emptyBoard,
+      notificationPermission: .askedBySDK
     ),
     backend: DemoBackend(signingSecret: DemoConfig.signingSecret)
   )

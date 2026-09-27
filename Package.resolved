@@ -1,6 +1,15 @@
 {
-  "originHash" : "8b4b24ddfd26df99ed247a32c7c605926880023729ecadbd2881374cf69f0825",
+  "originHash" : "01c9b401abffe5e771ad25fa44324faae5eff95d87ce78406e024428eeface22",
   "pins" : [
+    {
+      "identity" : "differentrequests-proto",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Different-Productions/differentrequests-proto.git",
+      "state" : {
+        "revision" : "c64c5dfa4bdc68b127137d5cb097ef55a8f7523a",
+        "version" : "0.40.0"
+      }
+    },
     {
       "identity" : "swift-protobuf",
       "kind" : "remoteSourceControl",

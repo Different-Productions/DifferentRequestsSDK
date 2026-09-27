@@ -15,7 +15,15 @@ they care about a request:
 
 Trigger: vote for a request (on the board, or on its own screen), or follow one on its own screen.
 
-The card is offered only when all of these hold: the app's plan sends notifications
+**The host app decides who asks for notification permission**, set once on `DifferentRequestsHub`
+the way `appearance` and `emptyBoard` are:
+
+- `notificationPermission: .askedBySDK` — the SDK offers the card and brings up Apple's prompt, as
+  below. The Example app passes this.
+- `notificationPermission: .askedByApp` — the app asks for permission itself, when it chooses. The
+  SDK never offers the card and never brings up Apple's prompt. Backlog passes this.
+
+With `.askedBySDK`, the card is offered only when all of these hold: the app's plan sends notifications
 (`DRAppConfig.pushEnabled`), the card was never answered on this phone, and Apple has not asked
 this app yet (`authorizationStatus == .notDetermined`). The host app no longer prompts on launch;
 it registers for remote notifications only where they are already allowed, and still hands the
@@ -33,6 +41,7 @@ token to `registerDevice(tokenData:environment:)` from its delegate.
 | Leaves the request's screen | The one-time line is gone, and is not said again on this phone |
 | Votes again, on any request, later | No line. No card if it was answered, or if Apple already asked |
 | The app's plan sends no notifications | No card, ever. The one-time line still shows: the inbox tells them too |
+| The host app passed `.askedByApp` | No card and no Apple prompt from the SDK, ever. The one-time line still shows |
 
 | When it fails | Exact error text the user sees |
 |---|---|
@@ -54,6 +63,8 @@ FirstVoteNote.voted(requestID:)          (votes on a request's screen only)   Fi
         |     yes -> set true, requestID = this one -> the line is drawn
         v
 NotificationOffer.votedOrFollowed(requestID:)                                 NotificationOffer.swift
+        |  permission == .askedBySDK (from the hub)             NotificationPermission.swift
+        |     .askedByApp -> stop: no card, no prompt
         |  no card up · AppConfigStore.config.pushEnabled ·
         |  UserDefaults "DifferentRequests.notificationOfferAnswered" false ·
         |  UNUserNotificationCenter settings .notDetermined
@@ -73,7 +84,8 @@ Host app delegate receives the token -> registerDevice   RemoteNotificationDeleg
 ```
 
 Both stores are built once by `DifferentRequestsHub.swift`, with `UserDefaults.standard`, which
-`PrivacyInfo.xcprivacy` declares under reason `CA92.1`.
+`PrivacyInfo.xcprivacy` declares under reason `CA92.1`. The hub hands `NotificationOffer` the
+`NotificationPermission` the host app passed to its `init`.
 
 ## What was walked
 
@@ -88,4 +100,5 @@ Both stores are built once by `DifferentRequestsHub.swift`, with `UserDefaults.s
   **Not now** put it away. Quit, relaunched, voted again from the row: no card.
 - A newly provisioned Free app ("Badge Walk"): a vote from the row drew no card, because Free sends no
   notifications.
+- `.askedByApp`: not walked yet.
 - The owner's real walk: not yet.
