@@ -14,33 +14,22 @@ struct PoweredByBadge: View {
   /// the configuration answers without the screen arranging it.
   let appConfig: AppConfigStore
 
-  /// Where a tap goes. On iOS it opens over the app and returns the reader where they were; on
-  /// macOS there is no such thing, and opening the browser is what a Mac app does.
-  static let home = URL(string: "https://differentrequests.com")
-
-  @State private var isShowingHome = false
-  @Environment(\.openURL) private var openURL
+  /// Whether "What is this?" is up over the screen.
+  @State private var isShowingAbout = false
 
   var body: some View {
-    if appConfig.badge.isCarried, let home = Self.home {
+    if appConfig.badge.isCarried {
       Button {
-        #if os(iOS)
-          isShowingHome = true
-        #else
-          openURL(home)
-        #endif
+        isShowingAbout = true
       } label: {
         label
       }
       .buttonStyle(.plain)
-      .accessibilityLabel("Powered by Different Requests")
-      .accessibilityHint("Opens the Different Requests website")
-      #if os(iOS)
-        .sheet(isPresented: $isShowingHome) {
-          SafariSheet(url: home)
-            .ignoresSafeArea()
-        }
-      #endif
+      .accessibilityLabel(Text("Powered by Different Requests", bundle: .module, comment: "VoiceOver label for the badge; Different Requests is the product's name"))
+      .accessibilityHint(Text("Says what Different Requests is", bundle: .module, comment: "VoiceOver hint for the badge; Different Requests is the product's name"))
+      .sheet(isPresented: $isShowingAbout) {
+        PoweredByPage(appConfig: appConfig)
+      }
     }
   }
 
@@ -53,11 +42,11 @@ struct PoweredByBadge: View {
     // Two `Text`s in a stack of their own, holding the word space between them rather than the
     // stack's spacing. `Text + Text` said this in one run and is gone in 26.
     HStack(spacing: 0) {
-      Text("Powered by ")
-        .foregroundStyle(.tertiary)
-      Text("Different Requests")
-        .foregroundStyle(.secondary)
+      Text("Powered by ", bundle: .module, comment: "Words before the product name on the badge, with the space before the name")
+      Text(verbatim: "Different Requests")
+        .fontWeight(.semibold)
     }
-    .font(.caption2)
+    .font(.caption)
+    .foregroundStyle(.secondary)
   }
 }

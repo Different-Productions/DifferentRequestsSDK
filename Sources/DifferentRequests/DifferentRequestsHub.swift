@@ -15,7 +15,11 @@ import Foundation
 /// ```swift
 /// @main
 /// struct MyApp: App {
-///   private let requests = DifferentRequestsHub(client: .make(appKey: "…"))
+///   private let requests = DifferentRequestsHub(
+///     client: .make(appKey: "…"),
+///     appearance: .standard,
+///     emptyBoard: .standard
+///   )
 ///
 ///   var body: some Scene {
 ///     WindowGroup {
@@ -47,6 +51,10 @@ public final class DifferentRequestsHub {
   /// screen is actually drawn in is ``appearanceDrawn``, because the app's plan decides whether this
   /// is used.
   public let appearance: Appearance
+
+  /// What a board with nothing on it says, as the host app asked for it. What is drawn is
+  /// ``emptyBoardDrawn``, because the app's plan decides whether this is used.
+  public let emptyBoard: EmptyBoard
 
   // MARK: - The screens' state
 
@@ -81,6 +89,12 @@ public final class DifferentRequestsHub {
   /// Who the host app signed in. Read by every screen that offers a control acting for a person.
   let whoIsHere: WhoIsHere
 
+  /// The "Get told when this changes?" card, offered after a first vote or follow.
+  let notificationOffer: NotificationOffer
+
+  /// The one-time "You'll be told when this changes." line after the first vote on this phone.
+  let firstVoteNote: FirstVoteNote
+
   // MARK: - Init
 
   /// - Parameter client: The client every screen reads and writes through. Build it with
@@ -92,18 +106,33 @@ public final class DifferentRequestsHub {
   ///   - client: The client every screen reads and writes through.
   ///   - appearance: What the screens are drawn in. ``Appearance/standard`` is the SDK's own look,
   ///     named rather than defaulted so an app that has not thought about it says so.
-  public init(client: DifferentRequestsClient, appearance: Appearance) {
+  ///   - emptyBoard: What a board with nothing on it says. ``EmptyBoard/standard`` is the SDK's own
+  ///     words, named for the same reason.
+  public init(client: DifferentRequestsClient, appearance: Appearance, emptyBoard: EmptyBoard) {
     self.client = client
     self.appearance = appearance
-    self.board = BoardStore(client: client, statuses: [], sort: .top)
+    self.emptyBoard = emptyBoard
+    self.news = NewsAboutRequests()
+    self.appConfig = AppConfigStore(client: client)
+    self.notificationOffer = NotificationOffer(appConfig: appConfig, defaults: .standard)
+    self.firstVoteNote = FirstVoteNote(defaults: .standard)
+    self.board = BoardStore(
+      client: client,
+      news: news,
+      notificationOffer: notificationOffer,
+      statuses: [],
+      sort: .top
+    )
     self.roadmap = RoadmapStore(client: client)
     self.changelog = ChangelogStore(client: client)
-    self.news = NewsAboutRequests()
     self.whoIsHere = WhoIsHere(client: client)
     self.inbox = InboxStore(client: client, news: news)
     self.submission = SubmitStore(client: client)
-    self.appConfig = AppConfigStore(client: client)
-    self.details = RequestDetailStores(client: client)
+    self.details = RequestDetailStores(
+      client: client,
+      notificationOffer: notificationOffer,
+      firstVoteNote: firstVoteNote
+    )
   }
 
   // MARK: - The look
@@ -115,14 +144,29 @@ public final class DifferentRequestsHub {
   /// errs on, so an app paying for its look never sees ours. Read by each screen as it draws, so the
   /// look follows the configuration the moment it answers.
   var appearanceDrawn: Appearance {
+    if usesHostAppearance {
+      return appearance
+    }
+    return .standard
+  }
+
+  /// What a board with nothing on it says: the host app's words where its plan includes its own
+  /// look, and the SDK's where it does not. Errs the same way as ``appearanceDrawn``.
+  var emptyBoardDrawn: EmptyBoard {
+    if usesHostAppearance {
+      return emptyBoard.filledIn
+    }
+    return .standard
+  }
+
+  /// Whether the host app's own look is drawn: its plan includes it, or the configuration has not
+  /// answered yet.
+  private var usesHostAppearance: Bool {
     switch appConfig.badge {
     case .bought, .carried:
-      if appConfig.config.appearanceEnabled {
-        return appearance
-      }
-      return .standard
+      return appConfig.config.appearanceEnabled
     case .unread, .reading, .failed:
-      return appearance
+      return true
     }
   }
 

@@ -19,12 +19,27 @@ final class RequestDetailStores {
   /// The client each store is built against.
   private let client: DifferentRequestsClient
 
+  /// Handed to each store, which offers the notification card after a vote or follow.
+  private let notificationOffer: NotificationOffer
+
+  /// Handed to each store, which says the one-time line after the first vote.
+  private let firstVoteNote: FirstVoteNote
+
   /// What has been opened this launch, by request id.
   private var stores: [String: RequestDetailStore] = [:]
 
-  /// - Parameter client: The client the stores read and write through.
-  init(client: DifferentRequestsClient) {
+  /// - Parameters:
+  ///   - client: The client the stores read and write through.
+  ///   - notificationOffer: Offered the notification card after a vote or follow.
+  ///   - firstVoteNote: Says the one-time line after the first vote.
+  init(
+    client: DifferentRequestsClient,
+    notificationOffer: NotificationOffer,
+    firstVoteNote: FirstVoteNote
+  ) {
     self.client = client
+    self.notificationOffer = notificationOffer
+    self.firstVoteNote = firstVoteNote
   }
 
   /// The store for `requestID`: made on the first ask, and the same one on every ask after that.
@@ -32,7 +47,12 @@ final class RequestDetailStores {
     if let held = stores[requestID] {
       return held
     }
-    let opened = RequestDetailStore(client: client, requestID: requestID)
+    let opened = RequestDetailStore(
+      client: client,
+      requestID: requestID,
+      notificationOffer: notificationOffer,
+      firstVoteNote: firstVoteNote
+    )
     stores[requestID] = opened
     return opened
   }

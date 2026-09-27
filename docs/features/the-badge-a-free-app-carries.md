@@ -11,9 +11,15 @@ Three decisions shape it, and all three were taken against a mockup before any c
 than an advertisement laid over somebody else's product. A developer who resents it least is the
 one most likely to leave it there long enough to pay for its removal.
 
-**A tap opens Safari over the app, not instead of it.** `openURL` hands the reader to Safari and
-they have to find their way back — out of an app that is not ours, following a link we put there.
-A sheet is dismissed and they are where they were.
+**A tap says what this is, in the app user's words.** Owner ruling 2026-09-26, piece 24: the badge
+opens a **"What is this?"** sheet — "[App name] uses Different Requests to hear what you want
+next.", then **Ask**, **Follow**, and **Your requests go to [App name]'s team.** "We don't sell or
+share what you write." — with **About Different Requests** at the bottom. The app name is
+`DRAppConfig.app.name`, or "This app" when it is empty.
+
+**About Different Requests opens Safari over the app, not instead of it.** `openURL` hands the
+reader to Safari and they have to find their way back — out of an app that is not ours, following a
+link we put there. A sheet is dismissed and they are where they were.
 
 **Board and inbox only.** The two screens a reader returns to. On all five it starts reading as
 watermarking.
@@ -36,9 +42,10 @@ navigation title sits a small mark and the words `Powered by Different Requests`
 
 **Not seeing it.** The same screens in an app on Pro. Nothing is drawn and nothing reserves space.
 
-**Tapping it.** On iOS a Safari sheet rises over the app on `https://differentrequests.com`, and
-dismissing it returns the reader exactly where they were. On macOS the default browser opens,
-because there is no in-app browser on macOS and opening one is what a Mac app does.
+**Tapping it.** "What is this?" rises as a sheet on both platforms, with **Done**. Its **About
+Different Requests** opens `https://differentrequests.com`: on iOS a Safari sheet over the page, and
+dismissing it returns the reader exactly where they were; on macOS the default browser, because
+there is no in-app browser on macOS and opening one is what a Mac app does.
 
 **Before the answer arrives.** Nothing. The badge appears when the configuration answers, which is
 the first round trip either screen makes.
@@ -54,7 +61,7 @@ the first round trip either screen makes.
 | The configuration has not answered yet | Nothing drawn |
 | The configuration read **failed** | Nothing drawn, and the store will ask again |
 | Read once per launch | Yes. The client answers a repeat `config` from its first read, so both screens asking costs one round trip |
-| VoiceOver | One button, labelled `Powered by Different Requests`, hinted `Opens the Different Requests website` |
+| VoiceOver | One button, labeled `Powered by Different Requests`, hinted `Says what Different Requests is` |
 
 ### What it refuses
 
@@ -69,26 +76,30 @@ the first round trip either screen makes.
 ```
 DifferentRequestsView / InboxView
   │
-  ├─ .task { await hub.badge.load() }
+  ├─ .task { await hub.appConfig.load() }
   │    │
-  │    └─ BadgeStore.load() .......................... Stores/BadgeStore.swift
-  │         ├─ state.needsReading == false → return   ← answered already, or reading
-  │         ├─ state = .reading
+  │    └─ AppConfigStore.load() ...................... Stores/AppConfigStore.swift
+  │         ├─ badge.needsReading == false → return   ← answered already, or reading
+  │         ├─ badge = .reading
   │         ├─ try await client.config()
-  │         │    └─ throws → state = .failed(error)   ← draws nothing, retryable
-  │         └─ state = BadgeState(response:)
+  │         │    └─ throws → badge = .failed(error)   ← draws nothing, retryable
+  │         ├─ config = answer.config                 ← also decides which surfaces are reachable
+  │         └─ badge = BadgeState(response:) ......... State/BadgeState.swift
   │              └─ config.badgeRemoved ? .bought : .carried
   │
-  └─ PoweredByBadge(badge: hub.badge) ............... Views/PoweredByBadge.swift
+  └─ PoweredByBadge(appConfig: hub.appConfig) ....... Views/PoweredByBadge.swift
        │
-       └─ badge.state.isCarried == false → nothing at all
-          badge.state.isCarried == true  → Button
+       └─ appConfig.badge.isCarried == false → nothing at all
+          appConfig.badge.isCarried == true  → Button
             ├─ label: chevron on the accent + the words
-            └─ tap
-                 ├─ iOS   → isShowingHome = true
-                 │            └─ .sheet { SafariSheet(url:) } .. Views/SafariSheet.swift
-                 │                 └─ SFSafariViewController
-                 └─ macOS → openURL(home)
+            └─ tap → isShowingAbout = true
+                 └─ .sheet { PoweredByPage(appConfig:) } ........ Views/PoweredByPage.swift
+                      "What is this?" · appConfig.config.app.name, or "This app"
+                      Done → dismiss()
+                      About Different Requests
+                        ├─ iOS   → .sheet { SafariSheet(url:) } .. Views/SafariSheet.swift
+                        │            └─ SFSafariViewController
+                        └─ macOS → openURL(PoweredByPage.home)
 ```
 
 The store is on the hub, not on either screen. Two screens draw it, and a second copy of the answer
@@ -99,9 +110,9 @@ is a second thing to keep in step.
 ```
 ┌─────────────────────────────────┐
 │ Requests                    [+] │  ← navigationTitle, toolbar
-│ ▲ Powered by Different Requests │  ← here. caption2, tertiary + secondary
+│ ▲ Powered by Different Requests │  ← here. caption, secondary
 ├─────────────────────────────────┤
-│ [ Top ] [ Open ] [ Planned ]    │  ← BoardFilterBar
+│ [ Most votes ] [ Open ] [ Planned ]    │  ← BoardFilterBar
 ├─────────────────────────────────┤
 │ ▲12  Dark mode        PLANNED   │
 │ ▲ 9  Filter by tag    OPEN      │
@@ -135,4 +146,7 @@ The walk, and what it answered:
 | Move that app to Pro with `Entitle` and relaunch | Nothing is drawn |
 | Open the board with the network down | Nothing is drawn — an answer that never came is not a Free app |
 | Tap the badge on iOS | The site opens over the app and returns where it was |
+| 2026-09-26: tap the badge on a newly provisioned Free app ("Badge Walk"), iOS 27 simulator | "What is this?" with "Badge Walk uses Different Requests to hear what you want next." and "Your requests go to Badge Walk's team." |
+| Tap **About Different Requests** | differentrequests.com in a Safari sheet over the page; closing it returns to the page, and **Done** returns to the board |
+| macOS | Builds; not walked — the Mac walk waits for the owner's go-ahead |
 

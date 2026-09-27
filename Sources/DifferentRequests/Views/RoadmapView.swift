@@ -5,9 +5,13 @@ import SwiftUI
 ///
 /// ```swift
 /// NavigationStack {
-///   RoadmapView(hub: requests)
+///   RoadmapView(hub: requests, isShowingRequests: $isShowingRequests)
 /// }
 /// ```
+///
+/// Handed a binding, an empty roadmap offers **See requests**, which sets it to `true` so the host
+/// opens its requests list. Handed `nil`, it offers nothing: pushed from the board, the back button
+/// already goes there. Shown as the first screen of a sheet, it draws its own Done.
 ///
 /// A section per column rather than panes side by side. The contract's columns are ordered for
 /// display and read left to right, which at phone width would hide two of the three; stacked, all
@@ -25,17 +29,27 @@ public struct RoadmapView: View {
   /// The hub's roadmap state, which outlives this screen and keeps what it has read.
   private let store: RoadmapStore
 
-  /// - Parameter hub: What the host app built once and holds.
-  public init(hub: DifferentRequestsHub) {
+  /// Set to `true` by **See requests** on an empty roadmap, or nil when the host gave no way there.
+  private let isShowingRequests: Binding<Bool>?
+
+  /// - Parameters:
+  ///   - hub: What the host app built once and holds.
+  ///   - isShowingRequests: What opens the host's requests list, or nil for no **See requests**.
+  public init(hub: DifferentRequestsHub, isShowingRequests: Binding<Bool>?) {
     self.hub = hub
     self.store = hub.roadmap
+    self.isShowingRequests = isShowingRequests
   }
 
   public var body: some View {
     content
-      .navigationTitle("Roadmap")
+      .navigationTitle(Text("Roadmap", bundle: .module, comment: "Title of the roadmap screen"))
       .worn(by: hub.appearanceDrawn)
-      .firstRead(store.read) {
+      .sheetDoneButton()
+      .sheetMinimumSize()
+      .task {
+        // Every appearance: a vote cast elsewhere changes the rows' votes, and the roadmap has no
+        // pages to lose. What is held stays on screen while it reads.
         await store.load()
       }
   }
@@ -50,8 +64,8 @@ public struct RoadmapView: View {
     switch store.plan {
     case .unread, .reading:
       ProgressView()
-    case .failed:
-      LoadFailure {
+    case .failed(let error):
+      LoadFailure(error: error) {
         await store.load()
       }
     case .excluded:
@@ -69,15 +83,23 @@ public struct RoadmapView: View {
     switch store.read {
     case .unread, .reading:
       ProgressView()
-    case .failed:
-      LoadFailure {
+    case .failed(let error):
+      LoadFailure(error: error) {
         await store.load()
       }
     case .empty:
       ContentUnavailableView {
-        Label("No roadmap yet", systemImage: "map")
+        Label {
+          Text("Nothing planned yet", bundle: .module, comment: "Heading when the roadmap has nothing on it")
+        } icon: {
+          Image(systemName: "map")
+        }
       } description: {
-        Text("Nothing has been planned publicly.")
+        Text("When the team plans something, it shows up here.", bundle: .module, comment: "Message when the roadmap has nothing on it")
+      } actions: {
+        if let isShowingRequests {
+          SeeRequestsButton(isShowingRequests: isShowingRequests)
+        }
       }
     case .loaded(let held), .refreshing(let held):
       list(held)
@@ -89,7 +111,7 @@ public struct RoadmapView: View {
       ForEach(columns, id: \.status.rawValue) { column in
         Section {
           if column.requests.isEmpty {
-            Text("Nothing here yet.")
+            Text("Nothing here yet.", bundle: .module, comment: "A roadmap column with no requests in it")
               .font(.subheadline)
               .foregroundStyle(.secondary)
           } else {
@@ -122,21 +144,21 @@ public struct RoadmapView: View {
     }
   }
 
-  /// Columns are ranked by demand, so the count is what orders the rows and belongs on each one.
-  /// Voting is not offered here: a roadmap is a summary, and the request's own screen is where a
-  /// vote is cast and where the count it changes is authoritative.
+  /// The count and the caller's own vote, drawn as on the board but not pressable: a roadmap is a
+  /// summary, and the request's own screen is where a vote is cast. The divider runs from the
+  /// title's edge.
   private func row(_ request: DRFeatureRequest) -> some View {
     HStack(spacing: Self.rowSpacing) {
+      VoteTally(voteCount: Int(request.voteCount), voted: request.viewer.voted)
+
       Text(request.title)
         .font(.subheadline)
         .lineLimit(2)
+        .alignmentGuide(.listRowSeparatorLeading) { viewDimensions in
+          viewDimensions[.leading]
+        }
 
       Spacer()
-
-      Label(request.voteCount.formatted(), systemImage: "chevron.up")
-        .font(.caption)
-        .monospacedDigit()
-        .foregroundStyle(.secondary)
     }
   }
 }

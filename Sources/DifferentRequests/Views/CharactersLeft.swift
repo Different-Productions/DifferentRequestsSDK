@@ -16,11 +16,11 @@ struct CharactersLeft: View {
 
   var body: some View {
     if left < 0 {
-      Text("\(-left) too many")
+      Text("\(-left) too many", bundle: .module, comment: "Characters over a field's limit")
         .font(.footnote)
         .foregroundStyle(.red)
     } else if left <= Self.showFrom {
-      Text("\(left) left")
+      Text("\(left) left", bundle: .module, comment: "Characters left before a field's limit")
         .font(.footnote)
         .foregroundStyle(.secondary)
     }

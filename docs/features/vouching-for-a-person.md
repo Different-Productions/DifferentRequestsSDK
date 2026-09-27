@@ -109,7 +109,7 @@ DifferentRequestsClient.createSession(…, proof:)  (DifferentRequestsClient.swi
 perform(.createSession, body:)
   │  X-App-Key, protobuf both ways
   ▼
-the server                                        (IdentityRepository+Sessions.swift, server #236)
+the server                                        (DifferentRequests-Server, server #236)
   ├─ no secret for this app ──────────────────► answered as before, proof ignored
   ├─ secret, proof adds up ───────────────────► session, and traits refreshed
   └─ secret, proof missing or wrong ──────────► RPCFailure(unauthenticated:)
@@ -128,7 +128,7 @@ The example app, signed in (a proof was accepted, or the app has no secret)
 ┌──────────────────────────────────────────────┐
 │ Example                                      │
 │ Your app                                     │
-│  ⌸ Feature requests                        › │
+│  ⌸ Requests                                › │
 │  ⌸ Inbox                                 3 › │ ← the badge needs a session
 │  ⌸ Diagnostics                             › │
 └──────────────────────────────────────────────┘
@@ -137,7 +137,7 @@ The same app, sign-in refused — identical, minus what needs a person
 ┌──────────────────────────────────────────────┐
 │ Example                                      │
 │ Your app                                     │
-│  ⌸ Feature requests                        › │ ← opens, reads, rows draw
+│  ⌸ Requests                                › │ ← opens, reads, rows draw
 │  ⌸ Inbox                                   › │ ← no badge: nobody to count for
 │  ⌸ Diagnostics                             › │ ← says "signed in  nobody"
 └──────────────────────────────────────────────┘
@@ -145,15 +145,22 @@ No alert, no banner, no red text. The refusal is in the log only.
 
 Inside the board, with nobody signed in
 ┌──────────────────────────────────────────────┐
-│ Feature requests                             │
-│  ▲ 12  Dark mode on the widget               │ ← vote controls are not offered
-│  ▲  4  Export to CSV                         │
+│ Requests                                     │
+│  ^ 12  Dark mode on the widget               │ ← VoteTally: the count, nothing to press
+│  ^  4  Export to CSV                         │
 └──────────────────────────────────────────────┘
-  no "+" and no composer: asking acts for a person
+  no "+", and the "…" menu offers neither New request nor Inbox;
+  with no Roadmap or What's New either, the menu is not drawn at all
+
+A request, with nobody signed in
+  the count as a VoteTally, no Follow, and no comment strip
+
+The Inbox, with nobody signed in
+  "Nothing yet", and nothing is read from the server
 
 In flight
   Starting…            the whole root, while the session and the config are read
-  Can't reach Different Requests + Try Again    only when the config read fails
+  Can't reach Different Requests + Try again    only when the config read fails
 ```
 
 ## Platform differences
@@ -182,5 +189,16 @@ Walked 2026-09-17 against `api-dev.differentrequests.com`, app **Identity Walk**
 | A proof whose expiry has passed | `Sign-in refused: unauthenticated: That proof has expired.` Walked by signing with a negative lifetime, then putting the five minutes back |
 | No secret on the app, a proof sent anyway | `Signed in as usr_31ab7ae7f16d4f99948f133074856972` — the server has nothing to check it against and ignores it |
 
-Not walked: a tap into the board itself. RocketSim's `elements` does not answer under Xcode 27, and
-that a board with nobody signed in offers no composer shipped in 0.9.0.
+Walked 2026-09-25 in the example app on an iPhone 17 Pro simulator against development, on an app
+given a signing secret and launched without a proof (#110):
+
+| Step | What it answered |
+|---|---|
+| The board | No "+", no "…" menu (a Free app, so it would hold nothing), and each row's count drawn with nothing to press |
+| A request | "4 votes" and nothing to press: no Follow, no comment strip |
+| The Inbox | "Nothing yet", not "Couldn't load… Check your connection" |
+| The secret removed, relaunched | Signed in: "+", "…", Vote, Follow and the comment strip are all back |
+
+Before the fix the same walk found the menu offering New request, and Vote, Follow and the
+comment box on screen, each answering "Your vote didn't go through. Try it again." or "That didn't
+send. It's still written — send it again." when pressed.

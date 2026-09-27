@@ -15,6 +15,7 @@ public struct InboxView: View {
 
   private static let rowSpacing: CGFloat = 12
   private static let summarySpacing: CGFloat = 4
+  private static let unreadDotWidth: CGFloat = 12
 
   /// What the screen reads from, and what a push from a row is built against.
   private let hub: DifferentRequestsHub
@@ -38,8 +39,10 @@ public struct InboxView: View {
       content
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
-      .navigationTitle("Inbox")
+      .navigationTitle(Text("Inbox", bundle: .module, comment: "Menu item and title of the screen listing updates on requests"))
       .worn(by: hub.appearanceDrawn)
+      .sheetDoneButton()
+      .sheetMinimumSize()
       .task {
         await hub.appConfig.load()
       }
@@ -49,7 +52,7 @@ public struct InboxView: View {
             AsyncButton {
               await store.markAllRead()
             } label: {
-              Text("Read All")
+              Text("Mark all as read", bundle: .module, comment: "Button that marks every inbox update read")
             }
             .disabled(store.write.isWriting)
           }
@@ -59,7 +62,10 @@ public struct InboxView: View {
         // Every time, not only the first: an inbox is the list of what changed while somebody was
         // elsewhere, and coming back to it is exactly the moment that list is out of date. A read
         // already in flight is not started twice, so returning costs one round trip at most.
-        await store.load()
+        await hub.whoIsHere.read()
+        if hub.whoIsHere.somebodyIsHere {
+          await store.load()
+        }
       }
   }
 
@@ -70,21 +76,34 @@ public struct InboxView: View {
   /// takes that task with it.
   @ViewBuilder
   private var content: some View {
-    switch store.read {
-    case .unread, .reading:
-      ProgressView()
-    case .failed:
-      LoadFailure {
-        await store.load()
+    if hub.whoIsHere.somebodyIsHere {
+      switch store.read {
+      case .unread, .reading:
+        ProgressView()
+      case .failed(let error):
+        LoadFailure(error: error) {
+          await store.load()
+        }
+      case .empty:
+        nothingYet
+      case .loaded(let notifications), .refreshing(let notifications):
+        list(notifications)
       }
-    case .empty:
-      ContentUnavailableView {
-        Label("Nothing yet", systemImage: "bell")
-      } description: {
-        Text("Vote for a request or follow one, and you'll hear when it moves.")
+    } else {
+      nothingYet
+    }
+  }
+
+  /// An inbox with nothing in it, which is also what one belonging to nobody holds.
+  private var nothingYet: some View {
+    ContentUnavailableView {
+      Label {
+        Text("Nothing yet", bundle: .module, comment: "Heading on an empty inbox")
+      } icon: {
+        Image(systemName: "bell")
       }
-    case .loaded(let notifications), .refreshing(let notifications):
-      list(notifications)
+    } description: {
+      Text("Vote for or follow a request, and you'll get updates here when it changes.", bundle: .module, comment: "Message on an empty inbox")
     }
   }
 
@@ -122,6 +141,25 @@ public struct InboxView: View {
   /// it reaches the network and nothing at all happens on screen.
   private func row(_ notification: DRNotification) -> some View {
     HStack(spacing: Self.rowSpacing) {
+      // Always the same width, read or not, so every row's text and chevron line up.
+      if notification.hasReadAt == false {
+        AsyncButton {
+          await store.markRead(notificationID: notification.id)
+        } label: {
+          Image(systemName: "circle.fill")
+            .font(.caption2)
+            .foregroundStyle(dotTint)
+            .frame(width: Self.unreadDotWidth)
+        }
+        .buttonStyle(.plain)
+        .disabled(store.write.isWriting)
+        .accessibilityLabel(Text("Mark as read", bundle: .module, comment: "VoiceOver label for the unread dot on an inbox update"))
+      } else {
+        Color.clear
+          .frame(width: Self.unreadDotWidth)
+          .accessibilityHidden(true)
+      }
+
       NavigationLink {
         RequestDetailView(hub: hub, requestID: destinationID(notification))
           // Opening it is reading it. The dot beside the row stays, for marking one read without
@@ -133,19 +171,6 @@ public struct InboxView: View {
           }
       } label: {
         summary(notification)
-      }
-
-      if notification.hasReadAt == false {
-        AsyncButton {
-          await store.markRead(notificationID: notification.id)
-        } label: {
-          Image(systemName: "circle.fill")
-            .font(.caption2)
-            .foregroundStyle(dotTint)
-        }
-        .buttonStyle(.plain)
-        .disabled(store.write.isWriting)
-        .accessibilityLabel("Mark as read")
       }
     }
   }
@@ -195,18 +220,18 @@ public struct InboxView: View {
   /// News this SDK version does not know still says something happened, rather than rendering an
   /// empty row: the request title underneath is what the reader recognizes anyway.
   ///
-  /// The words come off the contract. The server writes a push alert about this same row, and a
-  /// push disagreeing with the row it opens is one event told two ways.
+  /// In the phone's language, saying in English what the contract's `NotificationHeadline` labels
+  /// say, which is also what the server's push alert says.
   private func headline(_ notification: DRNotification) -> String {
     switch notification.news {
     case .statusChanged(let moved):
-      return "\(DRNotificationHeadline.statusChanged.label) \(moved.newStatus.label)"
+      return moved.newStatus.movedHeadline
     case .commentAdded:
-      return DRNotificationHeadline.commentAdded.label
+      return String(localized: "New comment", bundle: .module, comment: "Inbox headline: someone commented on a followed request")
     case .requestDuplicated:
-      return DRNotificationHeadline.requestDuplicated.label
+      return String(localized: "Already asked for", bundle: .module, comment: "Inbox headline: the request was merged into another")
     case .none:
-      return DRNotificationHeadline.unspecified.label
+      return String(localized: "Something changed", bundle: .module, comment: "Inbox headline for news this version can't name")
     }
   }
 }

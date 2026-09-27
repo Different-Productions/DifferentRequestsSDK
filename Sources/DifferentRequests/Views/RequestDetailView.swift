@@ -48,9 +48,14 @@ public struct RequestDetailView: View {
 
   public var body: some View {
     content
-      .navigationTitle("Request")
+      .navigationTitle(Text("Request", bundle: .module, comment: "Title of one feature request's screen"))
       .worn(by: hub.appearanceDrawn)
+      .sheetMinimumSize()
+      .onDisappear {
+        hub.firstVoteNote.putAway()
+      }
       .task {
+        await hub.whoIsHere.read()
         // Read when there is nothing, and read again when this request changed after the copy
         // here arrived. An alert exists because it changed, so a screen opened from one would
         // otherwise draw exactly what the alert came to correct.
@@ -65,22 +70,26 @@ public struct RequestDetailView: View {
   // MARK: - Content
 
   /// Four outcomes, from one state. "Gone" and "unreachable" are two of them and not one: a
-  /// request the server says is not there gets no Try Again, because there is nothing on the
+  /// request the server says is not there gets no Try again, because there is nothing on the
   /// other side of it to try again for.
   @ViewBuilder
   private var content: some View {
     switch store.read {
     case .unread, .reading:
       ProgressView()
-    case .failed:
-      LoadFailure {
+    case .failed(let error):
+      LoadFailure(error: error) {
         await store.load()
       }
     case .empty:
       ContentUnavailableView {
-        Label("This request is gone", systemImage: "questionmark.folder")
+        Label {
+          Text("This request is gone", bundle: .module, comment: "Heading when a request no longer exists")
+        } icon: {
+          Image(systemName: "questionmark.folder")
+        }
       } description: {
-        Text("It was removed, or the link that got you here is out of date.")
+        Text("It was removed, or the link that got you here is out of date.", bundle: .module, comment: "Message when a request no longer exists")
       }
     case .loaded(let request), .refreshing(let request):
       loaded(request)
@@ -96,19 +105,28 @@ public struct RequestDetailView: View {
           header(request)
         }
 
+        if hub.notificationOffer.isOffered(on: request.id) {
+          Section {
+            NotificationOfferCard(offer: hub.notificationOffer)
+          }
+        }
+
         Section {
           thread
         } header: {
-          Text("Discussion")
+          Text("Comments", bundle: .module, comment: "Header over a request's comments")
         }
       }
       .refreshable {
         await store.load()
       }
 
-      Divider()
+      // Commenting acts for a person, so with nobody signed in the strip is not drawn at all.
+      if hub.whoIsHere.somebodyIsHere {
+        Divider()
 
-      composer
+        composer
+      }
     }
   }
 
@@ -129,7 +147,7 @@ public struct RequestDetailView: View {
         .frame(maxWidth: .infinity)
         .padding(.vertical, Self.composerPadding)
     case .failed:
-      RetryRow(message: "Couldn't tell whether this app takes comments.") {
+      RetryRow(message: String(localized: "Comments didn't load.", bundle: .module, comment: "Row where the comment field goes when the app's comment setting failed to load")) {
         await store.loadCommenting()
       }
       .padding(.horizontal)
@@ -140,6 +158,7 @@ public struct RequestDetailView: View {
       CommentComposer(
         draft: $store.draft,
         canSend: store.canPostComment,
+        charactersLeft: store.commentCharactersLeft,
         isWriting: store.write.isWriting
       ) {
         await store.postComment()
@@ -211,17 +230,27 @@ public struct RequestDetailView: View {
       }
 
       HStack(spacing: Self.actionSpacing) {
-        VoteControl(
-          voteCount: Int(request.voteCount),
-          voted: request.viewer.voted,
-          isWriting: store.write.isWriting
-        ) {
-          await store.toggleVote()
+        if hub.whoIsHere.somebodyIsHere {
+          VoteControl(
+            voteCount: Int(request.voteCount),
+            voted: request.viewer.voted,
+            isWriting: store.write.isWriting
+          ) {
+            await store.toggleVote()
+          }
+
+          followButton(request)
+        } else {
+          VoteTally(voteCount: Int(request.voteCount), voted: request.viewer.voted)
         }
 
-        followButton(request)
-
         Spacer()
+      }
+
+      if hub.firstVoteNote.requestID == request.id {
+        Text("You'll be told when this changes.", bundle: .module, comment: "One-time line after a person's first vote on this phone")
+          .font(.subheadline)
+          .foregroundStyle(.secondary)
       }
 
       // Directly under the two controls that write, which is where whoever tapped one is
@@ -261,35 +290,66 @@ public struct RequestDetailView: View {
     NavigationLink {
       RequestDetailView(hub: hub, requestID: requestID)
     } label: {
-      Label(
-        "This was already asked for — your vote went there",
-        systemImage: "arrow.triangle.merge"
-      )
+      Label {
+        Text(
+          "Someone already asked for this. Your vote moved to their request.",
+          bundle: .module,
+          comment: "Link on a request the team merged into an earlier one"
+        )
+      } icon: {
+        Image(systemName: "arrow.triangle.merge")
+      }
       .font(.subheadline)
     }
   }
 
+  /// Filled with a checkmark while following and plain while not, so the two read apart at a
+  /// glance rather than by the bell alone.
+  @ViewBuilder
   private func followButton(_ request: DRFeatureRequest) -> some View {
-    AsyncButton {
-      await store.toggleFollow()
-    } label: {
-      Label(
-        request.viewer.isFollowing ? "Following" : "Follow",
-        systemImage: request.viewer.isFollowing ? "bell.fill" : "bell"
-      )
-      .font(.subheadline)
+    if request.viewer.isFollowing {
+      AsyncButton {
+        await store.toggleFollow()
+      } label: {
+        Label {
+          Text("Following", bundle: .module, comment: "Button showing the reader follows a request; a tap unfollows")
+        } icon: {
+          Image(systemName: "checkmark")
+        }
+        .font(.subheadline)
+          .foregroundStyle(.white)
+      }
+      .buttonStyle(.borderedProminent)
+      .disabled(store.write.isWriting)
+    } else {
+      AsyncButton {
+        await store.toggleFollow()
+      } label: {
+        Label {
+          Text("Follow", bundle: .module, comment: "Button that follows a request to get updates on it")
+        } icon: {
+          Image(systemName: "bell")
+        }
+        .font(.subheadline)
+      }
+      .buttonStyle(.bordered)
+      .disabled(store.write.isWriting)
     }
-    .buttonStyle(.bordered)
-    .disabled(store.write.isWriting)
   }
 
-  /// The contract says an author is absent for a deleted account and that this is normal, so it
-  /// reads as anonymous rather than as a blank line.
+  /// "Deleted user" once the person who asked is deleted, "The team" for a request the app's team
+  /// filed, the name their app gave, or "Anonymous" when it gave none.
   private func authorName(_ request: DRFeatureRequest) -> String {
-    if request.hasAuthor, request.author.displayName.isEmpty == false {
-      return request.author.displayName
+    if request.authorDeleted {
+      return String(localized: "Deleted user", bundle: .module, comment: "Author name for a request whose person was deleted")
     }
-    return "Anonymous"
+    if request.hasAuthor == false {
+      return String(localized: "The team", bundle: .module, comment: "Author name for a request the app's team filed")
+    }
+    if request.author.displayName.isEmpty {
+      return String(localized: "Anonymous", bundle: .module, comment: "Author name for a request whose person gave no name")
+    }
+    return request.author.displayName
   }
 
   // MARK: - The thread
@@ -305,11 +365,11 @@ public struct RequestDetailView: View {
       ProgressView()
         .frame(maxWidth: .infinity)
     case .failed:
-      RetryRow(message: "Couldn't load the discussion.") {
+      RetryRow(message: String(localized: "Couldn't load the comments.", bundle: .module, comment: "Row where a request's comments go when they failed to load")) {
         await store.load()
       }
     case .empty:
-      Text("No comments yet.")
+      Text("No comments yet.", bundle: .module, comment: "Shown under a request with no comments")
         .font(.subheadline)
         .foregroundStyle(.secondary)
     case .loaded(let comments), .refreshing(let comments):

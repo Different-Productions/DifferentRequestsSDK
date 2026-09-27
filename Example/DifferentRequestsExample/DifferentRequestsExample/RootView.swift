@@ -48,7 +48,7 @@ struct RootView: View {
       } description: {
         Text("What this app offers could not be read. The log says what the server answered.")
       } actions: {
-        Button("Try Again") {
+        Button("Try again") {
           Task { await session.start() }
         }
       }
@@ -71,10 +71,7 @@ struct RootView: View {
         } header: {
           Text("Your app")
         } footer: {
-          Text(
-            "Everything below this line is drawn by the SDK and presented over your app. "
-              + "Nothing about how it looks is written here."
-          )
+          Text("Everything in this list is drawn by the SDK and presented over your app. Nothing about how it looks is written here.")
         }
       }
       .navigationTitle("Example")
@@ -120,21 +117,49 @@ struct RootView: View {
     .buttonStyle(.plain)
   }
 
-  /// The SDK screen for a row, each one presented exactly as its documentation shows.
+  /// The SDK screen for a row, each one presented exactly as its documentation shows. The SDK's
+  /// screens draw their own Done on a sheet; Diagnostics is this app's, so it gets the app's.
   @ViewBuilder
   private func presented(_ screen: ExampleScreen) -> some View {
     switch screen {
     case .requests:
       DifferentRequestsView(hub: session.hub)
     case .inbox:
-      NavigationStack { InboxView(hub: session.hub) }
+      NavigationStack {
+        InboxView(hub: session.hub)
+      }
     case .roadmap:
-      NavigationStack { RoadmapView(hub: session.hub) }
+      NavigationStack {
+        RoadmapView(hub: session.hub, isShowingRequests: isShowingRequests)
+      }
     case .changelog:
-      NavigationStack { ChangelogView(hub: session.hub) }
+      NavigationStack {
+        ChangelogView(hub: session.hub, isShowingRequests: isShowingRequests)
+      }
     case .diagnostics:
-      NavigationStack { DiagnosticsView(session: session) }
+      NavigationStack {
+        DiagnosticsView(session: session)
+          .toolbar { doneItem }
+      }
     }
+  }
+
+  private var doneItem: some ToolbarContent {
+    ToolbarItem(placement: .cancellationAction) {
+      DoneButton()
+    }
+  }
+
+  /// What an empty Roadmap or What's New sets to open this app's requests list in place of it.
+  private var isShowingRequests: Binding<Bool> {
+    Binding(
+      get: { session.showing == .requests },
+      set: { isShowing in
+        if isShowing {
+          session.show(.requests)
+        }
+      }
+    )
   }
 
   /// What the sheet is bound to.

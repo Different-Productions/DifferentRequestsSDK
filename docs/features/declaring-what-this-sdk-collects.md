@@ -4,9 +4,9 @@
 
 `PrivacyInfo.xcprivacy`, shipped inside the package, saying exactly what this SDK sends and why.
 
-**Nothing was rejected for its absence, and nothing would have been.** This SDK calls no
-required-reason API — no `UserDefaults`, no file timestamps, no disk space, no boot time — and is not
-on Apple's list of SDKs that must ship a manifest.
+**Nothing was rejected for its absence, and nothing would have been.** This SDK calls one
+required-reason API — `UserDefaults`, declared below — and no file timestamps, disk space or boot
+time. It is not on Apple's list of SDKs that must ship a manifest.
 
 **What its absence cost was adoption.** Xcode builds a customer's App Store privacy report by adding
 up the manifests of their app and every SDK inside it. With none from us, that customer had to read
@@ -42,8 +42,11 @@ Declaring otherwise would be false.
 **Tracking is `false`, and that is a claim.** Nothing sent here is joined with data from another
 company's apps, and nothing goes to a data broker. `NSPrivacyTrackingDomains` is empty.
 
-**`NSPrivacyAccessedAPITypes` is empty**, and that is checkable: this package reads no
-required-reason API.
+**`NSPrivacyAccessedAPITypes` names `UserDefaults`, reason `CA92.1`** — read and written by this
+app alone. Two keys, both remembered on this phone and never sent: that the "Get told when this
+changes?" card was answered (`DifferentRequests.notificationOfferAnswered`, in
+`NotificationOffer.swift`) and that a first vote was made (`DifferentRequests.firstVoteNoted`, in
+`FirstVoteNote.swift`). Added 2026-09-26 with the owner's rulings for those two pieces.
 
 **A proof declares nothing new.** `createSession` takes an optional `DRIdentityProof`, which is a
 signature over the `external_id` already declared above and the instant it stops being accepted. It

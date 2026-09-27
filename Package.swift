@@ -12,6 +12,7 @@ import PackageDescription
 // allowed to drift: an installed app speaks whatever it was built against, forever.
 let package = Package(
   name: "DifferentRequestsSDK",
+  defaultLocalization: "en",
   platforms: [
     .iOS(.v26),
     .macOS(.v26),
@@ -25,7 +26,7 @@ let package = Package(
   dependencies: [
     .package(
       url: "https://github.com/Different-Productions/differentrequests-proto.git",
-      exact: "0.38.0"
+      exact: "0.40.0"
     ),
     // Declared directly, not leaned on transitively: this target names `Message` and
     // `serializedData()` itself. The range matches the contract package's own, so one
@@ -39,9 +40,14 @@ let package = Package(
         .product(name: "DifferentRequestsProtos", package: "differentrequests-proto"),
         .product(name: "SwiftProtobuf", package: "swift-protobuf"),
       ],
-      // Copied rather than processed. Xcode adds a customer's App Store privacy report up from
-      // the manifests of their app and every SDK inside it, and it has to arrive verbatim.
-      resources: [.copy("PrivacyInfo.xcprivacy")]
+      // The privacy manifest is copied rather than processed: Xcode adds a customer's App Store
+      // privacy report up from the manifests of their app and every SDK inside it, and it has to
+      // arrive verbatim. The string catalog is processed, so every word the screens draw ships in
+      // each language it lists.
+      resources: [
+        .copy("PrivacyInfo.xcprivacy"),
+        .process("Localizable.xcstrings"),
+      ]
     ),
   ]
 )

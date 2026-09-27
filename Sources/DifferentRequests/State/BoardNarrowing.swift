@@ -61,7 +61,7 @@ extension BoardNarrowing {
   var emptyIcon: String {
     switch self {
     case .nothing:
-      return "lightbulb.max"
+      return EmptyBoard.standard.symbol
     case .query, .queryAndStatuses:
       return "magnifyingglass"
     case .statuses:
@@ -73,13 +73,13 @@ extension BoardNarrowing {
   var emptyTitle: String {
     switch self {
     case .nothing:
-      return "What should we build?"
+      return EmptyBoard.standard.title
     case .query:
-      return "Nothing matches"
+      return String(localized: "Nothing matches", bundle: .module, comment: "Heading over the request board when a search finds nothing")
     case .statuses:
-      return "Nothing in this filter"
+      return String(localized: "Nothing in this filter", bundle: .module, comment: "Heading over the request board when the status filter leaves nothing")
     case .queryAndStatuses:
-      return "No matches in this filter"
+      return String(localized: "No matches in this filter", bundle: .module, comment: "Heading over the request board when a search inside a status filter finds nothing")
     }
   }
 
@@ -89,13 +89,13 @@ extension BoardNarrowing {
   var emptyMessage: String {
     switch self {
     case .nothing:
-      return "Nobody has asked for anything yet. Tell us what you want and everyone can vote on it."
+      return EmptyBoard.standard.message
     case .query:
-      return "Nobody has asked for this yet."
+      return String(localized: "Nobody has asked for this yet.", bundle: .module, comment: "Message on the request board when a search finds nothing")
     case .statuses:
-      return "No request is in the statuses you picked. Others are on the board — show every status to see them."
+      return String(localized: "No requests match this filter. Tap All to see every request.", bundle: .module, comment: "Message on the request board when the status filter leaves nothing; All is the filter chip's name")
     case .queryAndStatuses:
-      return "Nothing in the statuses you picked matches that search. Show every status to search the whole board."
+      return String(localized: "Nothing matches this search with this filter. Tap All to search every request.", bundle: .module, comment: "Message on the request board when a search inside a status filter finds nothing; All is the filter chip's name")
     }
   }
 
@@ -110,11 +110,9 @@ extension BoardNarrowing {
     case .nothing:
       return nil
     case .query:
-      return "Vote for a request that already says this — duplicates split the demand."
-    case .statuses:
-      return "You are looking at one slice of the board. Show every status before asking, or you may be asking twice."
-    case .queryAndStatuses:
-      return "You are looking at one slice of the board. Show every status before asking, or you may be asking twice."
+      return String(localized: "If a request already says this, vote for it instead, so the votes stay in one place.", bundle: .module, comment: "Warning above the new request form after a search")
+    case .statuses, .queryAndStatuses:
+      return String(localized: "You're only seeing some requests. Tap All first, so you don't ask for something that's already here.", bundle: .module, comment: "Warning above the new request form while a status filter is on; All is the filter chip's name")
     }
   }
 }

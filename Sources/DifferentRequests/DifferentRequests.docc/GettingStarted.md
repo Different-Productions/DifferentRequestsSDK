@@ -37,7 +37,8 @@ import DifferentRequests
 
 let requests = DifferentRequestsHub(
   client: .make(appKey: "your-app-key"),
-  appearance: .standard
+  appearance: .standard,
+  emptyBoard: .standard
 )
 ```
 
@@ -60,7 +61,8 @@ struct MyApp: App {
       appKey: "your-app-key",
       baseURL: SecureBaseURL(literal: "https://staging.example.com")
     ),
-    appearance: .standard
+    appearance: .standard,
+    emptyBoard: .standard
   )
 
   var body: some Scene {

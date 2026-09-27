@@ -3,7 +3,7 @@ import DifferentRequests
 
 /// The scene, and nothing else.
 ///
-/// The composition root is ``RemoteNotificationDelegate``: UIKit builds it before any window is
+/// The composition root is ``RemoteNotificationDelegate``: the system builds it before any window is
 /// shown, and a notification tapped from a cold launch is delivered to it before this scene exists.
 /// So the client, the hub and the session are built there, and read from here.
 ///
@@ -12,7 +12,11 @@ import DifferentRequests
 /// are — which is why it is held for the life of the process rather than by a view.
 @main
 struct DifferentRequestsExampleApp: App {
+  #if os(iOS)
   @UIApplicationDelegateAdaptor(RemoteNotificationDelegate.self) private var composition
+  #else
+  @NSApplicationDelegateAdaptor(RemoteNotificationDelegate.self) private var composition
+  #endif
 
   var body: some Scene {
     WindowGroup {

@@ -75,7 +75,7 @@ public enum DifferentRequestsError: Error, Sendable, LocalizedError {
   ///
   /// Distinct from every other failure because it is an answer rather than an outage: a link to
   /// a request that has since gone is not a connection to retry, and a surface that offers
-  /// "Try Again" for it sends someone to retry a read that will never succeed.
+  /// "Try again" for it sends someone to retry a read that will never succeed.
   public var isNotFound: Bool {
     guard case .api(let error) = self, case .notFound = error.reason else {
       return false

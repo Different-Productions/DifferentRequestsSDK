@@ -32,11 +32,11 @@ enum ExampleScreen: String, Identifiable, CaseIterable {
   /// What the row says.
   var title: String {
     switch self {
-    case .requests: return "Feature requests"
-    case .inbox: return "Inbox"
-    case .roadmap: return "Roadmap"
-    case .changelog: return "What's new"
-    case .diagnostics: return "Diagnostics"
+    case .requests: return String(localized: "Requests", comment: "Example row that opens the request board")
+    case .inbox: return String(localized: "Inbox", comment: "Example row that opens the inbox")
+    case .roadmap: return String(localized: "Roadmap", comment: "Example row that opens the roadmap")
+    case .changelog: return String(localized: "What's New", comment: "Example row that opens the release notes")
+    case .diagnostics: return String(localized: "Diagnostics", comment: "Example row that opens the SDK's own diagnostics")
     }
   }
 
@@ -54,15 +54,24 @@ enum ExampleScreen: String, Identifiable, CaseIterable {
   var explanation: String {
     switch self {
     case .requests:
-      return "Ranked by votes, searchable, with the composer built in."
+      return String(
+        localized: "Ranked by votes and searchable, with a button to ask for something new.",
+        comment: "Example row explanation"
+      )
     case .inbox:
-      return "Status changes, replies and duplicates on what they follow. Where a push lands."
+      return String(
+        localized: "Status changes, replies and duplicates on what they follow. Tapping a notification opens it.",
+        comment: "Example row explanation"
+      )
     case .roadmap:
-      return "Planned and in progress, in columns."
+      return String(localized: "Planned and in progress, in columns.", comment: "Example row explanation")
     case .changelog:
-      return "What shipped, written up, linked to the requests it answers."
+      return String(localized: "What shipped, written up, linked to the requests it answers.", comment: "Example row explanation")
     case .diagnostics:
-      return "What the SDK says about its own setup. Paste it into a support email."
+      return String(
+        localized: "What the SDK says about its own setup. Paste it into a support email.",
+        comment: "Example row explanation"
+      )
     }
   }
 

@@ -28,7 +28,7 @@ struct RetryRow: View {
       AsyncButton {
         await retry()
       } label: {
-        Text("Try Again")
+        Text("Try again", bundle: .module, comment: "Button that reads something again after it failed")
           .font(.subheadline)
       }
       .buttonStyle(.borderless)

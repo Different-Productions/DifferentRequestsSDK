@@ -1,24 +1,28 @@
 import DifferentRequests
 import SwiftUI
-import UIKit
 import UserNotifications
 
 /// This app's composition root, and the delegate remote notifications arrive on.
 ///
-/// The two are one object because UIKit builds this before any window is shown and builds it with
-/// no arguments — so it is both the first thing that exists and the only thing that can be handed
-/// what arrives. Everything long-lived is a `let` here, made once, in dependency order.
+/// The two are one object because the system builds the app delegate before any window is shown and
+/// builds it with no arguments — so it is both the first thing that exists and the only thing that
+/// can be handed what arrives. Everything long-lived is a `let` here, made once, in dependency order.
 ///
-/// Both halves of push only reach a delegate: the device token arrives on `UIApplicationDelegate`,
-/// and what happens to a notification arrives on `UNUserNotificationCenterDelegate`. The SDK cannot
-/// take either — a package does not get to be the app delegate — which is why a host app writes
-/// this and why the example ships one to copy.
+/// Both halves of push only reach a delegate: the device token arrives on the app delegate
+/// (`UIApplicationDelegate` on iOS, `NSApplicationDelegate` on macOS, one file each), and what
+/// happens to a notification arrives on `UNUserNotificationCenterDelegate`. The SDK cannot take
+/// either — a package does not get to be the app delegate — which is why a host app writes this and
+/// why the example ships one to copy.
 @MainActor
-final class RemoteNotificationDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
+final class RemoteNotificationDelegate: NSObject, UNUserNotificationCenterDelegate {
 
   /// Everything this app reads and writes through. Built here and nowhere else.
   let session = Session(
-    hub: DifferentRequestsHub(client: DemoConfig.client, appearance: DemoConfig.appearance),
+    hub: DifferentRequestsHub(
+      client: DemoConfig.client,
+      appearance: DemoConfig.appearance,
+      emptyBoard: DemoConfig.emptyBoard
+    ),
     backend: DemoBackend(signingSecret: DemoConfig.signingSecret)
   )
 
@@ -26,29 +30,17 @@ final class RemoteNotificationDelegate: NSObject, UIApplicationDelegate, UNUserN
   /// and everything else in the payload belongs to the app.
   private static let requestIDKey = "requestID"
 
-  func application(
-    _ application: UIApplication,
-    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
-  ) -> Bool {
-    // Set before anything can arrive. A notification tapped from the cold-launch state is delivered
-    // as soon as the center has a delegate, so installing one later loses it.
+  /// Set before anything can arrive. A notification tapped from the cold-launch state is delivered
+  /// as soon as the center has a delegate, so installing one later loses it.
+  func becomeNotificationDelegate() {
     UNUserNotificationCenter.current().delegate = self
-    return true
   }
 
-  // MARK: - Registering
-
-  func application(
-    _ application: UIApplication,
-    didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
-  ) {
+  func receivedDeviceToken(_ deviceToken: Data) {
     Task { await session.registerDevice(tokenData: deviceToken) }
   }
 
-  func application(
-    _ application: UIApplication,
-    didFailToRegisterForRemoteNotificationsWithError error: Error
-  ) {
+  func failedToRegister(_ error: any Error) {
     NSLog("Remote notification registration failed: %@", error.localizedDescription)
   }
 
@@ -56,8 +48,8 @@ final class RemoteNotificationDelegate: NSObject, UIApplicationDelegate, UNUserN
 
   /// Draws a notification that lands while the app is open.
   ///
-  /// Without this, iOS shows nothing at all for the app that is already frontmost — it assumes the
-  /// app is showing the news itself. This one is not, so it asks for the banner.
+  /// Without this, the system shows nothing at all for the app that is already frontmost — it
+  /// assumes the app is showing the news itself. This one is not, so it asks for the banner.
   func userNotificationCenter(
     _ center: UNUserNotificationCenter,
     willPresent notification: UNNotification

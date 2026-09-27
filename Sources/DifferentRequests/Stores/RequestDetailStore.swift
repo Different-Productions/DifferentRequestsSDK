@@ -30,6 +30,12 @@ final class RequestDetailStore {
   /// Which request the screen is about.
   let requestID: String
 
+  /// Offered the notification card after a vote or follow here.
+  let notificationOffer: NotificationOffer
+
+  /// Says "You'll be told when this changes." after the first vote on this phone.
+  let firstVoteNote: FirstVoteNote
+
   // MARK: - State
 
   /// When the copy this store holds arrived, so news about the request can be compared with it.
@@ -42,7 +48,7 @@ final class RequestDetailStore {
   ///
   /// `empty` is a server that says there is no such request. Someone arrives here from a
   /// notification kept overnight or a link pasted last month, and "it is not here any more" is a
-  /// different screen from "check your connection" — one of them has a Try Again on it that will
+  /// different screen from "check your connection" — one of them has a Try again on it that will
   /// never work.
   var read: ReadState<DRFeatureRequest> = .unread
 
@@ -76,9 +82,18 @@ final class RequestDetailStore {
   /// - Parameters:
   ///   - client: The client the screen reads and writes through.
   ///   - requestID: Which request the screen is about.
-  init(client: DifferentRequestsClient, requestID: String) {
+  ///   - notificationOffer: Offered the notification card after a vote or follow here.
+  ///   - firstVoteNote: Says the one-time line after the first vote on this phone.
+  init(
+    client: DifferentRequestsClient,
+    requestID: String,
+    notificationOffer: NotificationOffer,
+    firstVoteNote: FirstVoteNote
+  ) {
     self.client = client
     self.requestID = requestID
+    self.notificationOffer = notificationOffer
+    self.firstVoteNote = firstVoteNote
   }
 
   // MARK: - Loading
@@ -196,6 +211,10 @@ final class RequestDetailStore {
       }
       read = read.holding(written)
       write = .idle
+      if written.viewer.voted {
+        firstVoteNote.voted(requestID: requestID)
+        await notificationOffer.votedOrFollowed(requestID: requestID)
+      }
     } catch {
       write = .failed(WriteFailure(attempt: attempt, error: error))
     }
@@ -223,15 +242,25 @@ final class RequestDetailStore {
       }
       read = read.holding(written)
       write = .idle
+      if written.viewer.isFollowing {
+        await notificationOffer.votedOrFollowed(requestID: requestID)
+      }
     } catch {
       write = .failed(WriteFailure(attempt: attempt, error: error))
     }
   }
 
-  /// Whether the draft is worth sending. A blank comment is refused by the server, so it is
-  /// refused here instead of sent.
+  /// How many characters the draft has left, from the limit the contract declares. Negative once
+  /// it is over.
+  var commentCharactersLeft: Int {
+    DRCreateCommentRequest.TextLimit.body - draft.count
+  }
+
+  /// Whether the draft is worth sending. A blank or overlong comment is refused by the server, so
+  /// it is refused here instead of sent.
   var canPostComment: Bool {
     draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
+      && commentCharactersLeft >= 0
   }
 
   /// Posts the draft and clears it.

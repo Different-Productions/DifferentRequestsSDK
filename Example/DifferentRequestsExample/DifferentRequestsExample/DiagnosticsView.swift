@@ -24,15 +24,31 @@ struct DiagnosticsView: View {
   @State private var described = ""
 
   var body: some View {
-    ScrollView {
+    // Both directions, and never wrapped, so each value stays on its label's line.
+    ScrollView([.vertical, .horizontal]) {
       Text(described)
         .font(.system(.footnote, design: .monospaced))
         .textSelection(.enabled)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .fixedSize(horizontal: true, vertical: false)
         .padding()
     }
     .navigationTitle("Diagnostics")
+    #if os(iOS)
     .navigationBarTitleDisplayMode(.inline)
+    #endif
+    .toolbar {
+      ToolbarItem(placement: .primaryAction) {
+        Button("Copy") {
+          #if os(iOS)
+          UIPasteboard.general.string = described
+          #else
+          NSPasteboard.general.clearContents()
+          NSPasteboard.general.setString(described, forType: .string)
+          #endif
+        }
+        .disabled(described.isEmpty)
+      }
+    }
     .task {
       described = await session.client.describeIntegration()
     }

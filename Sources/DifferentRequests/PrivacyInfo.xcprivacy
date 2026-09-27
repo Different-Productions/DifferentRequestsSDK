@@ -10,10 +10,20 @@
 	<key>NSPrivacyTrackingDomains</key>
 	<array/>
 
-	<!-- No required-reason API is called. This SDK reads no UserDefaults, no file
+	<!-- UserDefaults only, to remember on this phone that the notification card was answered
+	     and that a first vote was made. Read and written by this app alone (CA92.1). No file
 	     timestamps, no disk space, no boot time and no active keyboard list. -->
 	<key>NSPrivacyAccessedAPITypes</key>
-	<array/>
+	<array>
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>CA92.1</string>
+			</array>
+		</dict>
+	</array>
 
 	<key>NSPrivacyCollectedDataTypes</key>
 	<array>

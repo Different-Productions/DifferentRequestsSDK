@@ -35,6 +35,13 @@ final class BoardStore {
   /// The client every call goes through.
   let client: DifferentRequestsClient
 
+  /// Where a vote cast from a row is recorded. A vote also follows the request, so a copy of it
+  /// held by the request's own screen is out of date the moment the vote lands.
+  let news: NewsAboutRequests
+
+  /// Offered the notification card after a vote cast from a row.
+  let notificationOffer: NotificationOffer
+
   // MARK: - What is being asked
 
   /// Which statuses the board covers. Empty means everything still on it.
@@ -129,6 +136,8 @@ final class BoardStore {
 
   /// - Parameters:
   ///   - client: The client the board reads through.
+  ///   - news: Where a vote cast here is recorded, so a request's own screen re-reads it.
+  ///   - notificationOffer: Offered the notification card after a vote cast here.
   ///   - statuses: Which statuses to cover, or empty for everything still on the board.
   ///   - sort: Whether to rank by demand or by recency.
   ///
@@ -137,10 +146,14 @@ final class BoardStore {
   /// rather than paging nothing.
   init(
     client: DifferentRequestsClient,
+    news: NewsAboutRequests,
+    notificationOffer: NotificationOffer,
     statuses: [DRRequestStatus],
     sort: DRRequestSort
   ) {
     self.client = client
+    self.news = news
+    self.notificationOffer = notificationOffer
     self.statuses = statuses
     self.sort = sort
     self.query = ""
@@ -292,7 +305,11 @@ final class BoardStore {
         written = try await client.vote(requestID: requestID).request
       }
       read = read.replacing(written, identifiedBy: { $0.id })
+      news.heard(aboutRequest: requestID, at: Date())
       write = .idle
+      if written.viewer.voted {
+        await notificationOffer.votedOrFollowed(requestID: requestID)
+      }
     } catch {
       write = .failed(WriteFailure(attempt: attempt, error: error))
     }

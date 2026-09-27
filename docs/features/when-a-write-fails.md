@@ -56,7 +56,7 @@ Three things fell out of doing this that were the same defect wearing different 
   on screen is what those views took as proof that nothing had gone wrong. The reader got a spinner
   under the last row that spun forever. `PageState.failed` is now its own case and `NextPageRow`
   draws it.
-- **A request the server says is gone** was rendered as "Couldn't load … Try Again", which is a
+- **A request the server says is gone** was rendered as "Couldn't load … Try again", which is a
   button that will never work. `ReadState.empty` on `RequestDetailStore.read` is now that answer,
   reached through `DifferentRequestsError.isNotFound`.
 - **A second tap during a write** was refused by the store — every store takes one write at a time
@@ -117,7 +117,7 @@ the write returned, found again by id rather than by an index taken before the c
 **What happens.** A first read that fails replaces the board with "Couldn't load" and a **Try
 Again**. A refresh keeps the list up for the whole read — `refreshing(held)` — and replaces it with
 the failure only when the answer is a failure. A *page* that fails leaves everything already read
-on screen and puts **"Couldn't load any more."** with **Try Again** where the spinner was. It does
+on screen and puts **"Couldn't load any more."** with **Try again** where the spinner was. It does
 not retry itself: a retry that fires itself loops against a server that is down.
 
 ### On one request (`RequestDetailView`)
@@ -134,7 +134,7 @@ directly under the vote-and-follow row, which is where whoever tapped is looking
 - un-vote — **"Couldn't take your vote back. Try it again."**
 - follow — **"Couldn't start following this. Try it again."**
 - unfollow — **"Couldn't stop following this. Try it again."**
-- comment — **"Your comment didn't post. It's still written — send it again."**, and the draft is
+- comment — **"Your comment didn't send. We kept what you wrote, so tap Send to try again."**, and the draft is
   still in the field, because the sentence says to send it again and there has to be something to
   send
 
@@ -143,15 +143,15 @@ directly under the vote-and-follow row, which is where whoever tapped is looking
 **Trigger it (reading).** Open a request id the server does not have; or open a real one with the
 thread rpc failing.
 
-**What happens.** A request that cannot be reached shows "Couldn't load" with **Try Again**. A
+**What happens.** A request that cannot be reached shows "Couldn't load" with **Try again**. A
 request the server says is *not there* shows **"This request is gone"** / "It was removed, or the
-link that got you here is out of date." — and no **Try Again**, because there is nothing on the
+link that got you here is out of date." — and no **Try again**, because there is nothing on the
 other side of it. A thread that fails leaves the request readable above it and puts **"Couldn't
-load the discussion."** with **Try Again** under the Discussion heading.
+load the comments."** with **Try again** under the Comments heading.
 
 ### In the inbox (`InboxView`)
 
-**Find it.** The blue dot at the right of every unread row, and **Read All** in the toolbar.
+**Find it.** The blue dot at the left of every unread row, and **Mark all as read** in the toolbar.
 
 **Trigger it.** Either, against a server that refuses.
 
@@ -161,17 +161,17 @@ or **"Couldn't mark everything read. Try it again."** The dot stays blue, becaus
 unread.
 
 **Reading.** The page and the unread count are one read. A page that arrives beside a count that
-did not is an inbox rendering a badge nobody vouches for — and **Read All** appears and disappears
+did not is an inbox rendering a badge nobody vouches for — and **Mark all as read** appears and disappears
 on that badge — so either both answered or the read failed.
 
 ### In the composer (`SubmitRequestView`)
 
-**Find it.** **Submit**, in the confirmation slot of the sheet's own toolbar.
+**Find it.** **Send**, in the confirmation slot of the sheet's own toolbar.
 
 **Trigger it.** As before. What changed is only where the state lives: `SubmitStore.submitError`
 became `SubmitStore.write`.
 
-**What happens.** As before — **"That didn't send. Try again in a moment."** with everything typed
+**What happens.** As before — **"That didn't send. We kept what you wrote, so tap Send to try again."** with everything typed
 still in the fields — with a **Dismiss** beside it now, and drawn by the same
 `WriteFailureNotice` the other three surfaces use.
 
@@ -184,7 +184,7 @@ still in the fields — with a **Dismiss** beside it now, and drawn by the same
 **What happens.** The changelog behaves as the board does. The roadmap has one deliberate change of
 behavior: columns held from a previous read used to survive a failed refresh, and a roadmap left
 on screen after a refresh that could not reach the server is a roadmap presenting itself as current
-when nobody knows whether it is. It now shows "Couldn't load" with **Try Again**.
+when nobody knows whether it is. It now shows "Couldn't load" with **Try again**.
 
 ### Through the API (`DifferentRequestsClient`)
 
@@ -215,7 +215,7 @@ no seconds to be asked for and the property answers nil.
 | Posts a comment on a fully-read thread | It joins the end of the thread and the draft clears |
 | Posts a comment on a partly-read thread | The draft clears and the comment is not appended; a thread reads oldest first, and appending would put it ahead of comments not yet fetched |
 | Reaches the end of a paged list | The spinner stops and nothing is drawn under the last row (`PageState.done`) |
-| Opens a request that has been folded into another | The request, plus "Folded into another request — your vote went with it" as a link into the one that now holds the demand |
+| Opens a request that has been folded into another | The request, plus "Someone already asked for this. Your vote moved to their request." as a link into the one that now holds the demand |
 | Reads a surface that is genuinely empty | Its own empty state, never a spinner and never blank space |
 
 ### Negative
@@ -224,18 +224,19 @@ no seconds to be asked for and the property answers nil.
 | --- | --- |
 | A vote fails, either direction | **"Your vote didn't go through. Try it again."** / **"Couldn't take your vote back. Try it again."** in a section at the top of the board, with **Dismiss**. The count does not move |
 | A follow or unfollow fails | **"Couldn't start following this. Try it again."** / **"Couldn't stop following this. Try it again."** under the vote-and-follow row. The bell does not change |
-| A comment fails to post | **"Your comment didn't post. It's still written — send it again."** and the draft is still in the field, untouched |
+| A comment fails to post | **"Your comment didn't send. We kept what you wrote, so tap Send to try again."** and the draft is still in the field, untouched |
 | One notification fails to mark read | **"Couldn't mark that read. Try it again."** at the top of the inbox. The dot stays blue |
 | Marking everything read fails | **"Couldn't mark everything read. Try it again."** at the top of the inbox. Nothing is re-read, because nothing was marked |
-| Filing a request fails | **"That didn't send. Try again in a moment."** in the composer, with the title and detail exactly as typed. The sheet stays up |
+| Filing a request fails | **"That didn't send. We kept what you wrote, so tap Send to try again."** in the composer, with the title and detail exactly as typed. The sheet stays up |
 | Any write is attempted with no end-user session | The same sentence for that write. `DifferentRequestsError.notAuthenticated(rpc)` is thrown from the audience the contract declares, before anything reaches the network, and it reaches the developer through `store.write.failure?.error` |
 | A second control is tapped while a write is in flight | It does not respond, and it is visibly dim — `disabled(write.isWriting)` plus a stated tertiary tint, because `.buttonStyle(.plain)` draws a disabled button exactly like an enabled one |
-| A first read fails | "Couldn't load" / "Something went wrong reaching the server. Check your connection and try again." with **Try Again** |
+| The server refuses the write itself | A sentence that says why, picked by `WriteRefusal` from the reason the contract carries: the request was removed (`notFound`), the account is not allowed (`permissionDenied`), or a field was empty or too long (`invalidArgument`, naming the title, the detail or the comment). No "try it again", because the same write is refused every time |
+| A first read fails | "Couldn't load" with **Try again**, and a sentence picked by `ReadTrouble`: "Your phone isn't connected. Check your connection and try again." for no connection, "Too many tries at once. Try again in N seconds." when the server asked for a pause, and "Couldn't load right now. Try again in a moment." otherwise |
 | A refresh of a loaded list fails | The same screen. The stale list is not left up: on the roadmap that was the old behavior, and it presented columns as current when nobody knew whether they were |
-| A further page fails | **"Couldn't load any more."** with **Try Again**, in place of the spinner. Everything already read stays on screen, and the cursor stays where it was so the retry asks for that page rather than skipping it |
-| The thread on a request fails to load | **"Couldn't load the discussion."** with **Try Again** under the Discussion heading. The request above it is still readable |
-| A request id the server does not have | **"This request is gone"** / "It was removed, or the link that got you here is out of date." No **Try Again**: there is nothing to try again for |
-| A read answers with nothing at all | The surface's own empty state — "No requests yet", "Nothing matches", "Nothing yet", "No roadmap yet", "Nothing published yet", "No comments yet." — never blank space |
+| A further page fails | **"Couldn't load any more."** with **Try again**, in place of the spinner. Everything already read stays on screen, and the cursor stays where it was so the retry asks for that page rather than skipping it |
+| The thread on a request fails to load | **"Couldn't load the comments."** with **Try again** under the Comments heading. The request above it is still readable |
+| A request id the server does not have | **"This request is gone"** / "It was removed, or the link that got you here is out of date." No **Try again**: there is nothing to try again for |
+| A read answers with nothing at all | The surface's own empty state — "No requests yet", "Nothing matches", "Nothing yet", "No roadmap yet", "Nothing new yet", "No comments yet." — never blank space |
 | The server's `DRApiError.message` says something specific | Nobody sees it. Every sentence above is written against what the person did; the contract states that message is for whoever is debugging and may name internals |
 | A failure notice is dismissed | It goes away. Nothing else changes — the write still did not land, and the control that starts it is on screen either way |
 
@@ -268,7 +269,7 @@ A WRITE THAT FAILS — the defect, and where it now goes
 
   VoteControl.swift  ─ AsyncButton ─► BoardStore.toggleVote(requestID:)
    (or the dot in InboxView, Follow in RequestDetailView, Send in CommentComposer,
-    Submit in SubmitRequestView)
+    Send in SubmitRequestView)
         │
         ▼
   BoardStore.swift  ── toggleVote(requestID:)
@@ -333,8 +334,8 @@ A READ, AND ITS FOUR OUTCOMES
   DifferentRequestsView.content
     switch store.read {
       case .unread, .reading            ──► ProgressView()
-      case .failed                      ──► LoadFailure.swift  "Couldn't load" + Try Again
-      case .empty                       ──► ContentUnavailableView + Ask for a feature
+      case .failed                      ──► LoadFailure.swift  "Couldn't load" + Try again
+      case .empty                       ──► ContentUnavailableView + New request
       case .loaded(let r), .refreshing(let r) ──► list(r)
     }                                        no default:, so a sixth case would not compile
 
@@ -347,7 +348,7 @@ A PAGE, WHICH USED TO SPIN FOREVER
                                               .reading ──► spinner
                                               .failed  ──► RetryRow.swift
                                                              "Couldn't load any more."
-                                                             + Try Again  (tapped, never auto)
+                                                             + Try again  (tapped, never auto)
                                               .done    ──► EmptyView()
                                             }
                                               │
@@ -359,7 +360,7 @@ A PAGE, WHICH USED TO SPIN FOREVER
     ├── success ──► read = read.appending(answer.requests); page = PageState(nextCursor:)
     └── failure ──► page = .failed(error)      read untouched — the list stays up
                        │
-                       └── the cursor is NOT advanced, so Try Again asks for this page
+                       └── the cursor is NOT advanced, so Try again asks for this page
 
 ONE REQUEST — two reads, because they are two rpcs that fail apart
 
@@ -380,7 +381,7 @@ ONE REQUEST — two reads, because they are two rpcs that fail apart
   RequestDetailView.thread ◄──┘
     switch store.thread {
       .unread, .reading ──► spinner
-      .failed           ──► RetryRow "Couldn't load the discussion." + Try Again
+      .failed           ──► RetryRow "Couldn't load the comments." + Try again
       .empty            ──► "No comments yet."
       .loaded(c), .refreshing(c) ──► ForEach(c) + NextPageRow
     }
@@ -415,8 +416,7 @@ DifferentRequestsView — a vote that did not land
 
   first read in flight   → centred spinner; nav bar and [ ⊕ ] still there
   refresh in flight      → the list, unchanged, with the system refresh control
-  read failed            → "Couldn't load" / "Something went wrong reaching the server.
-                            Check your connection and try again." + [Try Again]
+  read failed            → "Couldn't load" / "Couldn't load right now. Try again in a moment." + [Try again]
   read empty             → "No requests yet" / "Nobody has asked for anything. Be first."
   searched, no matches   → "Nothing matches" / "Nobody has asked for this yet."
                            (neither empty state has pull-to-refresh: there is no List
@@ -426,7 +426,7 @@ DifferentRequestsView — a vote that did not land
      .more    ─►  ( spinner )        — and it asks, on appear
      .reading ─►  ( spinner )        — it is asking
      .failed  ─►  Couldn't load any more.
-                  [Try Again]        — it stopped, and it waits to be told
+                  [Try again]        — it stopped, and it waits to be told
      .done    ─►  nothing at all
 
 RequestDetailView — a follow that did not land
@@ -443,7 +443,7 @@ RequestDetailView — a follow that did not land
 │  ⚠  Couldn't start following this.  Dismiss  │ ← under the controls, where the eye is
 │     Try it again.                            │
 │                                              │
-│  DISCUSSION                                  │
+│  COMMENTS                                    │
 │  Ada Lovelace · 2 days ago                   │
 │  Agreed.                                     │
 │ ─────────────────────────────────────────── │
@@ -452,36 +452,36 @@ RequestDetailView — a follow that did not land
 │ └──────────────────────────────────────────┘ │   while write.isWriting; disabled when
 └──────────────────────────────────────────────┘   the draft trims to nothing
 
-  request read failed    → "Couldn't load" + [Try Again]        (whole screen)
+  request read failed    → "Couldn't load" + [Try again]        (whole screen)
   request read empty     → "This request is gone" / "It was removed, or the link that
                             got you here is out of date."       (whole screen, NO retry)
-  thread failed          → request still readable; under DISCUSSION:
-                              Couldn't load the discussion.
-                              [Try Again]
+  thread failed          → request still readable; under COMMENTS:
+                              Couldn't load the comments.
+                              [Try again]
   thread empty           → "No comments yet."
-  comment failed         → "Your comment didn't post. It's still written — send it
-                            again." and the draft still in the field
+  comment failed         → "Your comment didn't send. We kept what you wrote, so tap
+                            Send to try again." and the draft still in the field
 
 InboxView — a stamp that did not land
 ┌──────────────────────────────────────────────┐
-│  Inbox                            Read All   │ ← shown only while unreadCount > 0,
+│  Inbox                    Mark all as read   │ ← shown only while unreadCount > 0,
 │ ┌──────────────────────────────────────────┐ │   .disabled(write.isWriting)
 │ │ ⚠  Couldn't mark that read.      Dismiss │ │
 │ │    Try it again.                         │ │
 │ └──────────────────────────────────────────┘ │
-│  Now Planned                             ●   │ ← still blue: the row is still unread.
-│  Dark mode everywhere                        │   .disabled + .tertiary while writing
-│  2 hours ago                                 │
+│  ●  Now Planned                              │ ← still blue: the row is still unread.
+│     Dark mode everywhere                     │   .disabled + .tertiary while writing
+│     2 hours ago                              │
 └──────────────────────────────────────────────┘
 
-  read failed  → "Couldn't load" + [Try Again]   (the page and the unread count are one
-                  read: a badge nobody vouches for is what Read All appears on)
-  read empty   → "Nothing yet" / "Vote for a request or follow one, and you'll hear
-                  when it moves."
+  read failed  → "Couldn't load" + [Try again]   (the page and the unread count are one
+                  read: a badge nobody vouches for is what Mark all as read appears on)
+  read empty   → "Nothing yet" / "Vote for or follow a request, and you'll get
+                  updates here when it changes."
 
 SubmitRequestView — unchanged in copy, moved to the shared component
 ┌──────────────────────────────────────────────┐
-│ Cancel      Ask for a feature        Submit  │ ← grayed while the title is blank, and
+│ Cancel      New request        Send  │ ← grayed while the title is blank, and
 │  WHAT DO YOU WANT?                           │   again while the write is in flight
 │ ┌──────────────────────────────────────────┐ │
 │ │ dark mode                                │ │ ← still exactly as typed
@@ -492,10 +492,10 @@ SubmitRequestView — unchanged in copy, moved to the shared component
 
 RoadmapView / ChangelogView
   reading  → centred spinner
-  failed   → "Couldn't load" + [Try Again]     (roadmap: stale columns are no longer
+  failed   → "Couldn't load" + [Try again]     (roadmap: stale columns are no longer
               left up behind a failed refresh)
   empty    → "No roadmap yet" / "Nothing has been planned publicly."
-             "Nothing published yet" / "Release notes will appear here."
+             "Nothing new yet" / "When the app gets something new, you'll read about it here."
   loaded   → sections / rows, changelog with a NextPageRow under the last one
 ```
 
@@ -508,7 +508,7 @@ RoadmapView / ChangelogView
 - **Disabled buttons.** `VoteControl` and the inbox dot both use `.buttonStyle(.plain)`, which
   renders its own label and therefore draws a disabled button identically to an enabled one on both
   platforms. Neither relies on the system dim: each states a `.tertiary` tint of its own while
-  `isWriting`. `Follow`, `Read All` and `Submit` use bordered styles and do get the system's
+  `isWriting`. `Follow`, `Mark all as read` and `Send` use bordered styles and do get the system's
   disabled treatment, which differs in shade between iOS and macOS but is present on both.
 - **Pull to refresh.** `.refreshable` is a pull gesture on iOS and a menu command plus a scroll
   gesture on macOS. Both call the same `load()`, and both are why a refresh keeps the list up: the
@@ -516,7 +516,7 @@ RoadmapView / ChangelogView
 - **`ContentUnavailableView`.** Centres in the available space on both, which is the whole screen
   for a failed or empty surface here.
 - **`ToolbarItem(placement: .primaryAction)`** — trailing edge of the navigation bar on iOS, window
-  toolbar on macOS. `Read All` is there on both.
+  toolbar on macOS. `Mark all as read` is there on both.
 - **The stack around it all.** The host app owns it on every platform. The SDK ships no
   `NavigationStack` of its own except inside the composer sheet.
 

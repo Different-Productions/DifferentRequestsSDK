@@ -82,12 +82,18 @@ final class RoadmapStore {
   /// What is already held stays on screen for the length of the read, and a read that fails
   /// replaces it with the failure: columns left up after a refresh that could not reach the server
   /// are a roadmap presenting itself as current when nobody knows whether it is.
+  ///
+  /// The server always answers with every column, so a roadmap is empty when every column is.
   private func readColumns() async {
     read = read.whileReading
 
     do {
       let answer = try await client.roadmap()
-      read = ReadState(page: answer.columns)
+      if answer.columns.allSatisfy({ $0.totalCount == 0 }) {
+        read = .empty
+      } else {
+        read = ReadState(page: answer.columns)
+      }
     } catch {
       read = ReadState(readFailure: error)
     }

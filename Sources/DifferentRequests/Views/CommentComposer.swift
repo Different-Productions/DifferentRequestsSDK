@@ -17,6 +17,9 @@ struct CommentComposer: View {
   /// Whether there is anything worth sending.
   let canSend: Bool
 
+  /// The limit minus what is typed, shown once it is close. Negative once it is over.
+  let charactersLeft: Int
+
   /// `true` while a write on this request is in flight. Only one runs at a time, so the composer
   /// waits out a vote as well as a comment.
   let isWriting: Bool
@@ -26,9 +29,17 @@ struct CommentComposer: View {
 
   var body: some View {
     HStack(alignment: .bottom, spacing: Self.spacing) {
-      TextField("Add a comment", text: $draft, axis: .vertical)
+      TextField(
+        text: $draft,
+        prompt: Text("Add a comment", bundle: .module, comment: "Placeholder in the comment field under a request"),
+        axis: .vertical
+      ) {
+        Text("Add a comment", bundle: .module, comment: "Placeholder in the comment field under a request")
+      }
         .lineLimit(Self.lineLimit)
         .textFieldStyle(.plain)
+
+      CharactersLeft(left: charactersLeft)
 
       if isWriting {
         ProgressView()
@@ -41,7 +52,7 @@ struct CommentComposer: View {
         }
         .buttonStyle(.plain)
         .disabled(canSend == false)
-        .accessibilityLabel("Post comment")
+        .accessibilityLabel(Text("Send comment", bundle: .module, comment: "VoiceOver label for the button that sends a comment"))
       }
     }
     .padding(.horizontal)

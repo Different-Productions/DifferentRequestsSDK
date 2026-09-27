@@ -59,12 +59,14 @@ Every surface this package ships, and whether the board can be sorted or filtere
 ### On the board (`DifferentRequestsView`)
 
 **Find it.** A strip directly under the navigation bar and the search field, above whatever the board
-is showing — a spinner, a failure, an empty state or the list. It reads left to right: the rankings,
-a divider, then **All** and one capsule per status.
+is showing — a spinner, a failure, an empty state or the list. On the left, **All** and one capsule
+per status, wrapping onto a second line when they do not fit. On the right, a small menu naming the
+ranking in use — **Most votes ⌄** — per the owner's ruling of 2026-09-26: chips only filter, and
+sorting is one choice, so it is a menu.
 
-**Trigger it.** Tap a capsule.
+**Trigger it.** Tap a capsule, or open the menu and pick a ranking.
 
-- A ranking capsule calls `BoardStore.show(sort:)`.
+- A ranking in the menu calls `BoardStore.show(sort:)`. The one in use carries a checkmark.
 - A status capsule calls `BoardStore.toggle(status:)` — on if it was off, off if it was on. Several
   can be on at once; they are sent as one comma-separated `statuses` value.
 - **All** calls `BoardStore.showEveryStatus()`, which clears the statuses and leaves the search field
@@ -106,8 +108,8 @@ in the scheme, or it never reaches the board at all.
 
 | What someone does | What they get |
 | --- | --- |
-| Opens the board for the first time | **Top** and **All** highlighted, every other capsule plain, and the whole board ranked by votes |
-| Taps **New** | The capsule highlights at once, a spinner appears at the end of the bar, the old rows stay up, then the board comes back newest-first from page one |
+| Opens the board for the first time | The menu reads **Most votes ⌄**, **All** is highlighted, every other capsule plain, and the whole board ranked by votes |
+| Opens the menu and picks **Newest** | The menu reads **Newest ⌄**, a spinner appears beside it, the old rows stay up, then the board comes back newest-first from page one |
 | Taps **Planned** | **All** stops being highlighted, **Planned** starts, and the board is re-read as `?statuses=planned` |
 | Taps **Planned**, then **Shipped** | Both highlighted, one read, sent as `?statuses=planned,shipped` |
 | Taps **Shipped**, then **Open** | Sent as `?statuses=open,shipped` — kept in the order the contract declares them, so one set is always one URL |
@@ -116,7 +118,7 @@ in the scheme, or it never reaches the board at all.
 | Searches "dark mode" and taps **Shipped** | Both narrowings on one call: `?sort=top&statuses=shipped&query=dark%20mode` |
 | Scrolls four pages into a filtered board | Each further page is asked for under the filter the cursor came from, not under whatever the bar says now |
 | Filters, opens a request, comes back | The same filter, the same rows, the same place in them. No re-read: the store answers the question the bar is asking |
-| Filters to something empty, taps **Show every status** | The whole board, with the search text untouched |
+| Filters to something empty, taps **Show all** | The whole board, with the search text untouched |
 | Taps a second capsule while the first one's read is still running | One further read, not two — the read in flight notices the question moved and reads again for it |
 | Pulls to refresh a filtered board | The same filter, re-read from page one |
 | A status is added to the contract | It appears on the bar with no change to this package, because the bar is `allCases` filtered by `urlToken` |
@@ -125,12 +127,12 @@ in the scheme, or it never reaches the board at all.
 
 | What happens | What they see |
 | --- | --- |
-| The board is narrowed to statuses nothing is in | "Nothing in this filter" / "No request is in the statuses you picked. Others are on the board — show every status to see them." with **Show every status** and **Ask for a feature** |
-| A search inside a status filter matches nothing | "No matches in this filter" / "Nothing in the statuses you picked matches that search. Show every status to search the whole board." with the same two buttons |
-| A search on an unfiltered board matches nothing | "Nothing matches" / "Nobody has asked for this yet." with **Ask for a feature** |
-| The whole board is empty and nothing is narrowing it | "What should we build?" / "Nobody has asked for anything yet. Tell us what you want and everyone can vote on it." with **Ask for a feature**, where somebody is signed in |
-| The read a capsule started does not answer | "Couldn't load" / "Something went wrong reaching the server. Check your connection and try again." with **Try Again**. The bar stays above it with the tapped capsule highlighted, so the filter can be changed or undone without a successful read first |
-| A further page of a filtered board fails | "Couldn't load any more." with **Try Again** under the last row. The rows already read stay, and so does the filter |
+| The board is narrowed to statuses nothing is in | "Nothing in this filter" / "No requests match this filter. Tap All to see every request." with **Show all** and **New request** |
+| A search inside a status filter matches nothing | "No matches in this filter" / "Nothing matches this search with this filter. Tap All to search every request." with the same two buttons |
+| A search on an unfiltered board matches nothing | "Nothing matches" / "Nobody has asked for this yet." with **New request** |
+| The whole board is empty and nothing is narrowing it | "What should we build?" / "Nobody has asked for anything yet. Tell us what you want and everyone can vote on it." with **New request**, where somebody is signed in |
+| The read a capsule started does not answer | "Couldn't load" / "Couldn't load right now. Try again in a moment." with **Try again**. The bar stays above it with the tapped capsule highlighted, so the filter can be changed or undone without a successful read first |
+| A further page of a filtered board fails | "Couldn't load any more." with **Try again** under the last row. The rows already read stay, and so does the filter |
 | A vote fails on a filtered board | "Your vote didn't go through. Try it again." — the filter is untouched and the notice sits above the rows |
 | The same capsule is tapped twice inside one round trip | The second tap does nothing. No error text: the capsule already shows the state the first tap asked for, and it goes live again the moment the read lands |
 | The contract carries a status with no `url_token` | It is never drawn on the bar. There is no capsule, no error, and nothing to tap — it cannot be sent, so it is not offered |
@@ -142,7 +144,7 @@ in the scheme, or it never reaches the board at all.
 ```
 Host app  ──►  DifferentRequestsHub.swift
                  board = BoardStore(client:, statuses: [], sort: .top)
-                   └── asked = BoardQuestion(statuses: [], sort: .top, query: "")
+                   └── asked = DRListRequestsRequest(statuses: [], sort: .top)
         │
         ▼
 DifferentRequestsView.swift
@@ -150,27 +152,24 @@ DifferentRequestsView.swift
    └── VStack(spacing: 0)
         ├── BoardFilterBar.swift  ── drawn in ALL FOUR read states, above the content
         │     HStack
-        │      ├── ScrollView(.horizontal)
-        │      │    ├── sortChips
-        │      │    │     ForEach(store.offeredSorts, id: \.self)
-        │      │    │       BoardStore.offeredSorts
-        │      │    │         = DRRequestSort.allCases.filter { $0.urlToken != nil }
-        │      │    │              └── URLTokens.differentrequests_sdk.generated.swift
-        │      │    │       FilterChip.swift(label: sort.filterLabel,
-        │      │    │                        isActive: store.sort == sort)
-        │      │    │         └── AsyncButton.swift ──► BoardStore.show(sort:)
-        │      │    ├── Divider
+        │      ├── ChipFlow.swift
         │      │    └── statusChips
         │      │          FilterChip("All", isActive: store.statuses.isEmpty)
         │      │            └── AsyncButton ──► BoardStore.showEveryStatus()
         │      │          ForEach(store.offeredStatuses, id: \.self)
         │      │            BoardStore.offeredStatuses
-        │      │              = DRRequestStatus.allCases.filter { $0.urlToken != nil }
-        │      │                   └── URLTokens.differentrequests_domain.generated.swift
+        │      │              = DRRequestStatus.shownOnABoard
+        │      │                   └── differentrequests-proto package
         │      │            FilterChip(label: status.badgeLabel,   ── StatusBadge.swift
         │      │                       isActive: store.statuses.contains(status))
         │      │              └── AsyncButton ──► BoardStore.toggle(status:)
-        │      └── ProgressView .opacity(store.read.isReading ? 1 : 0)
+        │      ├── ProgressView .opacity(store.read.isReading ? 1 : 0)
+        │      └── sortMenu  Menu labeled store.sort.filterLabel + chevron.down
+        │            ForEach(store.offeredSorts, id: \.self)
+        │              BoardStore.offeredSorts
+        │                = DRRequestSort.allCases.filter { $0.urlToken != nil }
+        │              DRRequestSort+FilterLabel.swift  "Most votes" · "Newest"
+        │              AsyncButton.swift ──► BoardStore.show(sort:)   ✓ on the one in use
         │
         └── content  ── switch store.read (ReadState.swift)
               ├── .unread, .reading  ──► ProgressView
@@ -184,12 +183,12 @@ DifferentRequestsView.swift
               │            (false, false) ──► .queryAndStatuses
               │        ContentUnavailableView(emptyTitle, emptyIcon, emptyMessage)
               │        if narrowing.isStatusFiltered
-              │            AsyncButton "Show every status" ──► store.showEveryStatus()
+              │            AsyncButton "Show all" ──► store.showEveryStatus()
               │            askButton .bordered
               │        else
               │            askButton .borderedProminent
               └── .loaded, .refreshing ──► list(requests)
-                     Section footer ──► store.narrowing.listFooter
+                     (no footer: the narrowing's warning is the composer's, composerWarning)
 
 BoardStore.swift  ── a capsule tapped
   show(sort:)          sort = …                         ─┐
@@ -202,16 +201,16 @@ BoardStore.swift  ── a capsule tapped
     if read.isReading { return }        ← the read already running finishes the job
     repeat {
       read = read.whileReading          ReadState.swift  loaded→refreshing · empty→reading
-      asked = question                  BoardQuestion.swift(statuses:sort:query:)
+      asked = question                  DRListRequestsRequest (statuses, sort, query; cursor empty)
       cursor = ""                       ← the old cursor addressed the old question
       page = .more
       await readFirstPage(asked)
-          └── fetch(asked, cursor: "")
-                └── DifferentRequestsClient.requests(statuses:sort:query:cursor:)
+          └── fetch(asked, cursor: "")   cursor set on a copy of asked
+                └── DifferentRequestsClient.swift  requests(_ asked: DRListRequestsRequest)
                       sort.urlToken            ──► URLQueryItem("sort", "top"|"new")
                       statuses.compactMap(\.urlToken).joined(separator: ",")
                                                ──► URLQueryItem("statuses", "open,shipped")
-                      GET /requests            ServiceEndpoints.generated.swift
+                      GET /requests            .listRequests, differentrequests-proto package
                                                audience .appKey — no session needed
           read = ReadState(page: answer.requests)   ──► .empty | .loaded
           page = PageState(nextCursor:)
@@ -258,7 +257,7 @@ DifferentRequestsView — loaded, nothing narrowing
 │ ┌────────────────────────────────────────────────┐ │
 │ │ 🔍 Search requests                             │ │
 │ └────────────────────────────────────────────────┘ │
-│ (Top) (New) │ (All) (Open) (Planned) (In Prog… ›   │ ← BoardFilterBar, horizontal scroll
+│ (All) (Open) (Planned) (In progress)    Most votes ⌄ │ ← BoardFilterBar: chips wrap, sort is a menu
 │  ▔▔▔▔▔        ▔▔▔▔▔                                │   filled = active · plain = off
 │ ══════════════════════════════════════════════════ │ ← Divider; everything below is `content`
 │  ⌃    Dark mode everywhere                         │
@@ -269,15 +268,12 @@ DifferentRequestsView — loaded, nothing narrowing
 │  74   …                          [Open]  last week │
 │ ────────────────────────────────────────────────── │
 │              ( spinner )                           │ ← NextPageRow, while page is not .done
-│        ┌────────────────────────────┐              │
-│        │ ⊕  Ask for a feature       │              │
-│        └────────────────────────────┘              │
-│   Not on the board? Ask for it.                    │ ← BoardNarrowing.listFooter
 └────────────────────────────────────────────────────┘
+  nothing after the last row: asking is the nav bar's [ ⊕ ] and the "…" menu
 
   in flight (any read: a capsule tap, a search, a pull-to-refresh)
 ┌────────────────────────────────────────────────────┐
-│ (Top) (New) │ (All) (Open) (Planned) (In Prog… ›  ◌ │ ← the spinner is always in the layout,
+│ (All) (Open) (Planned) (In progress)  ◌ Most votes ⌄ │ ← the spinner is always in the layout,
 │  ▔▔▔▔▔               ▔▔▔▔▔▔▔▔▔                     │   only sometimes visible, so the strip
 │ ══════════════════════════════════════════════════ │   never changes width
 │  ⌃    Dark mode everywhere                         │ ← the rows already read STAY UP through
@@ -291,36 +287,34 @@ DifferentRequestsView — loaded, nothing narrowing
 
   loaded, filtered, nothing in it
 ┌────────────────────────────────────────────────────┐
-│ (Top) (New) │ (All) (Open) (Planned) (Declined) ›  │ ← STILL HERE. This is the whole point of
+│ (All) (Open) (Planned) (Declined)       Most votes ⌄ │ ← STILL HERE. This is the whole point of
 │  ▔▔▔▔▔                            ▔▔▔▔▔▔▔▔▔▔       │   drawing the bar above the content
 │ ══════════════════════════════════════════════════ │
 │                                                    │
 │                     ⊟                              │ ← line.3.horizontal.decrease.circle
 │              Nothing in this filter                │
-│    No request is in the statuses you picked.       │
-│    Others are on the board — show every status     │
-│    to see them.                                    │
+│    No requests match this filter. Tap All to       │
+│    see every request.                              │
 │        ┌────────────────────────────┐              │
-│        │   Show every status        │              │ ← prominent: the likelier fix
+│        │         Show all           │              │ ← prominent: the likelier fix
 │        └────────────────────────────┘              │
 │        ┌────────────────────────────┐              │
-│        │ ⊕  Ask for a feature       │              │ ← bordered
+│        │ ⊕  New request       │              │ ← bordered
 │        └────────────────────────────┘              │
 └────────────────────────────────────────────────────┘
 
-  read failed, filtered  → the bar, then "Couldn't load" + "Something went wrong reaching the
-                           server. Check your connection and try again." + [Try Again].
+  read failed, filtered  → the bar, then "Couldn't load" + "Couldn't load right now. Try again in a moment." + [Try again].
                            The capsules are live; a filter can be changed without a good read first
   first read in flight   → the bar, then a centred spinner
   loaded, unfiltered,    → the bar, then "What should we build?" + "Nobody has asked for
-  board empty              anything yet." + [ ⊕ Ask for a feature ] (prominent, and alone,
+  board empty              anything yet." + [ ⊕ New request ] (prominent, and alone,
                            and only where a person is signed in)
   searched, no filter,   → the bar, then "Nothing matches" + "Nobody has asked for this yet."
-  no matches               + [ ⊕ Ask for a feature ]
+  no matches               + [ ⊕ New request ]
   searched inside a      → the bar, then "No matches in this filter" + "Nothing in the statuses
-  filter, no matches       you picked matches that search. Show every status to search the whole
-                           board." + [Show every status] + [ ⊕ Ask for a feature ]
-  loaded, filtered, rows → footer reads "This is one slice of the board. Show every status before
+  filter, no matches       you picked matches that search. Show all to search the whole
+                           board." + [Show all] + [ ⊕ New request ]
+  loaded, filtered, rows → footer reads "This is one slice of the board. Show all before
                            asking, or you may be asking twice." — a status filter can hide the
                            very duplicate the composer exists to catch
 ```
@@ -332,9 +326,8 @@ DifferentRequestsView — loaded, nothing narrowing
 - **The bar is the view's own content, not a toolbar item.** It draws identically on both platforms
   and does not compete with `.primaryAction` for toolbar room, which on macOS is a window toolbar
   shared with whatever the host app put there.
-- **Horizontal scrolling.** Touch-drag on iOS, trackpad scroll or shift-scroll on macOS.
-  `.scrollIndicators(.hidden)` is stated so the strip reads as a row of capsules on both rather than
-  growing a bar on one.
+- **Wrapping, not scrolling.** `ChipFlow` puts a chip that does not fit on a new line, on both
+  platforms. The sort `Menu` is a pull-down on iOS and a pop-up on macOS.
 - **Colors.** The capsules use `Color.accentColor` and `HierarchicalShapeStyle.quaternary`, both of
   which resolve against the host app's accent and the platform's own materials. No `UIColor` or
   `NSColor` is named, so there is nothing here that compiles on one platform and not the other.
@@ -351,7 +344,7 @@ The walk, and what it answered:
 | Step | Answer |
 |---|---|
 | Open the board with nothing chosen | Most-wanted first, every status shown |
-| Switch to New | Newest first, and the same page size |
+| Switch to Newest from the sort menu | Newest first, and the same page size. Walked 2026-09-26 on the iOS 27 simulator: the menu showed ✓ Most votes and Newest; picking Newest relabeled it "Newest ⌄" and put the newest request first |
 | Pick one status, then a second | Only those statuses, and the union of the two |
 | Search a word in a body, then one in a title | Each found, whatever the case |
 | Search something nothing matches | "Nothing matches", with the way back to every status |

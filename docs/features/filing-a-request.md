@@ -48,22 +48,22 @@ Every surface this package ships, and whether filing a request appears on it.
 
 **Find it.** Top right of the navigation bar, a `plus.bubble` button, present in every state the
 board can be in — loading, loaded, empty, failed, searched. Again at the end of the list as a
-prominent **Ask for a feature** button under a footer line, and again inside both empty states.
+prominent **New request** button under a footer line, and again inside both empty states.
 
 **Trigger it.** Tapping any of them calls `DifferentRequestsHub.beginSubmission()`, which seeds the
 composer's title from `BoardStore.query` and clears everything else, and then raises the sheet.
 
 **What happens.** The composer comes up with the search text as the title (or empty if nothing was
-searched), the detail field blank, and **Submit** disabled until the title has something other than
+searched), the detail field blank, and **Send** disabled until the title has something other than
 whitespace in it. Sending files the request, re-reads the board, and dismisses. A failure keeps the
 sheet up with everything still typed in it.
 
 ### In the composer (`SubmitRequestView`)
 
 **Find it.** It is presented, not pushed, and carries its own `NavigationStack` for **Cancel** and
-**Submit**.
+**Send**.
 
-**Trigger it.** **Submit** in the confirmation slot. It is disabled on a blank title, and disables
+**Trigger it.** **Send** in the confirmation slot. It is disabled on a blank title, and disables
 itself again while the write is in flight so a second tap cannot file the duplicate this whole flow
 exists to prevent.
 
@@ -98,13 +98,14 @@ in the scheme, or it never signs in and never reaches the board at all.
 
 | What someone does | What they get |
 | --- | --- |
-| Opens a board with requests on it | A `plus.bubble` button in the nav bar, and **Ask for a feature** at the end of the list under "Not on the board? Ask for it." |
-| Opens a board with nothing on it | "No requests yet" / "Nobody has asked for anything. Be first." and **Ask for a feature** |
-| Searches for something nobody has asked for | "Nothing matches" / "Nobody has asked for this yet." and **Ask for a feature** |
-| Searches, gets matches, and none of them is theirs | The matches, then **Ask for a feature** under "Vote for one of these if it already says it — duplicates split the demand." |
+| Opens a board with requests on it | A `plus.bubble` **New request** button in the nav bar, and **New request** in the "…" menu. Nothing is drawn at the end of the list: on a board with one row a button there floated in the middle of an empty screen |
+| Opens a board with nothing on it | "No requests yet" / "Nobody has asked for anything. Be first." and **New request** |
+| Searches for something nobody has asked for | "Nothing matches" / "Nobody has asked for this yet." and **New request** |
+| Searches, gets matches, and none of them is theirs | The matches; opening **New request** warns "If a request already says this, vote for it instead, so the votes stay in one place." |
 | Taps any way in after searching "dark mode" | The composer, titled `dark mode`, detail blank |
-| Taps the nav-bar button with no search typed | The composer, both fields empty, **Submit** disabled |
-| Types a title and sends | The request is filed with their own vote on it, the board re-reads, the sheet closes |
+| Taps the nav-bar button with no search typed | The composer, both fields empty, **Send** disabled |
+| Types a title and sends | The request is filed with their own vote and follow on it, the board re-reads, the sheet closes, and "Your request is posted. You're following it." stands under the filter bar for four seconds, then fades (owner ruling 2026-09-26) |
+| Taps the "posted" strip while it shows | The request they just filed opens |
 | Sends, then opens the composer again | Both fields empty — the last request is not still sitting there |
 | Types half a request while something above the board redraws | Both fields still say what they said; the draft belongs to the hub, not to the sheet |
 | Scrolls four pages in, opens a request, comes back | The same four pages and the same place in them |
@@ -115,13 +116,13 @@ in the scheme, or it never signs in and never reaches the board at all.
 
 | What happens | What they see |
 | --- | --- |
-| Title is empty, or only spaces and newlines | **Submit** is grayed out and does nothing. No error text — nothing has been attempted |
-| The write is in flight | **Submit** is grayed out for the duration; a second tap cannot file a second request |
-| No end-user session exists (`createSession` was never called) | "That didn't send. Try again in a moment." The thrown `DifferentRequestsError.notAuthenticated(.createRequest)` never reaches the network, and reaches the developer through `SubmitStore.write.failure?.error` |
-| The server refuses — plan required, rate limited, anything with a `DRApiError` | "That didn't send. Try again in a moment." The server's own message is written for whoever is debugging and may name internals, so it is not shown |
-| The network is unreachable or times out | "That didn't send. Try again in a moment." |
+| Title is empty, or only spaces and newlines | **Send** is grayed out and does nothing. No error text — nothing has been attempted |
+| The write is in flight | **Send** is grayed out for the duration; a second tap cannot file a second request |
+| No end-user session exists (`createSession` was never called) | "That didn't send. We kept what you wrote, so tap Send to try again." The thrown `DifferentRequestsError.notAuthenticated(.createRequest)` never reaches the network, and reaches the developer through `SubmitStore.write.failure?.error` |
+| The server refuses — plan required, rate limited, anything with a `DRApiError` | "That didn't send. We kept what you wrote, so tap Send to try again." The server's own message is written for whoever is debugging and may name internals, so it is not shown |
+| The network is unreachable or times out | "That didn't send. We kept what you wrote, so tap Send to try again." |
 | Any failure at all while sending | The sheet stays up with the title and detail exactly as typed. Dismissing on a failure would throw the words away |
-| The request files but re-reading the board fails | The sheet closes — the request was filed — and the board shows "Couldn't load" / "Something went wrong reaching the server. Check your connection and try again." with **Try Again** |
+| The request files but re-reading the board fails | The sheet closes — the request was filed — and the board shows "Couldn't load" / "Couldn't load right now. Try again in a moment." with **Try again** |
 | The board's first read fails | The same "Couldn't load" screen, with the nav-bar way in still there: a board that cannot be read is not a reason to be unable to ask |
 | The host app forgets the `NavigationStack` | No title, no nav-bar button, no search field, and rows push nothing. Every SDK screen's doc comment states the requirement; the Example is the worked example |
 
@@ -130,7 +131,7 @@ in the scheme, or it never signs in and never reaches the board at all.
 ```
 Host app (composition root, built once and held)
   DifferentRequestsExampleApp.swift
-    let session = Session(hub: DifferentRequestsHub(client: .make(appKey:)))
+    let session = Session(hub: DifferentRequestsHub(client:appearance:emptyBoard:))
         │
         ▼
   DifferentRequestsHub.swift ─── init assigns, in dependency order:
@@ -165,13 +166,13 @@ Host app (composition root, built once and held)
   SubmitRequestView.swift
     init ──────────────────────────►  _store = Bindable(hub.submission)  (constructs nothing)
     Form
-     ├── TextField("Title",  text: $store.title)
-     ├── TextField("Detail", text: $store.body)
+     ├── TextField("In a few words", text: $store.title)
+     ├── TextField("Why you'd use it (optional)", text: $store.body)
      ├── if let failure = store.write.failure ──► WriteFailureNotice.swift
-     │        "That didn't send. Try again in a moment."  + Dismiss
+     │        "That didn't send. We kept what you wrote, so tap Send to try again."  + Dismiss
      └── toolbar
           ├── Cancel ──► dismiss()
-          └── AsyncButton(Submit).disabled(store.canSubmit == false)
+          └── AsyncButton(Send).disabled(store.canSubmit == false)
                     AsyncButton.swift: @State isRunning + .disabled(isRunning)
                         │
                         ▼
@@ -191,7 +192,13 @@ Host app (composition root, built once and held)
                                  └── submitted == nil ? return : BoardStore.load()
                         │
                         ▼
-                  store.submitted == nil ? stay up : dismiss()
+                  store.write.failure == nil ? dismiss() : stay up
+                        │
+                        ▼
+DifferentRequestsView  (isComposing == false)
+  PostedNotice.swift   hub.submission.submitted != nil
+                         ──► "Your request is posted. You're following it."  ✓ green, › opens it
+                         .task ──► SubmitStore.putAwayPosted(after: 4 s) ──► submitted = nil (fades)
 ```
 
 Pushing a request off the board walks the same lifetime rule:
@@ -222,27 +229,22 @@ DifferentRequestsView — loaded, nothing searched
 │       [Open]                    last week    │
 │ ─────────────────────────────────────────── │
 │              ( spinner )                     │ ← NextPageRow, while page is not .done
-│ ─────────────────────────────────────────── │
-│        ┌────────────────────────────┐        │
-│        │ ⊕  Ask for a feature       │        │ ← end of list, every state
-│        └────────────────────────────┘        │
-│   Not on the board? Ask for it.              │
 └──────────────────────────────────────────────┘
+  asking is the nav bar's [ ⊕ ] and the "…" menu; nothing is drawn after the last row
 
-  searched, with matches → same list, footer reads instead:
-    "Vote for one of these if it already says it — duplicates split the demand."
+  searched, with matches → the composer warns instead:
+    "If a request already says this, vote for it instead, so the votes stay in one place."
 
   first read in flight        → centred spinner, nav bar and [ ⊕ ] still there
-  read failed, nothing held   → "Couldn't load" + "Something went wrong reaching the
-                                 server. Check your connection and try again." + [Try Again]
+  read failed, nothing held   → "Couldn't load" + "Couldn't load right now. Try again in a moment." + [Try again]
   loaded, board empty         → "No requests yet" + "Nobody has asked for anything.
-                                 Be first." + [ ⊕ Ask for a feature ]
+                                 Be first." + [ ⊕ New request ]
   loaded, search matched none → "Nothing matches" + "Nobody has asked for this yet."
-                                 + [ ⊕ Ask for a feature ]
+                                 + [ ⊕ New request ]
 
 SubmitRequestView — presented over the board
 ┌──────────────────────────────────────────────┐
-│ Cancel      Ask for a feature        Submit  │ ← Submit grayed while title is blank,
+│ Cancel      New request        Send  │ ← Send grayed while title is blank,
 │                                              │   and grayed again while the write runs
 │  WHAT DO YOU WANT?                           │
 │ ┌──────────────────────────────────────────┐ │
@@ -253,16 +255,18 @@ SubmitRequestView — presented over the board
 │                                              │
 │  ANYTHING ELSE?                              │
 │ ┌──────────────────────────────────────────┐ │
-│ │ Detail                                   │ │ ← 3…8 lines, grows as it is typed
+│ │ Why you'd use it (optional)              │ │ ← 3…8 lines, grows as it is typed
 │ │                                          │ │
 │ └──────────────────────────────────────────┘ │
-│                                              │
-│  ⚠  That didn't send. Try again in a moment. │ ← only after a failed write; the fields
+│  ⚠  That didn't send. We kept what you wrote, │ ← only after a failed write, in the detail
+│     so tap Send to try again.        Dismiss │   footer; the fields
 └──────────────────────────────────────────────┘   above still hold everything typed
 
-  in flight  : Submit dimmed and inert (AsyncButton's isRunning), fields still editable
-  disabled   : Submit dimmed whenever the title trims to nothing
-  success    : sheet dismisses; the board underneath has re-read and the new request is on it
+  in flight  : Send dimmed and inert (AsyncButton's isRunning), fields still editable
+  disabled   : Send dimmed whenever the title trims to nothing
+  success    : sheet dismisses; the board underneath has re-read, and for four seconds a green
+               strip under the filter bar says "Your request is posted. You're following it."
+               Tapping it opens the request. Then it fades.
 ```
 
 ## Platform differences
@@ -276,7 +280,7 @@ SubmitRequestView — presented over the board
 - **The search field.** `.searchable` is a field under the title on iOS and a toolbar search field
   on macOS. Both write the same `BoardStore.query`, so both seed the composer identically.
 - **The composer.** A card sheet on iOS, a window-modal sheet on macOS. It carries its own
-  `NavigationStack` so **Cancel** and **Submit** have a bar in both.
+  `NavigationStack` so **Cancel** and **Send** have a bar in both.
 - **The stack around it all.** The host app owns it on every platform. The SDK ships no
   `NavigationStack` of its own except inside the composer sheet.
 
@@ -289,10 +293,11 @@ The walk, and what it answered:
 
 | Step | Answer |
 |---|---|
-| Open the board with somebody signed in | **Ask for a feature** is offered |
+| Open the board with somebody signed in | **New request** is offered |
 | Open it with nobody signed in | No ask button anywhere — nothing is offered that can only fail |
-| Type a title past 200 characters | "24 too many" in red, and Submit refused while it is over |
-| Cut it back and press Submit | The sheet dismisses and the row is on the board, one vote, Open |
+| Type a title past 200 characters | "24 too many" in red, and Send refused while it is over |
+| Cut it back and press Send | The sheet dismisses and the row is on the board, one vote, Open |
+| 2026-09-26, iOS 27 simulator: send "Walk: the board says it is posted" | The sheet closed; a green "Your request is posted. You're following it." sat under the filter bar above the new row, and was gone five seconds later |
 | Open the same request again after a redraw of the board | The thread and any half-written comment are still there |
-| Submit with the network down | The composer keeps what was typed and says it did not send |
+| Send with the network down | The composer keeps what was typed and says it did not send |
 

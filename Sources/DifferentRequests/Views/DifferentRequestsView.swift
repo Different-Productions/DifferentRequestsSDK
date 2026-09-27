@@ -43,9 +43,6 @@ public struct DifferentRequestsView: View {
 
   private static let rowSpacing: CGFloat = 12
 
-  /// How wide the empty board's buttons run. Wide enough to be the thing on the screen rather than
-  /// a pill under a paragraph, and short of the edges so they still read as buttons.
-  private static let callToActionWidth: CGFloat = 260
   private static let callToActionInset: CGFloat = 32
 
   /// What the screen reads from, and what its pushes and its sheet are built against.
@@ -74,8 +71,10 @@ public struct DifferentRequestsView: View {
     NavigationStack {
       board
     }
-    .searchable(text: $store.query, prompt: "Search requests")
+    .searchable(text: $store.query, prompt: Text("Search requests", bundle: .module, comment: "Placeholder in the request board's search field"))
+    .searchPresentationToolbarBehavior(.avoidHidingContent)
     .worn(by: hub.appearanceDrawn)
+    .sheetMinimumSize()
   }
 
   /// The board itself, inside the stack this view owns.
@@ -90,10 +89,18 @@ public struct DifferentRequestsView: View {
 
       BoardFilterBar(store: store)
 
+      // Only once the composer is closed, so its few seconds start when the board can be seen.
+      if isComposing == false {
+        PostedNotice(hub: hub)
+          .padding(.horizontal)
+          .padding(.top, 8)
+      }
+
       content
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
-    .navigationTitle("Requests")
+    .animation(.easeOut, value: hub.submission.submitted)
+    .navigationTitle(Text("Requests", bundle: .module, comment: "Title of the request board"))
     .task {
       await hub.appConfig.load()
       await hub.whoIsHere.read()
@@ -104,19 +111,34 @@ public struct DifferentRequestsView: View {
       // and did nothing when pressed.
       if isPresented {
         ToolbarItem(placement: .cancellationAction) {
-          Button("Done") { dismiss() }
+          Button {
+            dismiss()
+          } label: {
+            Text("Done", bundle: .module, comment: "Button that closes the request board")
+          }
         }
       }
       // Asking acts for a person. With nobody signed in it can only be refused, and a control that
       // can only fail is worse than one that is not there — see #84.
       if hub.whoIsHere.somebodyIsHere {
         ToolbarItem(placement: .primaryAction) {
-          askButton
-            .labelStyle(.iconOnly)
+          // A Mac sheet draws its toolbar as a row of buttons at the bottom, where an icon alone
+          // does not read as asking.
+          #if os(macOS)
+            askButton
+              .labelStyle(.titleAndIcon)
+          #else
+            askButton
+              .labelStyle(.iconOnly)
+          #endif
         }
       }
-      ToolbarItem(placement: .primaryAction) {
-        everythingElse
+      if hub.whoIsHere.somebodyIsHere
+        || hub.appConfig.config.roadmapEnabled
+        || hub.appConfig.config.changelogEnabled {
+        ToolbarItem(placement: .primaryAction) {
+          everythingElse
+        }
       }
     }
     .firstRead(store.read) {
@@ -167,8 +189,8 @@ public struct DifferentRequestsView: View {
     switch store.read {
     case .unread, .reading:
       ProgressView()
-    case .failed:
-      LoadFailure {
+    case .failed(let error):
+      LoadFailure(error: error) {
         await store.load()
       }
     case .empty:
@@ -187,17 +209,17 @@ public struct DifferentRequestsView: View {
   /// follows it.
   private var empty: some View {
     ContentUnavailableView {
-      Label(store.narrowing.emptyTitle, systemImage: store.narrowing.emptyIcon)
+      Label(emptyTitle, systemImage: emptySymbol)
     } description: {
-      Text(store.narrowing.emptyMessage)
+      Text(emptyMessage)
     } actions: {
       if store.narrowing.isStatusFiltered {
         AsyncButton {
           await store.showEveryStatus()
         } label: {
-          Text("Show every status")
+          Text("Show all", bundle: .module, comment: "Button that clears the status filter on an empty board")
             .foregroundStyle(.background)
-            .frame(maxWidth: Self.callToActionWidth)
+            .frame(maxWidth: CallToActionSize.width)
         }
         .buttonStyle(.borderedProminent)
         .controlSize(.large)
@@ -209,14 +231,48 @@ public struct DifferentRequestsView: View {
             .controlSize(.large)
         }
       } else if hub.whoIsHere.somebodyIsHere {
-        askButton
-          .labelStyle(.titleOnly)
-          .foregroundStyle(.background)
-          .buttonStyle(.borderedProminent)
-          .controlSize(.large)
+        Button {
+          hub.beginSubmission()
+          isComposing = true
+        } label: {
+          Text(emptyButton)
+            .frame(maxWidth: CallToActionSize.width)
+        }
+        .foregroundStyle(.background)
+        .buttonStyle(.borderedProminent)
+        .controlSize(.large)
       }
     }
     .padding(.horizontal, Self.callToActionInset)
+  }
+
+  // Only the board with nothing narrowing it is the host app's to word; the others describe what
+  // the reader did.
+
+  private var emptySymbol: String {
+    if store.narrowing == .nothing {
+      return hub.emptyBoardDrawn.symbol
+    }
+    return store.narrowing.emptyIcon
+  }
+
+  private var emptyTitle: String {
+    if store.narrowing == .nothing {
+      return hub.emptyBoardDrawn.title
+    }
+    return store.narrowing.emptyTitle
+  }
+
+  private var emptyMessage: String {
+    if store.narrowing == .nothing {
+      return hub.emptyBoardDrawn.message
+    }
+    return store.narrowing.emptyMessage
+  }
+
+  /// Read only on the board with nothing narrowing it: the one empty screen whose button is this.
+  private var emptyButton: String {
+    hub.emptyBoardDrawn.button
   }
 
   private func list(_ requests: [DRFeatureRequest]) -> some View {
@@ -231,6 +287,10 @@ public struct DifferentRequestsView: View {
 
       ForEach(requests, id: \.id) { request in
         row(request)
+
+        if hub.notificationOffer.isOffered(on: request.id) {
+          NotificationOfferCard(offer: hub.notificationOffer)
+        }
       }
 
       if store.page.isDone == false {
@@ -255,12 +315,16 @@ public struct DifferentRequestsView: View {
   /// surface exists to stop.
   private func row(_ request: DRFeatureRequest) -> some View {
     HStack(alignment: .top, spacing: Self.rowSpacing) {
-      VoteControl(
-        voteCount: Int(request.voteCount),
-        voted: request.viewer.voted,
-        isWriting: store.write.isWriting
-      ) {
-        await store.toggleVote(requestID: request.id)
+      if hub.whoIsHere.somebodyIsHere {
+        VoteControl(
+          voteCount: Int(request.voteCount),
+          voted: request.viewer.voted,
+          isWriting: store.write.isWriting
+        ) {
+          await store.toggleVote(requestID: request.id)
+        }
+      } else {
+        VoteTally(voteCount: Int(request.voteCount), voted: request.viewer.voted)
       }
 
       NavigationLink {
@@ -268,6 +332,9 @@ public struct DifferentRequestsView: View {
       } label: {
         RequestSummary(request: request)
       }
+    }
+    .alignmentGuide(.listRowSeparatorLeading) { viewDimensions in
+      viewDimensions[.leading]
     }
   }
 
@@ -281,8 +348,12 @@ public struct DifferentRequestsView: View {
       hub.beginSubmission()
       isComposing = true
     } label: {
-      Label("Ask for a feature", systemImage: "plus.bubble")
-        .frame(maxWidth: Self.callToActionWidth)
+      Label {
+        Text("New request", bundle: .module, comment: "Button that opens the form for a new feature request")
+      } icon: {
+        Image(systemName: "plus.bubble")
+      }
+      .frame(maxWidth: CallToActionSize.width)
     }
   }
 
@@ -293,30 +364,53 @@ public struct DifferentRequestsView: View {
   /// so one the app does not have is absent rather than present and refused when tapped.
   private var everythingElse: some View {
     Menu {
-      Button {
-        hub.beginSubmission()
-        isComposing = true
-      } label: {
-        Label("Ask for a feature", systemImage: "plus.bubble")
-      }
+      // Asking and the inbox belong to a person, so neither is offered with nobody signed in.
+      if hub.whoIsHere.somebodyIsHere {
+        Button {
+          hub.beginSubmission()
+          isComposing = true
+        } label: {
+          Label {
+            Text("New request", bundle: .module, comment: "Button that opens the form for a new feature request")
+          } icon: {
+            Image(systemName: "plus.bubble")
+          }
+        }
 
-      Divider()
+        Divider()
 
-      NavigationLink { InboxView(hub: hub) } label: {
-        Label("Inbox", systemImage: "bell")
+        NavigationLink { InboxView(hub: hub) } label: {
+          Label {
+            Text("Inbox", bundle: .module, comment: "Menu item and title of the screen listing updates on requests")
+          } icon: {
+            Image(systemName: "bell")
+          }
+        }
       }
       if hub.appConfig.config.roadmapEnabled {
-        NavigationLink { RoadmapView(hub: hub) } label: {
-          Label("Roadmap", systemImage: "map")
+        NavigationLink { RoadmapView(hub: hub, isShowingRequests: nil) } label: {
+          Label {
+            Text("Roadmap", bundle: .module, comment: "Title of the roadmap screen")
+          } icon: {
+            Image(systemName: "map")
+          }
         }
       }
       if hub.appConfig.config.changelogEnabled {
-        NavigationLink { ChangelogView(hub: hub) } label: {
-          Label("What's New", systemImage: "sparkles")
+        NavigationLink { ChangelogView(hub: hub, isShowingRequests: nil) } label: {
+          Label {
+            Text("What's New", bundle: .module, comment: "Menu item and title of the app's release notes screen")
+          } icon: {
+            Image(systemName: "sparkles")
+          }
         }
       }
     } label: {
-      Label("More", systemImage: "ellipsis")
+      Label {
+        Text("More", bundle: .module, comment: "Menu holding the request board's other screens")
+      } icon: {
+        Image(systemName: "ellipsis")
+      }
     }
   }
 }

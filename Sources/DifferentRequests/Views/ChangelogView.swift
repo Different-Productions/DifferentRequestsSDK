@@ -5,9 +5,13 @@ import SwiftUI
 ///
 /// ```swift
 /// NavigationStack {
-///   ChangelogView(hub: requests)
+///   ChangelogView(hub: requests, isShowingRequests: $isShowingRequests)
 /// }
 /// ```
+///
+/// Handed a binding, an empty What's New offers **See requests**, which sets it to `true` so the
+/// host opens its requests list. Handed `nil`, it offers nothing: pushed from the board, the back
+/// button already goes there. Shown as the first screen of a sheet, it draws its own Done.
 ///
 /// An entry is a release note rather than a shipped request: a release is usually several
 /// requests plus work nobody asked for, and it carries prose the requests do not have.
@@ -22,16 +26,25 @@ public struct ChangelogView: View {
   /// The hub's changelog state, which outlives this screen and keeps the pages it has read.
   private let store: ChangelogStore
 
-  /// - Parameter hub: What the host app built once and holds.
-  public init(hub: DifferentRequestsHub) {
+  /// Set to `true` by **See requests** on an empty What's New, or nil when the host gave no way
+  /// there.
+  private let isShowingRequests: Binding<Bool>?
+
+  /// - Parameters:
+  ///   - hub: What the host app built once and holds.
+  ///   - isShowingRequests: What opens the host's requests list, or nil for no **See requests**.
+  public init(hub: DifferentRequestsHub, isShowingRequests: Binding<Bool>?) {
     self.hub = hub
     self.store = hub.changelog
+    self.isShowingRequests = isShowingRequests
   }
 
   public var body: some View {
     content
-      .navigationTitle("What's New")
+      .navigationTitle(Text("What's New", bundle: .module, comment: "Menu item and title of the app's release notes screen"))
       .worn(by: hub.appearanceDrawn)
+      .sheetDoneButton()
+      .sheetMinimumSize()
       .firstRead(store.read) {
         await store.load()
       }
@@ -48,8 +61,8 @@ public struct ChangelogView: View {
     switch store.plan {
     case .unread, .reading:
       ProgressView()
-    case .failed:
-      LoadFailure {
+    case .failed(let error):
+      LoadFailure(error: error) {
         await store.load()
       }
     case .excluded:
@@ -67,15 +80,23 @@ public struct ChangelogView: View {
     switch store.read {
     case .unread, .reading:
       ProgressView()
-    case .failed:
-      LoadFailure {
+    case .failed(let error):
+      LoadFailure(error: error) {
         await store.load()
       }
     case .empty:
       ContentUnavailableView {
-        Label("Nothing published yet", systemImage: "sparkles")
+        Label {
+          Text("Nothing new yet", bundle: .module, comment: "Heading on an empty release notes screen")
+        } icon: {
+          Image(systemName: "sparkles")
+        }
       } description: {
-        Text("Release notes will appear here.")
+        Text("When the app gets something new, you'll read about it here.", bundle: .module, comment: "Message on an empty release notes screen")
+      } actions: {
+        if let isShowingRequests {
+          SeeRequestsButton(isShowingRequests: isShowingRequests)
+        }
       }
     case .loaded(let held), .refreshing(let held):
       list(held)
@@ -102,14 +123,19 @@ public struct ChangelogView: View {
   private func row(_ entry: DRChangelogEntry) -> some View {
     VStack(alignment: .leading, spacing: Self.entrySpacing) {
       HStack(spacing: Self.headerSpacing) {
-        Text(entry.title)
-          .font(.headline)
-
-        if entry.version.isEmpty == false {
+        if entry.title.isEmpty {
           Text(entry.version)
-            .font(.caption)
-            .monospaced()
-            .foregroundStyle(.secondary)
+            .font(.headline)
+        } else {
+          Text(entry.title)
+            .font(.headline)
+
+          if entry.version.isEmpty == false {
+            Text(entry.version)
+              .font(.caption)
+              .monospaced()
+              .foregroundStyle(.secondary)
+          }
         }
 
         Spacer()
@@ -124,6 +150,22 @@ public struct ChangelogView: View {
       if entry.body.isEmpty == false {
         Text(entry.body)
           .font(.subheadline)
+      }
+
+      if entry.answers.isEmpty == false {
+        Text("What this answers", bundle: .module, comment: "Heading over the requests a What's New entry answers")
+          .font(.caption.weight(.semibold))
+          .textCase(.uppercase)
+          .foregroundStyle(.secondary)
+          .padding(.top, Self.entrySpacing)
+
+        ForEach(entry.answers, id: \.requestID) { answer in
+          NavigationLink {
+            RequestDetailView(hub: hub, requestID: answer.requestID)
+          } label: {
+            ChangelogAnswerRow(answer: answer)
+          }
+        }
       }
     }
     .padding(.vertical, Self.entrySpacing)

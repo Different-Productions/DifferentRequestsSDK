@@ -3,6 +3,37 @@
 Every released version, newest first. Versions are tags on the public repository,
 `Different-Productions/DifferentRequestsSDK`.
 
+## Unreleased
+
+**Three source changes to make.**
+
+1. `DifferentRequestsHub` takes `emptyBoard:`. Pass `.standard` to keep our words, or an
+   `EmptyBoard` with your own.
+2. `RoadmapView` and `ChangelogView` take `isShowingRequests:`. Pass a binding that opens your
+   requests list, and an empty screen offers **See requests**; pass `nil` for no button.
+3. Remove your own Done from Inbox, Roadmap and What's New. They draw one when they are the first
+   screen of a sheet, and none when pushed.
+
+- On Pro, the board with nothing on it says what your app wants it to: `EmptyBoard(symbol:title:
+  message:button:)`, set once on the hub beside `appearance`. A field left empty uses ours. On Free,
+  ours are drawn whatever you set. Searches and filters that find nothing keep our words.
+- Every word the SDK draws follows the phone's language: Arabic, French, German, Italian, Japanese,
+  Polish, Portuguese (Brazil) and Spanish, with English for the rest. Words your app sends (request
+  titles, release notes, your `EmptyBoard`) are drawn as you wrote them.
+- **The SDK now asks for notification permission itself.** After a person's first vote or follow,
+  on a plan that sends notifications, a "Get told when this changes?" card offers Not now and Turn
+  on; Turn on shows Apple's prompt and registers for remote notifications. Stop prompting at launch,
+  keep registering where notifications are already allowed, and keep passing the token to
+  `registerDevice`. The answer is remembered on the phone in `UserDefaults`, which the privacy
+  manifest now declares (reason `CA92.1`).
+- After the first vote on a phone, the request says "You'll be told when this changes."
+- After sending, the board says "Your request is posted. You're following it." for a few seconds.
+- The board sorts from a small menu; the chips only filter by status.
+- "Powered by Different Requests" opens a "What is this?" page for your users.
+- An empty Roadmap says "Nothing planned yet" instead of three empty columns.
+- Every button says its words in sentence case: "Try again", "Show all", "Mark all as read".
+- On macOS, the SDK's screens have a minimum size, so a sheet no longer collapses its list.
+
 ## 0.11.0 — 2026-09-18
 
 **No source change to make.** What changes is what a Free app is drawn with.

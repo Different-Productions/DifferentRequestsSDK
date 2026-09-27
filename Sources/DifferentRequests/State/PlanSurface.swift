@@ -51,26 +51,24 @@ extension PlanSurface {
   var absentTitle: String {
     switch self {
     case .roadmap:
-      return "This app has no roadmap"
+      return String(localized: "This app has no roadmap", bundle: .module, comment: "Heading when the app doesn't publish a roadmap")
     case .changelog:
-      return "This app has no release notes"
+      return String(localized: "This app has no What's New", bundle: .module, comment: "Heading when the app doesn't publish release notes; What's New is the screen's name")
     case .comments:
-      return "Comments are off"
+      return String(localized: "Comments are off", bundle: .module, comment: "Heading when the app doesn't take comments on requests")
     }
   }
 
-  /// What is there instead, which is the part worth reading.
-  ///
-  /// Each names somewhere to go that exists on every plan — the board takes requests and every
-  /// request takes votes — so nobody is left at a dead end being told what is not there.
+  /// The sentence under the heading: a plain fact about the app, and never a pointer to a screen
+  /// the person has no button to reach from here.
   var absentDescription: String {
     switch self {
     case .roadmap:
-      return "It doesn't publish one. What people have asked for is on the board."
+      return String(localized: "Its plans aren't shared here.", bundle: .module, comment: "Message when the app doesn't publish a roadmap")
     case .changelog:
-      return "It doesn't publish them. What people have asked for is on the board."
+      return String(localized: "This app doesn't share news about its updates.", bundle: .module, comment: "Message when the app doesn't publish release notes")
     case .comments:
-      return "This app doesn't take them. Voting is how you say you want this."
+      return String(localized: "This app doesn't have comments. Vote to show you want this.", bundle: .module, comment: "Message when the app doesn't take comments on requests")
     }
   }
 

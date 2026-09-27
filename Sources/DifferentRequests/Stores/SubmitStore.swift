@@ -109,9 +109,21 @@ final class SubmitStore {
 
   /// Puts away the notice about the last failed filing.
   ///
-  /// Acknowledgement, not repair: nothing was filed, and Submit is still in the bar with
+  /// Acknowledgement, not repair: nothing was filed, and Send is still in the bar with
   /// everything typed still under it.
   func acknowledgeWriteFailure() {
     write = .idle
+  }
+
+  /// Lets the "posted" notice stand for `shownFor`, then puts it away.
+  ///
+  /// A canceled wait means the screen showing the notice went away, and the notice goes with it.
+  func putAwayPosted(after shownFor: Duration) async {
+    do {
+      try await Task.sleep(for: shownFor)
+    } catch {
+      // Canceled with its screen: nothing is left to show the notice on.
+    }
+    submitted = nil
   }
 }

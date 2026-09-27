@@ -1,27 +1,21 @@
 import DifferentRequestsProtos
 import SwiftUI
 
-/// The bar above the board: how it is ranked, and which statuses it covers.
+/// The bar above the board: which statuses it covers, as chips, and how it is ranked, as a menu.
 ///
 /// Above the board's content rather than inside its list, and drawn in every state the board can
-/// be in — reading, failed, empty and full. A filter that lives inside the list is a filter that
-/// disappears at the one moment it has to be reachable: narrow to a status nothing is in and the
-/// list is replaced by an empty state, taking with it the only control that could undo the
-/// narrowing. What is left says the app has no feature requests, which is not true and cannot be
-/// argued with.
+/// be in — reading, failed, empty and full — so the control that undoes a narrowing is never taken
+/// away by the empty state that narrowing produced.
 ///
 /// What it offers is read from the contract's own tables and filtered to the values that have a
-/// spelling in a URL. A value with no spelling cannot be sent, so it is not offered; that is what
-/// keeps `unspecified` — the zero every proto enum decodes to by default — off the bar and out of
-/// the query string. Nothing here lists a status or a ranking, so one added to the contract
+/// spelling in a URL. Nothing here lists a status or a ranking, so one added to the contract
 /// arrives by being declared.
 struct BoardFilterBar: View {
 
   private static let chipSpacing: CGFloat = 8
   private static let groupSpacing: CGFloat = 12
   private static let verticalPadding: CGFloat = 8
-  private static let dividerHeight: CGFloat = 20
-  private static let dividerWidth: CGFloat = 1
+  private static let menuSpacing: CGFloat = 4
 
   /// What the bar reads its selection from and writes its taps to. Owned by the hub, so a redraw
   /// above the board cannot reset the filter someone set.
@@ -31,18 +25,17 @@ struct BoardFilterBar: View {
     VStack(spacing: 0) {
       HStack(alignment: .top, spacing: Self.groupSpacing) {
         ChipFlow(spacing: Self.chipSpacing, lineSpacing: Self.chipSpacing) {
-          sortChips
-          // Drawn rather than a `Divider`, which takes its orientation from an enclosing stack and
-          // has none here: inside a layout it lies down and reads as a stray dash between chips.
-          Rectangle()
-            .fill(.separator)
-            .frame(width: Self.dividerWidth, height: Self.dividerHeight)
           statusChips
         }
         .padding(.leading)
 
-        reading
-          .padding(.trailing)
+        Spacer(minLength: 0)
+
+        HStack(spacing: Self.chipSpacing) {
+          reading
+          sortMenu
+        }
+        .padding(.trailing)
       }
       .padding(.vertical, Self.verticalPadding)
 
@@ -52,16 +45,31 @@ struct BoardFilterBar: View {
 
   // MARK: - Ranking
 
-  private var sortChips: some View {
-    ForEach(store.offeredSorts, id: \.self) { sort in
-      FilterChip(
-        label: sort.filterLabel,
-        spokenLabel: sort.filterSpokenLabel,
-        isActive: store.sort == sort
-      ) {
-        await store.show(sort: sort)
+  /// One choice at a time, so a menu naming the current ranking rather than a row of chips.
+  private var sortMenu: some View {
+    Menu {
+      ForEach(store.offeredSorts, id: \.self) { sort in
+        AsyncButton {
+          await store.show(sort: sort)
+        } label: {
+          if store.sort == sort {
+            Label(sort.filterLabel, systemImage: "checkmark")
+          } else {
+            Text(sort.filterLabel)
+          }
+        }
       }
+    } label: {
+      HStack(spacing: Self.menuSpacing) {
+        Text(store.sort.filterLabel)
+        Image(systemName: "chevron.down")
+          .imageScale(.small)
+      }
+      .font(.subheadline)
     }
+    .fixedSize()
+    .accessibilityLabel(Text("Sort", bundle: .module, comment: "VoiceOver label for the board's sort menu"))
+    .accessibilityValue(store.sort.filterLabel)
   }
 
   // MARK: - Statuses
@@ -71,8 +79,8 @@ struct BoardFilterBar: View {
   @ViewBuilder
   private var statusChips: some View {
     FilterChip(
-      label: "All",
-      spokenLabel: "Show every status",
+      label: String(localized: "All", bundle: .module, comment: "Filter chip that shows requests in every status"),
+      spokenLabel: String(localized: "All statuses", bundle: .module, comment: "VoiceOver label for the All filter chip"),
       isActive: store.statuses.isEmpty
     ) {
       await store.showEveryStatus()
@@ -80,8 +88,8 @@ struct BoardFilterBar: View {
 
     ForEach(store.offeredStatuses, id: \.self) { status in
       FilterChip(
-        label: status.label,
-        spokenLabel: status.label,
+        label: status.localizedLabel,
+        spokenLabel: status.localizedLabel,
         isActive: store.statuses.contains(status)
       ) {
         await store.toggle(status: status)
@@ -91,48 +99,12 @@ struct BoardFilterBar: View {
 
   // MARK: - In flight
 
-  /// A tap on a chip keeps the rows already on screen up — `refreshing` holds them there on
-  /// purpose, so a filter change does not blank the list underneath it — which leaves the tapped
-  /// chip's own highlight as the only sign anything happened. This says the board is being fetched
-  /// as well as chosen.
-  ///
-  /// Always in the layout and only sometimes visible, so the strip beside it does not shift width
-  /// every time a read starts. Hidden from VoiceOver when invisible, or every board would announce
-  /// a busy indicator that is not there.
+  /// Always in the layout and only sometimes visible, so the bar does not shift width every time a
+  /// read starts; hidden from VoiceOver while invisible.
   private var reading: some View {
     ProgressView()
       .controlSize(.small)
       .opacity(store.read.isReading ? 1 : 0)
       .accessibilityHidden(store.read.isReading == false)
-  }
-}
-
-// MARK: - Presentation
-
-/// How a ranking reads on this bar.
-///
-/// Prefixed rather than named `label`, so a member the contract adds to the enum later cannot
-/// collide with one of these and silently change what a chip says.
-extension DRRequestSort {
-
-  /// One word, because it sits in a row of them. A ranking this SDK version has no word for is
-  /// never drawn — the bar offers only what has a URL spelling — but the switch names it anyway,
-  /// so adding a ranking to the contract is a compile error here rather than a blank chip.
-  var filterLabel: String {
-    switch self {
-    case .top: return "Top"
-    case .new: return "New"
-    case .unspecified, .UNRECOGNIZED: return "Unknown"
-    }
-  }
-
-  /// The same thing said in full. "Top" and "New" are a ranking when they are read beside each
-  /// other and a guess when they are read one at a time, which is how VoiceOver reads them.
-  var filterSpokenLabel: String {
-    switch self {
-    case .top: return "Rank by most votes"
-    case .new: return "Rank by newest"
-    case .unspecified, .UNRECOGNIZED: return "Unknown ranking"
-    }
   }
 }

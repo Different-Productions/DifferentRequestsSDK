@@ -66,13 +66,17 @@ public struct VoteControl: View {
           .fontWeight(.semibold)
           .monospacedDigit()
       }
-      .frame(width: Self.width)
+      .frame(width: Self.width, alignment: .leading)
       .foregroundStyle(tint)
     }
     .buttonStyle(.plain)
     .disabled(isWriting)
-    .accessibilityLabel(voted ? "Remove your vote" : "Vote for this")
-    .accessibilityValue(voteCount == 1 ? "1 vote" : "\(voteCount) votes")
+    .accessibilityLabel(
+      voted
+        ? Text("Remove your vote", bundle: .module, comment: "VoiceOver label for the vote button once the reader has voted")
+        : Text("Vote for this", bundle: .module, comment: "VoiceOver label for the vote button")
+    )
+    .accessibilityValue(Text("\(voteCount) votes", bundle: .module, comment: "VoiceOver count of a request's votes"))
   }
 
   /// `.buttonStyle(.plain)` renders its own label, so a disabled plain button looks exactly like

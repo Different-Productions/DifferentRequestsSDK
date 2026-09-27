@@ -23,7 +23,8 @@ struct MyApp: App {
   // every redraw above it, and the board's page cannot be.
   private let requests = DifferentRequestsHub(
     client: .make(appKey: "your-app-key"),
-    appearance: .standard
+    appearance: .standard,
+    emptyBoard: .standard
   )
 
   var body: some Scene {

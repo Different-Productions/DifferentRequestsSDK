@@ -8,8 +8,9 @@ import Foundation
 /// happened and stays true — a screen compares it with when its own copy arrived and re-reads when
 /// the news is newer.
 ///
-/// Two things put news in here: the inbox, every time it reads a notification, and the host app,
-/// when a push lands while it is running. Neither has to know what is holding a stale copy.
+/// Three things put news in here: the inbox, every time it reads a notification; the board, when a
+/// vote cast from a row lands; and the host app, when a push lands while it is running. None has to
+/// know what is holding a stale copy.
 ///
 /// Not observable. A screen asks this while its body is being built, which is the one moment a
 /// write to observed state must not happen, and nothing draws it directly.

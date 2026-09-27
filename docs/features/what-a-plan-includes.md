@@ -83,11 +83,10 @@ says the app has one; reach it in a Free app by building the view directly.
 **Trigger it.** Open the screen with an app key belonging to an app whose plan does not include
 the roadmap.
 
-**What happens.** `.firstRead(store.read)` runs `RoadmapStore.load()`, which asks
+**What happens.** A `.task` on every appearance runs `RoadmapStore.load()`, which asks
 `DifferentRequestsClient.config()` before it asks for anything else. `PlanState(surface: .roadmap,
 response:)` reads `AppConfig.roadmapEnabled`. On `false` the store stops there — `GetRoadmap` is
-never called — and the screen draws **"This app has no roadmap"** / "It doesn't publish one. What
-people have asked for is on the board." There is no **Try Again** on it, because there is nothing to
+never called — and the screen draws **"This app has no roadmap"** / "Its plans aren't shared here." There is no **Try again** on it, because there is nothing to
 try: the read behind it has one possible answer and it is one nobody may be shown.
 
 On `true` the store reads the roadmap and the screen behaves exactly as it did before this change.
@@ -98,8 +97,8 @@ On `true` the store reads the roadmap and the screen behaves exactly as it did b
 
 **Trigger it.** The same, against `AppConfig.changelogEnabled`.
 
-**What happens.** The same shape, with its own words: **"This app has no release notes"** / "It
-doesn't publish them. What people have asked for is on the board." `ListChangelog` is never called,
+**What happens.** The same shape, with its own words: **"This app has no What's New"** / "This app
+doesn't share news about its updates." `ListChangelog` is never called,
 so neither is its paging.
 
 ### The composer under a request (`RequestDetailView`)
@@ -112,8 +111,8 @@ developer setting behind the flag has started being honoured.
 
 **What happens.** `RequestDetailStore.load()` reads the request, then the thread, then asks the
 config. The composer's slot draws one of four things, and the request and its thread are readable
-above it in all four. Where the field would be: **"Comments are off"** / "This app doesn't take
-them. Voting is how you say you want this." The vote control is on the same screen, which is what
+above it in all four. Where the field would be: **"Comments are off"** / "This app doesn't have
+comments. Vote to show you want this." The vote control is on the same screen, which is what
 that sentence points at.
 
 ### Through the API (`DifferentRequestsClient`)
@@ -146,13 +145,13 @@ it rather than approximating it. A call that throws is not remembered, so the ne
 
 | What happens | What they see |
 | --- | --- |
-| The app's plan does not include the roadmap | **"This app has no roadmap"** / "It doesn't publish one. What people have asked for is on the board." No **Try Again**, and no request is sent |
-| The app's plan does not include the changelog | **"This app has no release notes"** / "It doesn't publish them. What people have asked for is on the board." No **Try Again**, and no request is sent |
-| The app does not take comments | **"Comments are off"** / "This app doesn't take them. Voting is how you say you want this." — in the strip the field would have occupied. The thread above it is still readable, and voting still works |
-| The config read fails on the roadmap or the changelog | **"Couldn't load"** / "Something went wrong reaching the server. Check your connection and try again." with **Try Again**, which asks for the config again. The surface itself is not read, because whether it exists is not known |
-| The config read fails on a request's composer | **"Couldn't tell whether this app takes comments."** with **Try Again**, in the composer's strip. The request and the thread above it are unaffected — they were read by a different rpc that answered |
+| The app's plan does not include the roadmap | **"This app has no roadmap"** / "Its plans aren't shared here." No **Try again**, and no request is sent |
+| The app's plan does not include the changelog | **"This app has no What's New"** / "This app doesn't share news about its updates." No **Try again**, and no request is sent |
+| The app does not take comments | **"Comments are off"** / "This app doesn't have comments. Vote to show you want this." — in the strip the field would have occupied. The thread above it is still readable, and voting still works |
+| The config read fails on the roadmap or the changelog | **"Couldn't load"** / "Couldn't load right now. Try again in a moment." with **Try again**, which asks for the config again. The surface itself is not read, because whether it exists is not known |
+| The config read fails on a request's composer | **"Comments didn't load."** with **Try again**, in the composer's strip. The request and the thread above it are unaffected — they were read by a different rpc that answered |
 | The config read answers with no `AppConfig` in it | The same "Couldn't load" screen, from `DifferentRequestsError.incompleteResponse(.getConfig)`. Not treated as an answer: every flag on an absent message reads as `false`, and a server that said nothing would otherwise be read as an app nobody paid for |
-| The server returns `planRequired` anyway — a plan that lapsed between the config read and the surface read | **"Couldn't load"** with **Try Again**, from `ReadState(readFailure:)`. The gate is a way to not ask; it is not a promise that an answer cannot change underneath it |
+| The server returns `planRequired` anyway — a plan that lapsed between the config read and the surface read | **"Couldn't load"** with **Try again**, from `ReadState(readFailure:)`. The gate is a way to not ask; it is not a promise that an answer cannot change underneath it |
 | The `DRApiError.message` on a plan refusal says something specific | Nobody sees it. The contract states that message is written for whoever is debugging and may name internals, and `planRequired` in particular is never surfaced to an end user |
 | A reader is shown any of the absent screens | Nothing about a plan, a tier, a price or an upgrade. They did not choose it and cannot change it |
 | The config read fails and the screen is opened again | It asks again. `PlanState.needsReading` is true after a failure, so one outage does not close a surface for the rest of the launch |
@@ -195,7 +194,7 @@ ONE READ, SHARED — the cache that makes asking cheap enough to do everywhere
 A PRO SURFACE — the defect, and where it now stops
 
   RoadmapView.body
-    .firstRead(store.read) ──► FirstRead.swift  task(id: state.hasRead)
+    .task, on every appearance (a vote elsewhere changes the rows)
         │
         ▼
   RoadmapStore.load()
@@ -224,7 +223,7 @@ A PRO SURFACE — the defect, and where it now stops
   RoadmapView.content
     switch store.plan {
       case .unread, .reading ──► ProgressView()
-      case .failed           ──► LoadFailure.swift   "Couldn't load" + Try Again
+      case .failed           ──► LoadFailure.swift   "Couldn't load" + Try again
       case .excluded         ──► AbsentSurface.swift  surface: .roadmap
       case .included         ──► columns
     }                             no default:, so a sixth case would not compile
@@ -232,7 +231,7 @@ A PRO SURFACE — the defect, and where it now stops
   RoadmapView.columns ◄─────────────────┘
     switch store.read {
       case .unread, .reading ──► ProgressView()
-      case .failed           ──► LoadFailure "Couldn't load" + Try Again
+      case .failed           ──► LoadFailure "Couldn't load" + Try again
       case .empty            ──► "No roadmap yet" / "Nothing has been planned publicly."
       case .loaded(h), .refreshing(h) ──► list(h)
     }
@@ -263,8 +262,8 @@ THE COMPOSER — the contract inconsistency, handled in the same shape
   RequestDetailView.composer ◄────────────────────────┘
     switch store.commenting {
       case .unread, .reading ──► ProgressView() in the strip
-      case .failed           ──► RetryRow.swift "Couldn't tell whether this app takes
-                                    comments." + Try Again ──► store.loadCommenting()
+      case .failed           ──► RetryRow.swift "Comments didn't load."
+                                    + Try again ──► store.loadCommenting()
                                     ⟵ re-asks the config only. The request and the
                                        thread on screen are not read again
       case .excluded         ──► commentsOff — the same words AbsentSurface gives a
@@ -285,20 +284,18 @@ RoadmapView — an app whose plan does not include one
 │                   🗺                          │
 │           This app has no roadmap            │ ← PlanSurface.roadmap.absentTitle
 │                                              │
-│      It doesn't publish one. What people     │ ← .absentDescription
-│        have asked for is on the board.       │
+│        Its plans aren't shared here.         │ ← .absentDescription
 │                                              │
-│                                              │ ← no Try Again, no spinner, nothing
+│                                              │ ← no Try again, no spinner, nothing
 │                                              │   to tap. Nothing is being waited for
 └──────────────────────────────────────────────┘
 
   plan .unread / .reading  → centred spinner. Identical to a roadmap being read,
                              deliberately: at that moment they are the same fact
-  plan .failed             → "Couldn't load" / "Something went wrong reaching the
-                             server. Check your connection and try again." + [Try Again]
-                             ⟵ [Try Again] re-asks the CONFIG, then the roadmap
+  plan .failed             → "Couldn't load" / "Couldn't load right now. Try again in a moment." + [Try again]
+                             ⟵ [Try again] re-asks the CONFIG, then the roadmap
   plan .included           → the four ReadState outcomes, unchanged:
-                             spinner · "Couldn't load" + [Try Again] ·
+                             spinner · "Couldn't load" + [Try again] ·
                              "No roadmap yet" / "Nothing has been planned publicly." ·
                              the columns
 
@@ -306,10 +303,9 @@ ChangelogView — the same screen, its own words
 ┌──────────────────────────────────────────────┐
 │               What's New                     │
 │                   ✨                          │
-│        This app has no release notes         │
+│          This app has no What's New          │
 │                                              │
-│      It doesn't publish them. What people    │
-│        have asked for is on the board.       │
+│  This app doesn't share news about its updates. │
 └──────────────────────────────────────────────┘
 
 RequestDetailView — an app that does not take comments
@@ -324,21 +320,21 @@ RequestDetailView — an app that does not take comments
 │  128   │ 🔔  Follow    │                     │   and the strip below points at the ⌃
 │        └───────────────┘                     │
 │                                              │
-│  DISCUSSION                                  │ ← the thread is not gated either:
+│  COMMENTS                                    │ ← the thread is not gated either:
 │  Ada Lovelace · 2 days ago                   │   comments already posted are still
 │  Agreed.                                     │   worth reading
 │ ─────────────────────────────────────────── │
 │  💬 Comments are off                         │ ← where the field was
-│  This app doesn't take them. Voting is how   │
-│  you say you want this.                      │
+│  This app doesn't have comments. Vote to show │
+│  you want this.                              │
 └──────────────────────────────────────────────┘
 
   commenting .unread / .reading → a centred spinner in the strip, same height.
                                   The field is not drawn first and withdrawn:
                                   a composer that appears and then leaves has
                                   already invited a reply it cannot take
-  commenting .failed            → Couldn't tell whether this app takes comments.
-                                  [Try Again]        ← asks the config only
+  commenting .failed            → Comments didn't load.
+                                  [Try again]        ← asks the config only
   commenting .included          → the composer, unchanged:
                                     "Add a comment"                       ⬆
                                     ⬆ disabled while the draft trims to nothing,

@@ -1,16 +1,20 @@
 import DifferentRequests
 import Foundation
-import UIKit
 import UserNotifications
+#if os(iOS)
+import UIKit
+#else
+import AppKit
+#endif
 
 /// Owns the SDK client and the app's sign-in lifecycle.
 ///
-/// Creates a session for the demo person on `start()`, then asks for push permission and, if it is
-/// granted, registers for remote notifications. The raw APNs token arrives on the app delegate and
+/// Creates a session for the demo person on `start()`, then, where notifications are already
+/// allowed, registers for remote notifications. The raw APNs token arrives on the app delegate and
 /// comes back here through ``registerDevice(tokenData:)``.
 ///
-/// Permission is asked for here rather than by the SDK. A host app decides when to prompt — usually
-/// after showing why — and a package that prompts on its own behalf takes that decision away.
+/// The SDK asks for permission itself, with its "Get told when this changes?" card after a
+/// person's first vote or follow, so this never prompts.
 @Observable
 @MainActor
 final class Session {
@@ -96,7 +100,7 @@ final class Session {
       let configured = try await client.config()
       phase = .ready(configured.config)
       if configured.config.pushEnabled {
-        await requestPushAuthorization()
+        await registerForRemoteNotifications()
       }
     } catch {
       NSLog("What this app offers could not be read: %@", error.localizedDescription)
@@ -162,17 +166,16 @@ final class Session {
     await refreshUnreadCount()
   }
 
-  /// Asks for push permission, keeping denial — a normal `false` — distinct from a request that
-  /// could not complete at all.
-  private func requestPushAuthorization() async {
-    do {
-      let granted = try await UNUserNotificationCenter.current()
-        .requestAuthorization(options: [.alert, .badge, .sound])
-      if granted {
-        UIApplication.shared.registerForRemoteNotifications()
-      }
-    } catch {
-      NSLog("Push authorization request failed: %@", error.localizedDescription)
+  /// Registers for remote notifications when the person already allowed them, so a rotated token
+  /// reaches the server on every launch.
+  private func registerForRemoteNotifications() async {
+    let settings = await UNUserNotificationCenter.current().notificationSettings()
+    if settings.authorizationStatus == .authorized {
+      #if os(iOS)
+      UIApplication.shared.registerForRemoteNotifications()
+      #else
+      NSApplication.shared.registerForRemoteNotifications()
+      #endif
     }
   }
 

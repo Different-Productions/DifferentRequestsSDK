@@ -21,8 +21,8 @@ struct WriteFailure {
   /// refused are different things to a person: the first is worth trying again and the second
   /// never is. Which it was comes from the reason the contract carries, not from a status code.
   var message: String {
-    if let refused = error as? DifferentRequestsError, refused.isARefusalOfWhatWasWritten {
-      return attempt.refusedMessage
+    if let refusal = WriteRefusal(error: error) {
+      return attempt.refusedMessage(refusal)
     }
     return attempt.failureMessage
   }

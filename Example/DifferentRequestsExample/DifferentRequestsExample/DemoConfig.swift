@@ -115,6 +115,15 @@ enum DemoConfig {
   /// Drawn where the app's plan includes it; a Free app is drawn in the SDK's own.
   static let appearance = Appearance(accent: .purple, font: .rounded)
 
+  /// The example's own words for a board with nothing on it, handed over the same way. Drawn where
+  /// the app's plan includes its own look; a Free app shows the SDK's words.
+  static let emptyBoard = EmptyBoard(
+    symbol: "sparkles",
+    title: "What would make this app better?",
+    message: "Ask for it here, and anyone else who wants it can add a vote.",
+    button: "Ask for it"
+  )
+
   /// Which APNs environment minted this build's device tokens.
   ///
   /// Stated rather than detected, because the SDK refuses a token with no environment: a sandbox

@@ -33,8 +33,11 @@ extension DifferentRequestsClient {
       lines.append("  app          not fetched yet — call config() to resolve the key")
     }
 
+    // The surfaces come from the server's config, which a gift can widen past the paid plan, so the
+    // two are separate lines and neither is read as deciding the other.
     if let config = configuration?.config {
-      lines.append("  plan         \(planLine(config))")
+      lines.append("  paid plan    \(config.app.plan)")
+      lines.append("  offers       \(surfacesSummary(config))")
     }
 
     // The line that answers "why can nobody ask for anything?", which is the one thing about an
@@ -56,16 +59,16 @@ extension DifferentRequestsClient {
     return tail.isEmpty ? "(empty)" : "…\(tail)"
   }
 
-  private func planLine(_ config: DRAppConfig) -> String {
+  private func surfacesSummary(_ config: DRAppConfig) -> String {
     let surfaces = [
       "roadmap \(config.roadmapEnabled ? "yes" : "no")",
-      "changelog \(config.changelogEnabled ? "yes" : "no")",
+      "what's new \(config.changelogEnabled ? "yes" : "no")",
       "comments \(config.commentsEnabled ? "yes" : "no")",
       "push \(config.pushEnabled ? "yes" : "no")",
       "your look \(config.appearanceEnabled ? "yes" : "no")",
       "badge \(config.badgeRemoved ? "hidden" : "shown")"
     ]
-    return "\(config.app.plan)  —  \(surfaces.joined(separator: ", "))"
+    return surfaces.joined(separator: ", ")
   }
 
   private var lastCallLine: String {

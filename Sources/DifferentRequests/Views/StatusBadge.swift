@@ -54,7 +54,7 @@ public struct StatusBadge: View {
   }
 
   public var body: some View {
-    Text(status.label)
+    Text(status.localizedLabel)
       .font(.caption)
       .fontWeight(.semibold)
       .padding(.horizontal, Self.horizontalPadding)

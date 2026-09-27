@@ -33,7 +33,7 @@ struct WriteFailureNotice: View {
       Button {
         acknowledge()
       } label: {
-        Text("Dismiss")
+        Text("Dismiss", bundle: .module, comment: "Button that hides a failure notice")
           .font(.subheadline)
       }
       .buttonStyle(.borderless)

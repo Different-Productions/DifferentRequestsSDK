@@ -8,13 +8,14 @@ extension Date {
   /// the phone is not wrong — what is wrong is telling somebody their own request has not happened
   /// yet.
   ///
-  /// Anything at or after this device's now is "now". Past that, the system's own relative wording,
-  /// so it reads in the reader's language without a table of words here.
+  /// Anything under a minute old, or after this device's now, is "Just now". Past that, the
+  /// system's own relative wording.
   var ago: String {
-    let now = Date()
-    if self >= now {
-      return now.formatted(.relative(presentation: .named))
+    if Date().timeIntervalSince(self) < Self.justNowSeconds {
+      return String(localized: "Just now", bundle: .module, comment: "When something happened less than a minute ago")
     }
     return formatted(.relative(presentation: .named))
   }
+
+  private static let justNowSeconds: TimeInterval = 60
 }

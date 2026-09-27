@@ -30,7 +30,7 @@ app paying for its look never sees ours.
 
 | Surface | Ships this? |
 |---|---|
-| Swift SDK | **Yes** — `Appearance`, handed to `DifferentRequestsHub(client:appearance:)`; every screen wears `hub.appearanceDrawn` |
+| Swift SDK | **Yes** — `Appearance`, handed to `DifferentRequestsHub(client:appearance:emptyBoard:)`; every screen wears `hub.appearanceDrawn` |
 | API (the rpcs) | **Reads it** — `GetConfig` answers `appearance_enabled` (server #251) |
 | Web console | **none.** The console is ours and is drawn in ours |
 | Push notifications | **none** — Apple draws those |
@@ -42,7 +42,8 @@ app paying for its look never sees ours.
 ```swift
 let requests = DifferentRequestsHub(
   client: .make(appKey: "your-app-key"),
-  appearance: Appearance(accent: .purple, font: .rounded)
+  appearance: Appearance(accent: .purple, font: .rounded),
+  emptyBoard: .standard
 )
 ```
 
@@ -75,7 +76,7 @@ drawn in the SDK's own look.
 ## The path a request takes
 
 ```
-DifferentRequestsHub(client:appearance:)
+DifferentRequestsHub(client:appearance:emptyBoard:)
   ├─ appearance: Appearance ── what the host app asked for
   └─ appConfig: AppConfigStore ── GetConfig, read by the board and the inbox (.task → load())
        │
@@ -122,7 +123,7 @@ development:
 | Step | Answer |
 |---|---|
 | Example app (`DemoConfig.appearance`: purple, rounded) against Identity Walk on **Free** | The board in the system blue and the system font, "Powered by Different Requests" under the title. More menu: Inbox only |
-| `Entitle` Identity Walk `pro`, relaunch | **Done** and **…** purple, text rounded, no badge. The example's list gains Roadmap and What's new |
+| `Entitle` Identity Walk `pro`, relaunch | **Done** and **…** purple, text rounded, no badge. The example's list gains Roadmap and What's New |
 | The push permission prompt | Not seen on either plan — this simulator may already hold an answer for the app, so the `pushEnabled` gate is read in code, not proven on screen |
 
 iPhone 17 Pro simulator, iOS 26.4, against development, 2026-09-18. Both apps put back on Free after.

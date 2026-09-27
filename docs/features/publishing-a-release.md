@@ -79,17 +79,17 @@ unchecked. It builds the same commit and prints it; nothing is pushed.
 ## The path
 
 ```
-git push origin X.Y.Z                         (this private repository)
+git push origin X.Y.Z                         (DifferentRequestsSDK-private)
         │
         ▼
-.github/workflows/publish-release-copy.yml     on: push tags [0-9]+.[0-9]+.[0-9]+
-        │  runs-on [self-hosted, macOS, ARM64], concurrency sdk-release-copy
+DifferentRequestsSDK-private: workflow "Publish release copy"   on: push tags [0-9]+.[0-9]+.[0-9]+
+        │  runs-on [self-hosted, macOS, ARM64, run-<run id>], concurrency sdk-release-copy
         │  checkout, fetch-depth 0
         ▼
-.github/actions/publish-release-copy/action.yml   @master, public-copy DifferentRequestsSDK
+DifferentRequestsSDK-private: action publish-release-copy   @master, public-copy DifferentRequestsSDK
         │
         ▼
-.github/actions/publish-release-copy/publish-release-copy.sh
+the action's shell script, beside its action definition
         │
         ├── VERSION, PUBLIC_COPY or PUBLISH empty ► error, exit 1
         ├── VERSION not N.N.N ───────────────► error, exit 1
@@ -137,7 +137,7 @@ There is no app screen. What a person sees is the Actions run and the public cop
 
  Run log, rehearsal                  (real output; tag 9.9.9 existed only in a local rehearsal)
    Release 9.9.9 of DifferentRequestsSDK: 81c970126ed6… on top of a5648906bc6f… (master)
-    1 file changed, 65 deletions(-)          ← the old .github/workflows/swift.yml going away
+    1 file changed, 65 deletions(-)          ← git diff --stat of the release against the previous public commit
    Rehearsal: nothing was pushed.
 
  Run log, refused                    (real output: Run workflow, 0.8.0, publish unchecked)

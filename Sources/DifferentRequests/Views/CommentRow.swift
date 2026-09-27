@@ -47,7 +47,7 @@ struct CommentRow: View {
       Text(text)
         .font(.subheadline)
     case .hidden:
-      Text("This comment was removed.")
+      Text("This comment was removed.", bundle: .module, comment: "Shown in place of a comment the team removed")
         .font(.subheadline)
         .italic()
         .foregroundStyle(.secondary)
@@ -57,7 +57,7 @@ struct CommentRow: View {
   }
 
   private var teamPill: some View {
-    Text("Team")
+    Text("Team", bundle: .module, comment: "Pill beside a comment written by the app's team")
       .font(.caption2)
       .fontWeight(.semibold)
       .padding(.horizontal, Self.headerSpacing)
@@ -66,12 +66,15 @@ struct CommentRow: View {
       .background(Color.accentColor.opacity(Self.pillFillOpacity), in: Capsule())
   }
 
-  /// The contract says an author is absent for a deleted account and that this is normal, so it
-  /// reads as anonymous rather than as a blank line.
+  /// "Deleted user" once the person is deleted, the name their app gave, or "Anonymous" when it
+  /// gave none.
   private var authorName: String {
+    if comment.authorDeleted {
+      return String(localized: "Deleted user", bundle: .module, comment: "Author name for a comment whose person was deleted")
+    }
     if comment.hasAuthor, comment.author.displayName.isEmpty == false {
       return comment.author.displayName
     }
-    return "Anonymous"
+    return String(localized: "Anonymous", bundle: .module, comment: "Author name for a comment whose person gave no name")
   }
 }
