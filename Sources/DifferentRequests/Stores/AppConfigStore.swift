@@ -40,15 +40,16 @@ final class AppConfigStore {
   /// Asks again only after a read that failed. An app does not change plan mid-launch, and the
   /// contract states the configuration is fetched once per launch.
   func load() async {
-    if badge.needsReading == false { return }
-    badge = .reading
+    if badge.needsReading {
+      badge = .reading
 
-    do {
-      let answer = try await client.config()
-      config = answer.config
-      badge = BadgeState(response: answer)
-    } catch {
-      badge = .failed(error)
+      do {
+        let answer = try await client.config()
+        config = answer.config
+        badge = BadgeState(response: answer)
+      } catch {
+        badge = .failed(error)
+      }
     }
   }
 }

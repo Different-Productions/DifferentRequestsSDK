@@ -100,5 +100,9 @@ Both stores are built once by `DifferentRequestsHub.swift`, with `UserDefaults.s
   **Not now** put it away. Quit, relaunched, voted again from the row: no card.
 - A newly provisioned Free app ("Badge Walk"): a vote from the row drew no card, because Free sends no
   notifications.
-- `.askedByApp`: not walked yet.
+- 2026-09-26, fresh iPhone 18 Pro simulator "DR Permission Walk", iOS 27, SDK 0.13.0, development
+  server, a newly provisioned Pro app ("Permission Walk"). With `.askedBySDK`: filed "Dark mode for
+  the walk", took the vote back and voted again from the row, and the card appeared under the row.
+  Reinstalled with the Example set to `.askedByApp`: the vote went 1 → 0 → 1 from the row, and no
+  card appeared and no Apple prompt came up.
 - The owner's real walk: not yet.

@@ -12,7 +12,7 @@ extension View {
   /// **The guard is a guard and never an id.** `task(id:)` cancels its work when the id changes, and
   /// ``ReadState/hasRead`` changes the moment the first answer arrives — which is partway through a
   /// read that makes more than one call. `RequestDetailStore.load` reads the request, then its
-  /// thread, then whether the app takes comments: keyed on `hasRead`, the first answer cancelled the
+  /// thread, then whether the app takes comments: keyed on `hasRead`, the first answer canceled the
   /// other two, and the request's discussion sat under "Couldn't load the discussion" while the call
   /// log showed `ListComments 200`. A single-call surface never noticed, which is why it survived.
   ///
@@ -24,8 +24,9 @@ extension View {
     read: @escaping () async -> Void
   ) -> some View {
     task {
-      if state.hasRead { return }
-      await read()
+      if state.hasRead == false {
+        await read()
+      }
     }
   }
 }

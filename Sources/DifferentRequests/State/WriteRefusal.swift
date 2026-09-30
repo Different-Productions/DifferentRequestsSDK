@@ -15,9 +15,6 @@ enum WriteRefusal {
 
   /// A refusal the person cannot change by editing or waiting.
   case other
-}
-
-extension WriteRefusal {
 
   /// Nil when the write was not refused: it did not arrive, was rate limited, or failed on the
   /// server's side, and each of those is worth trying again.

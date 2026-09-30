@@ -30,7 +30,13 @@ struct NextPageRow: View {
     case .reading:
       spinner
     case .failed:
-      RetryRow(message: String(localized: "Couldn't load any more.", bundle: .module, comment: "Row at the end of a list when the next page failed to load")) {
+      RetryRow(
+        message: String(
+          localized: "Couldn't load any more.",
+          bundle: .module,
+          comment: "Row at the end of a list when the next page failed to load"
+        )
+      ) {
         await more()
       }
     case .done:

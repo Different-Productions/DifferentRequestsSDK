@@ -3,6 +3,20 @@
 Every released version, newest first. Versions are tags on the public repository,
 `Different-Productions/DifferentRequestsSDK`.
 
+## 0.14.0 — 2026-09-30
+
+**Two source changes to make.**
+
+1. Remove `traits:` from `DifferentRequestsClient.createSession(externalID:email:displayName:traits:proof:)`.
+   It is now `createSession(externalID:email:displayName:proof:)`. The SDK sends nothing about
+   your users' standing inside your app.
+2. `DifferentRequestsClient.make(appKey:)` and `make(appKey:baseURL:)` are replaced by
+   `init(appKey:baseURL:)`. Write `DifferentRequestsClient(appKey: "…", baseURL: .production)`,
+   or pass your staging `SecureBaseURL`. `init(appKey:baseURL:session:)` is gone too: the client
+   owns its own `URLSession`.
+
+- The privacy manifest no longer declares "Other data", because the SDK no longer sends any.
+
 ## 0.13.0 — 2026-09-26
 
 **One source change to make.**

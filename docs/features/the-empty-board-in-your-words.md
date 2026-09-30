@@ -12,7 +12,7 @@ Set once, where the hub is made, next to the appearance:
 
 ```swift
 private let requests = DifferentRequestsHub(
-  client: .make(appKey: "your-app-key"),
+  client: DifferentRequestsClient(appKey: "your-app-key", baseURL: .production),
   appearance: .standard,
   emptyBoard: EmptyBoard(
     symbol: "leaf",

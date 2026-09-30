@@ -53,11 +53,11 @@ final class RoadmapStore {
   /// screen can show: the configuration is asked for again when the last ask did not answer, and
   /// asked for once when it did.
   func load() async {
-    if read.isReading { return }
-
-    await readPlan()
-    if plan.isIncluded {
-      await readColumns()
+    if read.isReading == false {
+      await readPlan()
+      if plan.isIncluded {
+        await readColumns()
+      }
     }
   }
 
@@ -66,14 +66,15 @@ final class RoadmapStore {
   /// The client answers a second ask from the first read, so the cost of every gated surface
   /// asking for itself is one round trip for all of them.
   private func readPlan() async {
-    if plan.needsReading == false { return }
-    plan = .reading
+    if plan.needsReading {
+      plan = .reading
 
-    do {
-      let answer = try await client.config()
-      plan = PlanState(surface: .roadmap, response: answer)
-    } catch {
-      plan = .failed(error)
+      do {
+        let answer = try await client.config()
+        plan = PlanState(surface: .roadmap, response: answer)
+      } catch {
+        plan = .failed(error)
+      }
     }
   }
 

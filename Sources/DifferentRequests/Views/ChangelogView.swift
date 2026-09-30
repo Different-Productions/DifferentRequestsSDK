@@ -66,7 +66,7 @@ public struct ChangelogView: View {
         await store.load()
       }
     case .excluded:
-      AbsentSurface(surface: .changelog)
+      AbsentSurface(surface: .changelog, isShowingRequests: isShowingRequests)
     case .included:
       entries
     }
@@ -92,7 +92,11 @@ public struct ChangelogView: View {
           Image(systemName: "sparkles")
         }
       } description: {
-        Text("When the app gets something new, you'll read about it here.", bundle: .module, comment: "Message on an empty release notes screen")
+        Text(
+          "When the app gets something new, you'll read about it here.",
+          bundle: .module,
+          comment: "Message on an empty release notes screen"
+        )
       } actions: {
         if let isShowingRequests {
           SeeRequestsButton(isShowingRequests: isShowingRequests)

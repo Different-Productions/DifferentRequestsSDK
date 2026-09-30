@@ -100,9 +100,9 @@ final class NotificationOffer {
   /// Asks the platform for a device token, which arrives on the host app's delegate.
   private func registerForRemoteNotifications() {
     #if canImport(UIKit)
-      UIApplication.shared.registerForRemoteNotifications()
+    UIApplication.shared.registerForRemoteNotifications()
     #elseif canImport(AppKit)
-      NSApplication.shared.registerForRemoteNotifications()
+    NSApplication.shared.registerForRemoteNotifications()
     #endif
   }
 }

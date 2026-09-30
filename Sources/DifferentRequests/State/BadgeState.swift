@@ -26,9 +26,6 @@ enum BadgeState {
 
   /// The configuration answered and this app is on the free plan.
   case carried
-}
-
-extension BadgeState {
 
   /// What an answer to `getConfig` says about the badge.
   init(response: DRGetConfigResponse) {

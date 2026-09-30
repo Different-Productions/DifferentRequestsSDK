@@ -1,6 +1,7 @@
+import SwiftUI
+
 #if canImport(AppKit) && !canImport(UIKit)
   import AppKit
-  import SwiftUI
 
   /// Finds, each time it joins a window, whether that window is a sheet.
   ///

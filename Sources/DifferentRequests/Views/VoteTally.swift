@@ -29,7 +29,11 @@ struct VoteTally: View {
     .foregroundStyle(tint)
     .accessibilityElement(children: .ignore)
     .accessibilityLabel(Text("\(voteCount) votes", bundle: .module, comment: "VoiceOver count of a request's votes"))
-    .accessibilityValue(voted ? Text("Including yours", bundle: .module, comment: "VoiceOver note that the count includes the reader's own vote") : Text(verbatim: ""))
+    .accessibilityValue(
+      voted
+        ? Text("Including yours", bundle: .module, comment: "VoiceOver note that the count includes the reader's own vote")
+        : Text(verbatim: "")
+    )
   }
 
   private var tint: AnyShapeStyle {

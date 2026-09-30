@@ -24,9 +24,6 @@ enum PlanSurface: CaseIterable {
 
   /// Whether a request takes replies. `AppConfig.commentsEnabled`.
   case comments
-}
-
-extension PlanSurface {
 
   /// This surface as the contract names it, which is what `DRAppConfig.includes(_:)` answers for.
   ///
@@ -53,7 +50,11 @@ extension PlanSurface {
     case .roadmap:
       return String(localized: "This app has no roadmap", bundle: .module, comment: "Heading when the app doesn't publish a roadmap")
     case .changelog:
-      return String(localized: "This app has no What's New", bundle: .module, comment: "Heading when the app doesn't publish release notes; What's New is the screen's name")
+      return String(
+        localized: "This app has no What's New",
+        bundle: .module,
+        comment: "Heading when the app doesn't publish release notes; What's New is the screen's name"
+      )
     case .comments:
       return String(localized: "Comments are off", bundle: .module, comment: "Heading when the app doesn't take comments on requests")
     }
@@ -66,9 +67,17 @@ extension PlanSurface {
     case .roadmap:
       return String(localized: "Its plans aren't shared here.", bundle: .module, comment: "Message when the app doesn't publish a roadmap")
     case .changelog:
-      return String(localized: "This app doesn't share news about its updates.", bundle: .module, comment: "Message when the app doesn't publish release notes")
+      return String(
+        localized: "This app doesn't share news about its updates.",
+        bundle: .module,
+        comment: "Message when the app doesn't publish release notes"
+      )
     case .comments:
-      return String(localized: "This app doesn't have comments. Vote to show you want this.", bundle: .module, comment: "Message when the app doesn't take comments on requests")
+      return String(
+        localized: "This app doesn't have comments. Vote to show you want this.",
+        bundle: .module,
+        comment: "Message when the app doesn't take comments on requests"
+      )
     }
   }
 

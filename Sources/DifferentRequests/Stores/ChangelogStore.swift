@@ -58,11 +58,11 @@ final class ChangelogStore {
   /// screen can show: the configuration is asked for again when the last ask did not answer, and
   /// asked for once when it did.
   func load() async {
-    if read.isReading { return }
-
-    await readPlan()
-    if plan.isIncluded {
-      await readFirstPage()
+    if read.isReading == false {
+      await readPlan()
+      if plan.isIncluded {
+        await readFirstPage()
+      }
     }
   }
 
@@ -71,14 +71,15 @@ final class ChangelogStore {
   /// The client answers a second ask from the first read, so the cost of every gated surface
   /// asking for itself is one round trip for all of them.
   private func readPlan() async {
-    if plan.needsReading == false { return }
-    plan = .reading
+    if plan.needsReading {
+      plan = .reading
 
-    do {
-      let answer = try await client.config()
-      plan = PlanState(surface: .changelog, response: answer)
-    } catch {
-      plan = .failed(error)
+      do {
+        let answer = try await client.config()
+        plan = PlanState(surface: .changelog, response: answer)
+      } catch {
+        plan = .failed(error)
+      }
     }
   }
 
@@ -107,18 +108,18 @@ final class ChangelogStore {
   /// Returns immediately when the server reported no further page, when one is already in flight,
   /// or when the whole changelog is being re-read.
   func loadMore() async {
-    if page.isReading || page.isDone { return }
-    if read.isReading { return }
-    page = .reading
+    if page.isReading == false, page.isDone == false, read.isReading == false {
+      page = .reading
 
-    do {
-      let answer = try await client.changelog(cursor: cursor)
-      read = read.appending(answer.entries)
-      cursor = answer.nextCursor
-      page = PageState(nextCursor: answer.nextCursor)
-    } catch {
-      // The cursor is left where it was, so the retry asks for this page rather than skipping it.
-      page = .failed(error)
+      do {
+        let answer = try await client.changelog(cursor: cursor)
+        read = read.appending(answer.entries)
+        cursor = answer.nextCursor
+        page = PageState(nextCursor: answer.nextCursor)
+      } catch {
+        // The cursor is left where it was, so the retry asks for this page rather than skipping it.
+        page = .failed(error)
+      }
     }
   }
 }

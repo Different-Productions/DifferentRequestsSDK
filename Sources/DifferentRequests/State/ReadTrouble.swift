@@ -11,9 +11,6 @@ enum ReadTrouble {
 
   /// Anything else, which the person can only wait out.
   case other
-}
-
-extension ReadTrouble {
 
   init(error: any Error) {
     if let known = error as? DifferentRequestsError, let seconds = known.retryAfterSeconds {
@@ -29,14 +26,30 @@ extension ReadTrouble {
   var message: String {
     switch self {
     case .offline:
-      return String(localized: "Your phone isn't connected. Check your connection and try again.", bundle: .module, comment: "Why a screen couldn't load: no connection")
+      return String(
+        localized: "Your phone isn't connected. Check your connection and try again.",
+        bundle: .module,
+        comment: "Why a screen couldn't load: no connection"
+      )
     case .tooManyTries(let seconds):
       if seconds > 1 {
-        return String(localized: "Too many tries at once. Try again in \(seconds) seconds.", bundle: .module, comment: "Why a screen couldn't load: rate limited; the number is seconds to wait")
+        return String(
+          localized: "Too many tries at once. Try again in \(seconds) seconds.",
+          bundle: .module,
+          comment: "Why a screen couldn't load: rate limited; the number is seconds to wait"
+        )
       }
-      return String(localized: "Too many tries at once. Try again in a moment.", bundle: .module, comment: "Why a screen couldn't load: rate limited, briefly")
+      return String(
+        localized: "Too many tries at once. Try again in a moment.",
+        bundle: .module,
+        comment: "Why a screen couldn't load: rate limited, briefly"
+      )
     case .other:
-      return String(localized: "Couldn't load right now. Try again in a moment.", bundle: .module, comment: "Why a screen couldn't load: any other failure")
+      return String(
+        localized: "Couldn't load right now. Try again in a moment.",
+        bundle: .module,
+        comment: "Why a screen couldn't load: any other failure"
+      )
     }
   }
 }

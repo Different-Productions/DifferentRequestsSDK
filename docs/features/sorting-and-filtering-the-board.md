@@ -127,8 +127,8 @@ in the scheme, or it never reaches the board at all.
 
 | What happens | What they see |
 | --- | --- |
-| The board is narrowed to statuses nothing is in | "Nothing in this filter" / "No requests match this filter. Tap All to see every request." with **Show all** and **New request** |
-| A search inside a status filter matches nothing | "No matches in this filter" / "Nothing matches this search with this filter. Tap All to search every request." with the same two buttons |
+| The board is narrowed to statuses nothing is in | "Nothing in this filter" / "No requests match this filter." with **Show all** and **New request** |
+| A search inside a status filter matches nothing | "No matches in this filter" / "Nothing matches this search with this filter." with the same two buttons |
 | A search on an unfiltered board matches nothing | "Nothing matches" / "Nobody has asked for this yet." with **New request** |
 | The whole board is empty and nothing is narrowing it | "What should we build?" / "Nobody has asked for anything yet. Tell us what you want and everyone can vote on it." with **New request**, where somebody is signed in |
 | The read a capsule started does not answer | "Couldn't load" / "Couldn't load right now. Try again in a moment." with **Try again**. The bar stays above it with the tapped capsule highlighted, so the filter can be changed or undone without a successful read first |
@@ -230,7 +230,7 @@ DifferentRequestsView
        ├── store.isCurrent  ──► return        (read.hasRead && asked == question)
        ├── query non-empty  ──► Task.sleep(300ms)   ← typing is debounced
        └── store.load()                             ← a capsule tap is not
-  .firstRead(store.read)  ──► FirstRead.swift ──► store.load()   once per store
+  .firstRead(store.read)  ──► View+FirstRead.swift ──► store.load()   once per store
        └── skipped when read.hasRead, which is what a warmed board already is
 ```
 
@@ -293,8 +293,7 @@ DifferentRequestsView — loaded, nothing narrowing
 │                                                    │
 │                     ⊟                              │ ← line.3.horizontal.decrease.circle
 │              Nothing in this filter                │
-│    No requests match this filter. Tap All to       │
-│    see every request.                              │
+│          No requests match this filter.            │
 │        ┌────────────────────────────┐              │
 │        │         Show all           │              │ ← prominent: the likelier fix
 │        └────────────────────────────┘              │

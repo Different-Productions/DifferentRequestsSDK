@@ -14,7 +14,7 @@ import SwiftProtobuf
 /// makes is addressed exactly as the server registered it.
 ///
 /// Calls that act for a person need a session first; see
-/// ``createSession(externalID:email:displayName:traits:proof:)``. Which calls those are is not a
+/// ``createSession(externalID:email:displayName:proof:)``. Which calls those are is not a
 /// rule to remember: each rpc carries its audience, and one that needs a session is refused here
 /// before it reaches the network.
 public actor DifferentRequestsClient {
@@ -26,7 +26,15 @@ public actor DifferentRequestsClient {
   // public: `describeIntegration()` is the only way out, and it elides the key.
   let appKey: String
   let baseURL: URL
-  private let session: URLSession
+
+  /// This client's own session, apart from the host app's, with timeouts short enough that a board
+  /// tab does not hang on a stalled connection.
+  private lazy var session: URLSession = {
+    let sessionConfiguration = URLSessionConfiguration.ephemeral
+    sessionConfiguration.timeoutIntervalForRequest = 15
+    sessionConfiguration.timeoutIntervalForResource = 20
+    return URLSession(configuration: sessionConfiguration)
+  }()
 
   private var sessionToken: String?
 
@@ -47,38 +55,17 @@ public actor DifferentRequestsClient {
 
   // MARK: - Creation
 
-  /// Assigns what it is given and nothing more. Use ``make(appKey:)`` for the ordinary case.
+  /// A client for `appKey`, pointed at `baseURL`. Assigns what it is given and nothing more.
   ///
   /// Takes a ``SecureBaseURL`` rather than a `URL`, so a plaintext address is refused where it is
   /// written rather than on the first call that carries a key over it.
-  public init(appKey: String, baseURL: SecureBaseURL, session: URLSession) {
+  ///
+  /// - Parameters:
+  ///   - appKey: Your app key, from the DifferentRequests console.
+  ///   - baseURL: Where the API is: ``SecureBaseURL/production``, or a staging endpoint.
+  public init(appKey: String, baseURL: SecureBaseURL) {
     self.appKey = appKey
     self.baseURL = baseURL.url
-    self.session = session
-    self.sessionToken = nil
-    self.currentUser = nil
-  }
-
-  /// A client pointed at production.
-  ///
-  /// - Parameter appKey: Your app key, from the DifferentRequests console.
-  public static func make(appKey: String) -> DifferentRequestsClient {
-    make(appKey: appKey, baseURL: .production)
-  }
-
-  /// A client pointed at `baseURL`, for a staging endpoint.
-  ///
-  /// Owns its own `URLSession` so it does not entangle with a host app's, with timeouts short enough
-  /// that a board tab does not hang on a stalled connection.
-  public static func make(appKey: String, baseURL: SecureBaseURL) -> DifferentRequestsClient {
-    let configuration = URLSessionConfiguration.ephemeral
-    configuration.timeoutIntervalForRequest = 15
-    configuration.timeoutIntervalForResource = 20
-    return DifferentRequestsClient(
-      appKey: appKey,
-      baseURL: baseURL,
-      session: URLSession(configuration: configuration)
-    )
   }
 
   /// Baked into every app built against this SDK version, so it cannot change without a coordinated
@@ -129,7 +116,6 @@ public actor DifferentRequestsClient {
     externalID: String,
     email: String?,
     displayName: String?,
-    traits: [String: String]?,
     proof: DRIdentityProof?
   ) async throws -> DRCreateSessionResponse {
     var body = DRCreateSessionRequest()
@@ -139,9 +125,6 @@ public actor DifferentRequestsClient {
     }
     if let displayName {
       body.displayName = displayName
-    }
-    if let traits {
-      body.traits = traits
     }
     if let proof {
       body.proof = proof

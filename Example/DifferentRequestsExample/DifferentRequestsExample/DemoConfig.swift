@@ -43,38 +43,30 @@ enum DemoConfig {
   /// the normal case — the client uses the production URL baked into the SDK.
   static let baseURLEnvironmentVariable = "DIFFERENT_REQUESTS_BASE_URL"
 
-  /// The staging endpoint to use, if one was named, is a URL, and is https.
+  /// Where the client points: production, unless a staging endpoint was named.
   ///
-  /// A named endpoint that is not https is refused here rather than dialled: every call carries the
+  /// A named endpoint that is not https is refused here rather than dialed: every call carries the
   /// app key, and over plain http it would cross the wire in the clear while appearing to work.
-  static var baseURL: SecureBaseURL? {
+  static var baseURL: SecureBaseURL {
     let environment = ProcessInfo.processInfo.environment
-    guard let stated = environment[baseURLEnvironmentVariable], stated.isEmpty == false else {
-      return nil
+    if let stated = environment[baseURLEnvironmentVariable], stated.isEmpty == false {
+      guard let url = URL(string: stated) else {
+        preconditionFailure(
+          "\(baseURLEnvironmentVariable) is not a URL: \(stated)"
+        )
+      }
+      do {
+        return try SecureBaseURL(url)
+      } catch {
+        // Not defaulted back to production. Somebody who named a staging endpoint and silently got
+        // production would be reading the wrong board and believing it was theirs, which is worse
+        // than stopping.
+        preconditionFailure(
+          "\(baseURLEnvironmentVariable) must be https, and is: \(stated)"
+        )
+      }
     }
-    guard let url = URL(string: stated) else {
-      preconditionFailure(
-        "\(baseURLEnvironmentVariable) is not a URL: \(stated)"
-      )
-    }
-    do {
-      return try SecureBaseURL(url)
-    } catch {
-      // Not defaulted back to production. Somebody who named a staging endpoint and silently got
-      // production would be reading the wrong board and believing it was theirs, which is worse
-      // than stopping.
-      preconditionFailure(
-        "\(baseURLEnvironmentVariable) must be https, and is: \(stated)"
-      )
-    }
-  }
-
-  /// The client this example runs on: production unless a staging endpoint was named.
-  static var client: DifferentRequestsClient {
-    if let baseURL {
-      return .make(appKey: appKey, baseURL: baseURL)
-    }
-    return .make(appKey: appKey)
+    return .production
   }
 
   /// Your app's own stable identifier for the signed-in person, when the environment names none.
@@ -107,9 +99,6 @@ enum DemoConfig {
     }
     return secret
   }
-
-  /// Host-app attributes a triager sees next to a request.
-  static let traits: [String: String] = ["platform": "ios", "tier": "demo"]
 
   /// The example's own look, handed to the hub the way a host app hands over its accent and font.
   /// Drawn where the app's plan includes it; a Free app is drawn in the SDK's own.

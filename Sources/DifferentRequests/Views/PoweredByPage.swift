@@ -47,12 +47,16 @@ struct PoweredByPage: View {
           if let home = Self.home {
             Button {
               #if os(iOS)
-                isShowingHome = true
+              isShowingHome = true
               #else
-                openURL(home)
+              openURL(home)
               #endif
             } label: {
-              Text("About Different Requests", bundle: .module, comment: "Button that opens the product's website; Different Requests is the product's name")
+              Text(
+                "About Different Requests",
+                bundle: .module,
+                comment: "Button that opens the product's website; Different Requests is the product's name"
+              )
             }
             .padding(.top, Self.spacing)
             #if os(iOS)

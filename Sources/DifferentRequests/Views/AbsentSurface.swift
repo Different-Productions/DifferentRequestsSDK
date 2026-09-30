@@ -14,11 +14,18 @@ struct AbsentSurface: View {
   /// Which surface is not here, and therefore what is said in its place.
   let surface: PlanSurface
 
+  /// What opens the host's requests list, or nil for no **See requests**.
+  let isShowingRequests: Binding<Bool>?
+
   var body: some View {
     ContentUnavailableView {
       Label(surface.absentTitle, systemImage: surface.absentSymbol)
     } description: {
       Text(surface.absentDescription)
+    } actions: {
+      if let isShowingRequests {
+        SeeRequestsButton(isShowingRequests: isShowingRequests)
+      }
     }
   }
 }

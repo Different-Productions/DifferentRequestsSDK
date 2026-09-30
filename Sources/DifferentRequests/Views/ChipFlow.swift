@@ -17,7 +17,13 @@ struct ChipFlow: Layout {
   let lineSpacing: CGFloat
 
   func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout Void) -> CGSize {
-    let width = proposal.width ?? .infinity
+    let width: CGFloat
+    if let proposed = proposal.width {
+      width = proposed
+    } else {
+      // An unspecified width asks for the ideal size, which is every chip on one line.
+      width = .infinity
+    }
     let lines = linesOf(subviews, inWidth: width)
 
     var height: CGFloat = 0

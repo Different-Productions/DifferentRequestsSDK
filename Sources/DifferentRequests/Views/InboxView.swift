@@ -103,7 +103,11 @@ public struct InboxView: View {
         Image(systemName: "bell")
       }
     } description: {
-      Text("Vote for or follow a request, and you'll get updates here when it changes.", bundle: .module, comment: "Message on an empty inbox")
+      Text(
+        "Vote for or follow a request, and you'll get updates here when it changes.",
+        bundle: .module,
+        comment: "Message on an empty inbox"
+      )
     }
   }
 
@@ -161,7 +165,7 @@ public struct InboxView: View {
       }
 
       NavigationLink {
-        RequestDetailView(hub: hub, requestID: destinationID(notification))
+        RequestDetailView(hub: hub, requestID: notification.destinationID)
           // Opening it is reading it. The dot beside the row stays, for marking one read without
           // opening it, but a person who has read the thing should not have to say so twice.
           .task {
@@ -186,7 +190,7 @@ public struct InboxView: View {
 
   private func summary(_ notification: DRNotification) -> some View {
     VStack(alignment: .leading, spacing: Self.summarySpacing) {
-      Text(headline(notification))
+      Text(notification.headline)
         .font(.subheadline)
         .fontWeight(.semibold)
 
@@ -200,38 +204,6 @@ public struct InboxView: View {
           .font(.caption)
           .foregroundStyle(.tertiary)
       }
-    }
-  }
-
-  /// Where a tap lands.
-  ///
-  /// Only duplicate news names somewhere else, and it names it on its own arm — so a tap can no
-  /// longer be routed by a target that arrived on news that was never about a duplicate.
-  private func destinationID(_ notification: DRNotification) -> String {
-    switch notification.news {
-    case .requestDuplicated(let folded):
-      // The request it duplicates now holds the demand, so that is the one worth opening.
-      return folded.duplicateOfRequestID
-    case .statusChanged, .commentAdded, .none:
-      return notification.requestID
-    }
-  }
-
-  /// News this SDK version does not know still says something happened, rather than rendering an
-  /// empty row: the request title underneath is what the reader recognizes anyway.
-  ///
-  /// In the phone's language, saying in English what the contract's `NotificationHeadline` labels
-  /// say, which is also what the server's push alert says.
-  private func headline(_ notification: DRNotification) -> String {
-    switch notification.news {
-    case .statusChanged(let moved):
-      return moved.newStatus.movedHeadline
-    case .commentAdded:
-      return String(localized: "New comment", bundle: .module, comment: "Inbox headline: someone commented on a followed request")
-    case .requestDuplicated:
-      return String(localized: "Already asked for", bundle: .module, comment: "Inbox headline: the request was merged into another")
-    case .none:
-      return String(localized: "Something changed", bundle: .module, comment: "Inbox headline for news this version can't name")
     }
   }
 }

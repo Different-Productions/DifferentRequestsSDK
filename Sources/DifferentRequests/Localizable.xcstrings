@@ -2293,56 +2293,56 @@
         }
       }
     },
-    "No requests match this filter. Tap All to see every request." : {
-      "comment" : "Message on the request board when the status filter leaves nothing; All is the filter chip's name",
+    "No requests match this filter." : {
+      "comment" : "Message on the request board when the status filter leaves nothing; a Show all button sits under it",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "لا توجد طلبات في هذا الفلتر. اضغط «الكل» لرؤية كل الطلبات."
+            "value" : "لا توجد طلبات في هذا الفلتر."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Keine Anfragen in diesem Filter. Tippe auf „Alle“, um jede Anfrage zu sehen."
+            "value" : "Keine Anfragen in diesem Filter."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ninguna solicitud coincide con este filtro. Toca Todas para ver todas."
+            "value" : "Ninguna solicitud coincide con este filtro."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aucune demande ne correspond à ce filtre. Touchez Toutes pour tout voir."
+            "value" : "Aucune demande ne correspond à ce filtre."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nessuna richiesta corrisponde a questo filtro. Tocca Tutte per vederle tutte."
+            "value" : "Nessuna richiesta corrisponde a questo filtro."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "このフィルタに一致するリクエストはありません。「すべて」をタップすると全件表示されます。"
+            "value" : "このフィルタに一致するリクエストはありません。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Żadna prośba nie pasuje do tego filtra. Dotknij „Wszystkie”, aby zobaczyć wszystkie."
+            "value" : "Żadna prośba nie pasuje do tego filtra."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nenhum pedido corresponde a este filtro. Toque em Todos para ver todos."
+            "value" : "Nenhum pedido corresponde a este filtro."
           }
         }
       }
@@ -2617,56 +2617,56 @@
         }
       }
     },
-    "Nothing matches this search with this filter. Tap All to search every request." : {
-      "comment" : "Message on the request board when a search inside a status filter finds nothing; All is the filter chip's name",
+    "Nothing matches this search with this filter." : {
+      "comment" : "Message on the request board when a search inside a status filter finds nothing; a Show all button sits under it",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "لا نتائج لهذا البحث مع هذا الفلتر. اضغط «الكل» للبحث في كل الطلبات."
+            "value" : "لا نتائج لهذا البحث مع هذا الفلتر."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Keine Treffer für diese Suche in diesem Filter. Tippe auf „Alle“, um alle Anfragen zu durchsuchen."
+            "value" : "Keine Treffer für diese Suche in diesem Filter."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nada coincide con esta búsqueda en este filtro. Toca Todas para buscar en todas."
+            "value" : "Nada coincide con esta búsqueda en este filtro."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aucun résultat pour cette recherche dans ce filtre. Touchez Toutes pour chercher partout."
+            "value" : "Aucun résultat pour cette recherche dans ce filtre."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nessun risultato per questa ricerca con questo filtro. Tocca Tutte per cercare ovunque."
+            "value" : "Nessun risultato per questa ricerca con questo filtro."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "このフィルタでは検索に一致するものがありません。「すべて」をタップすると全件から検索します。"
+            "value" : "このフィルタでは検索に一致するものがありません。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nic nie pasuje do tego wyszukiwania w tym filtrze. Dotknij „Wszystkie”, aby szukać wszędzie."
+            "value" : "Nic nie pasuje do tego wyszukiwania w tym filtrze."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nada corresponde a esta busca neste filtro. Toque em Todos para buscar em todos."
+            "value" : "Nada corresponde a esta busca neste filtro."
           }
         }
       }

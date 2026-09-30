@@ -46,14 +46,14 @@ public struct DifferentRequestsView: View {
   private static let callToActionInset: CGFloat = 32
 
   /// What the screen reads from, and what its pushes and its sheet are built against.
-  private let hub: DifferentRequestsHub
+  let hub: DifferentRequestsHub
 
   /// Bindable for the search field, which writes the query the board reads on. The store belongs
   /// to the hub; this only takes bindings from it.
   @Bindable private var store: BoardStore
 
   /// Whether the composer is up.
-  @State private var isComposing: Bool = false
+  @State var isComposing: Bool = false
 
   /// Closes the sheet the host presented this in.
   @Environment(\.dismiss) private var dismiss
@@ -71,7 +71,10 @@ public struct DifferentRequestsView: View {
     NavigationStack {
       board
     }
-    .searchable(text: $store.query, prompt: Text("Search requests", bundle: .module, comment: "Placeholder in the request board's search field"))
+    .searchable(
+      text: $store.query,
+      prompt: Text("Search requests", bundle: .module, comment: "Placeholder in the request board's search field")
+    )
     .searchPresentationToolbarBehavior(.avoidHidingContent)
     .worn(by: hub.appearanceDrawn)
     .sheetMinimumSize()
@@ -125,11 +128,11 @@ public struct DifferentRequestsView: View {
           // A Mac sheet draws its toolbar as a row of buttons at the bottom, where an icon alone
           // does not read as asking.
           #if os(macOS)
-            askButton
-              .labelStyle(.titleAndIcon)
+          askButton
+            .labelStyle(.titleAndIcon)
           #else
-            askButton
-              .labelStyle(.iconOnly)
+          askButton
+            .labelStyle(.iconOnly)
           #endif
         }
       }
@@ -167,15 +170,16 @@ public struct DifferentRequestsView: View {
   /// filter bar is one tap rather than a burst of them, so it sets and re-reads through the store
   /// in one call and waits for nothing.
   private func runSearch() async {
-    if store.isCurrent { return }
-    if store.query.isEmpty == false {
+    if store.isCurrent == false {
       do {
-        try await Task.sleep(for: Self.searchSettleDelay)
+        if store.query.isEmpty == false {
+          try await Task.sleep(for: Self.searchSettleDelay)
+        }
+        await store.load()
       } catch {
-        return
+        // The wait throws only when it is canceled, and a canceled search sends nothing.
       }
     }
-    await store.load()
   }
 
   // MARK: - Content
@@ -354,106 +358,6 @@ public struct DifferentRequestsView: View {
         Image(systemName: "plus.bubble")
       }
       .frame(maxWidth: CallToActionSize.width)
-    }
-  }
-
-  /// Everything this screen can do that is not on the board itself: asking for something, and the
-  /// other surfaces this app includes.
-  ///
-  /// One menu rather than a menu beside a button. The surfaces are built from the configuration,
-  /// so one the app does not have is absent rather than present and refused when tapped.
-  private var everythingElse: some View {
-    Menu {
-      // Asking and the inbox belong to a person, so neither is offered with nobody signed in.
-      if hub.whoIsHere.somebodyIsHere {
-        Button {
-          hub.beginSubmission()
-          isComposing = true
-        } label: {
-          Label {
-            Text("New request", bundle: .module, comment: "Button that opens the form for a new feature request")
-          } icon: {
-            Image(systemName: "plus.bubble")
-          }
-        }
-
-        Divider()
-
-        NavigationLink { InboxView(hub: hub) } label: {
-          Label {
-            Text("Inbox", bundle: .module, comment: "Menu item and title of the screen listing updates on requests")
-          } icon: {
-            Image(systemName: "bell")
-          }
-        }
-      }
-      if hub.appConfig.config.roadmapEnabled {
-        NavigationLink { RoadmapView(hub: hub, isShowingRequests: nil) } label: {
-          Label {
-            Text("Roadmap", bundle: .module, comment: "Title of the roadmap screen")
-          } icon: {
-            Image(systemName: "map")
-          }
-        }
-      }
-      if hub.appConfig.config.changelogEnabled {
-        NavigationLink { ChangelogView(hub: hub, isShowingRequests: nil) } label: {
-          Label {
-            Text("What's New", bundle: .module, comment: "Menu item and title of the app's release notes screen")
-          } icon: {
-            Image(systemName: "sparkles")
-          }
-        }
-      }
-    } label: {
-      Label {
-        Text("More", bundle: .module, comment: "Menu holding the request board's other screens")
-      } icon: {
-        Image(systemName: "ellipsis")
-      }
-    }
-  }
-}
-
-// MARK: - Request Summary
-
-/// What a request says and where it sits, as the tappable half of a board row.
-private struct RequestSummary: View {
-
-  private static let metadataSpacing: CGFloat = 8
-  private static let bodyLineLimit: Int = 2
-
-  let request: DRFeatureRequest
-
-  var body: some View {
-    VStack(alignment: .leading, spacing: 4) {
-      Text(request.title)
-        .font(.headline)
-
-      if request.body.isEmpty == false {
-        Text(request.body)
-          .font(.subheadline)
-          .foregroundStyle(.secondary)
-          .lineLimit(Self.bodyLineLimit)
-      }
-
-      HStack(spacing: Self.metadataSpacing) {
-        StatusBadge(state: request.state)
-
-        if request.commentCount > 0 {
-          Label(request.commentCount.formatted(), systemImage: "bubble.left")
-            .font(.caption)
-            .foregroundStyle(.secondary)
-        }
-
-        Spacer()
-
-        if request.hasCreatedAt {
-          Text(request.createdAt.date.ago)
-            .font(.caption)
-            .foregroundStyle(.tertiary)
-        }
-      }
     }
   }
 }

@@ -41,7 +41,7 @@ app paying for its look never sees ours.
 
 ```swift
 let requests = DifferentRequestsHub(
-  client: .make(appKey: "your-app-key"),
+  client: DifferentRequestsClient(appKey: "your-app-key", baseURL: .production),
   appearance: Appearance(accent: .purple, font: .rounded),
   emptyBoard: .standard
 )
@@ -88,7 +88,7 @@ hub.appearanceDrawn                                  DifferentRequestsHub.swift
        │
        ├─ DifferentRequestsView ─┐
        ├─ RequestDetailView      │
-       ├─ SubmitRequestView      ├─ .worn(by: hub.appearanceDrawn)      WornBy.swift
+       ├─ SubmitRequestView      ├─ .worn(by: hub.appearanceDrawn)      View+WornBy.swift
        ├─ InboxView              │     ├─ .tint(accent)
        ├─ RoadmapView            │     └─ .fontDesign(font)
        └─ ChangelogView         ─┘

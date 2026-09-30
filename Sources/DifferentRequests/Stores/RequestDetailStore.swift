@@ -114,20 +114,25 @@ final class RequestDetailStore {
   /// finished reading. It is usually free by then — the client answers it from the first read any
   /// gated surface made.
   func load() async {
-    if read.isReading || thread.isReading { return }
-    read = read.whileReading
+    if read.isReading == false, thread.isReading == false {
+      read = read.whileReading
 
-    do {
-      let answer = try await client.request(id: requestID)
-      read = .loaded(answer.request)
-      readAt = Date()
-    } catch {
-      read = ReadState(readFailure: error)
-      thread = .unread
-      page = .done
-      return
+      do {
+        let answer = try await client.request(id: requestID)
+        read = .loaded(answer.request)
+        readAt = Date()
+        await loadThread()
+        await loadCommenting()
+      } catch {
+        read = ReadState(readFailure: error)
+        thread = .unread
+        page = .done
+      }
     }
+  }
 
+  /// Reads the first page of the discussion under a request that was just read.
+  private func loadThread() async {
     thread = thread.whileReading
     cursor = ""
     page = .more
@@ -141,8 +146,6 @@ final class RequestDetailStore {
       thread = ReadState(readFailure: error)
       page = .done
     }
-
-    await loadCommenting()
   }
 
   /// Asks whether this app takes comments.
@@ -152,14 +155,15 @@ final class RequestDetailStore {
   /// open is owed a way to ask again that does not re-read the request and the thread they are
   /// already looking at.
   func loadCommenting() async {
-    if commenting.needsReading == false { return }
-    commenting = .reading
+    if commenting.needsReading {
+      commenting = .reading
 
-    do {
-      let answer = try await client.config()
-      commenting = PlanState(surface: .comments, response: answer)
-    } catch {
-      commenting = .failed(error)
+      do {
+        let answer = try await client.config()
+        commenting = PlanState(surface: .comments, response: answer)
+      } catch {
+        commenting = .failed(error)
+      }
     }
   }
 
@@ -168,18 +172,19 @@ final class RequestDetailStore {
   /// Returns immediately when the server reported no further page, when one is already in flight,
   /// or when the screen is being re-read.
   func loadMore() async {
-    if page.isReading || page.isDone { return }
-    if read.isReading || thread.isReading { return }
-    page = .reading
+    let isIdle = read.isReading == false && thread.isReading == false
+    if page.isReading == false, page.isDone == false, isIdle {
+      page = .reading
 
-    do {
-      let answer = try await client.comments(requestID: requestID, cursor: cursor)
-      thread = thread.appending(answer.comments)
-      cursor = answer.nextCursor
-      page = PageState(nextCursor: answer.nextCursor)
-    } catch {
-      // The cursor is left where it was, so the retry asks for this page rather than skipping it.
-      page = .failed(error)
+      do {
+        let answer = try await client.comments(requestID: requestID, cursor: cursor)
+        thread = thread.appending(answer.comments)
+        cursor = answer.nextCursor
+        page = PageState(nextCursor: answer.nextCursor)
+      } catch {
+        // The cursor is left where it was, so the retry asks for this page rather than skipping it.
+        page = .failed(error)
+      }
     }
   }
 
@@ -191,62 +196,60 @@ final class RequestDetailStore {
   /// the answer to a vote is the request the write returned, not a second guess at what it should
   /// now say.
   func toggleVote() async {
-    if write.isWriting { return }
-    guard let current = read.content else { return }
-
-    let attempt: WriteAttempt
-    if current.viewer.voted {
-      attempt = .clearVote
-    } else {
-      attempt = .vote
-    }
-    write = .writing(attempt)
-
-    do {
-      let written: DRFeatureRequest
+    if write.isWriting == false, let current = read.content {
+      let attempt: WriteAttempt
       if current.viewer.voted {
-        written = try await client.clearVote(requestID: requestID).request
+        attempt = .clearVote
       } else {
-        written = try await client.vote(requestID: requestID).request
+        attempt = .vote
       }
-      read = read.holding(written)
-      write = .idle
-      if written.viewer.voted {
-        firstVoteNote.voted(requestID: requestID)
-        await notificationOffer.votedOrFollowed(requestID: requestID)
+      write = .writing(attempt)
+
+      do {
+        let written: DRFeatureRequest
+        if current.viewer.voted {
+          written = try await client.clearVote(requestID: requestID).request
+        } else {
+          written = try await client.vote(requestID: requestID).request
+        }
+        read = read.holding(written)
+        write = .idle
+        if written.viewer.voted {
+          firstVoteNote.voted(requestID: requestID)
+          await notificationOffer.votedOrFollowed(requestID: requestID)
+        }
+      } catch {
+        write = .failed(WriteFailure(attempt: attempt, error: error))
       }
-    } catch {
-      write = .failed(WriteFailure(attempt: attempt, error: error))
     }
   }
 
   /// Starts or stops following, so status changes reach this reader without adding demand.
   func toggleFollow() async {
-    if write.isWriting { return }
-    guard let current = read.content else { return }
-
-    let attempt: WriteAttempt
-    if current.viewer.isFollowing {
-      attempt = .unfollow
-    } else {
-      attempt = .follow
-    }
-    write = .writing(attempt)
-
-    do {
-      let written: DRFeatureRequest
+    if write.isWriting == false, let current = read.content {
+      let attempt: WriteAttempt
       if current.viewer.isFollowing {
-        written = try await client.unfollow(requestID: requestID).request
+        attempt = .unfollow
       } else {
-        written = try await client.follow(requestID: requestID).request
+        attempt = .follow
       }
-      read = read.holding(written)
-      write = .idle
-      if written.viewer.isFollowing {
-        await notificationOffer.votedOrFollowed(requestID: requestID)
+      write = .writing(attempt)
+
+      do {
+        let written: DRFeatureRequest
+        if current.viewer.isFollowing {
+          written = try await client.unfollow(requestID: requestID).request
+        } else {
+          written = try await client.follow(requestID: requestID).request
+        }
+        read = read.holding(written)
+        write = .idle
+        if written.viewer.isFollowing {
+          await notificationOffer.votedOrFollowed(requestID: requestID)
+        }
+      } catch {
+        write = .failed(WriteFailure(attempt: attempt, error: error))
       }
-    } catch {
-      write = .failed(WriteFailure(attempt: attempt, error: error))
     }
   }
 
@@ -273,20 +276,20 @@ final class RequestDetailStore {
   /// A failure leaves the draft exactly as typed. The message says to send it again, and there
   /// has to be something to send.
   func postComment() async {
-    if write.isWriting { return }
     let body = draft.trimmingCharacters(in: .whitespacesAndNewlines)
-    if body.isEmpty { return }
-    write = .writing(.comment)
+    if write.isWriting == false, body.isEmpty == false {
+      write = .writing(.comment)
 
-    do {
-      let written = try await client.comment(requestID: requestID, body: body)
-      draft = ""
-      if page.isDone {
-        thread = thread.appending([written.comment])
+      do {
+        let written = try await client.comment(requestID: requestID, body: body)
+        draft = ""
+        if page.isDone {
+          thread = thread.appending([written.comment])
+        }
+        write = .idle
+      } catch {
+        write = .failed(WriteFailure(attempt: .comment, error: error))
       }
-      write = .idle
-    } catch {
-      write = .failed(WriteFailure(attempt: .comment, error: error))
     }
   }
 

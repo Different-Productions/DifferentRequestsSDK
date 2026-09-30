@@ -90,20 +90,20 @@ final class SubmitStore {
   /// Returns immediately when a write is already running: a second tap on a slow network would
   /// otherwise file the duplicate this whole flow exists to prevent.
   func submit() async {
-    if write.isWriting { return }
     let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
-    if trimmedTitle.isEmpty { return }
-    write = .writing(.fileRequest)
+    if write.isWriting == false, trimmedTitle.isEmpty == false {
+      write = .writing(.fileRequest)
 
-    do {
-      let written = try await client.submit(
-        title: trimmedTitle,
-        body: body.trimmingCharacters(in: .whitespacesAndNewlines)
-      )
-      submitted = written.request
-      write = .idle
-    } catch {
-      write = .failed(WriteFailure(attempt: .fileRequest, error: error))
+      do {
+        let written = try await client.submit(
+          title: trimmedTitle,
+          body: body.trimmingCharacters(in: .whitespacesAndNewlines)
+        )
+        submitted = written.request
+        write = .idle
+      } catch {
+        write = .failed(WriteFailure(attempt: .fileRequest, error: error))
+      }
     }
   }
 

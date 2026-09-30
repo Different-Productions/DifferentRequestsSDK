@@ -33,7 +33,6 @@ Declared `.copy` rather than `.process` because Xcode reads it verbatim when it 
 | **Name** — `display_name` | `createSession`, only if the host app passes one | Yes | No | App functionality |
 | **Other user content** — request titles and bodies, comments | `submit`, `comment` | Yes | No | App functionality |
 | **Device ID** — the APNs token | `registerDevice`, only if the host app calls it | Yes | No | App functionality |
-| **Other data** — `traits` | `createSession`, whatever the host app puts there | Yes | No | App functionality |
 
 **Linked is honest, not conservative.** `external_id` is deliberately stable across reinstalls — that
 is what lets somebody keep their votes — so everything sent with it is linked to a person by design.
@@ -53,25 +52,6 @@ signature over the `external_id` already declared above and the instant it stops
 carries no attribute of the person, and it is made on the host developer's own backend rather than
 read off the device. So the manifest is the same with a proof as without one.
 
-## `traits`, declared generically
-
-**`traits` is an open `[String: String]`**, and a manifest can only name what we can name.
-
-It is declared as `NSPrivacyCollectedDataTypeOtherDataTypes` — Apple's own category for data that
-does not fit the named ones. That keeps three things true at once:
-
-- the dictionary is **declared rather than invisible** in a customer's report
-- the released API does not change
-- a customer who puts a category Apple lists separately — health, location, financial — declares
-  that category in their own manifest, which is the only place it can be declared, because they are
-  the only party who knows what they put there
-
-The alternatives were closing it to a named set (plan, cohort, install date) or dropping it. Both
-change a released API, and neither is needed once the open case is declarable.
-
-Bounded on the server side as of server #166: fifty traits, a hundred characters of key, a thousand
-of value.
-
 ## Expectations
 
 ### It works
@@ -79,9 +59,8 @@ of value.
 | Given | When | Then |
 |---|---|---|
 | A customer adds this package | They build | The manifest is copied into the bundle |
-| A customer generates their privacy report | Xcode adds it up | Our six data types appear, attributed to this SDK |
-| A reviewer asks what this SDK sends | They read the manifest | Six types, all App Functionality, all not-tracking |
-| A customer fills `traits` | They generate a report | Covered generically as other data. A category Apple names separately is still **theirs to declare** |
+| A customer generates their privacy report | Xcode adds it up | Our five data types appear, attributed to this SDK |
+| A reviewer asks what this SDK sends | They read the manifest | Five types, all App Functionality, all not-tracking |
 
 ### It refuses
 
@@ -109,9 +88,8 @@ rpcs rather than from intent.
 What the manifest must agree with, and where each line comes from:
 
 ```
-  createSession(externalID:email:displayName:traits:proof:) UserID, EmailAddress, Name,
-                                                            OtherDataTypes (traits)
-                                                            proof declares nothing: see below
+  createSession(externalID:email:displayName:proof:) ...... UserID, EmailAddress, Name
+                                                            proof declares nothing: see above
   submit(title:body:) / comment(requestID:body:) .......... OtherUserContent
   registerDevice(token:) .................................. DeviceID
   everything else ......................................... reads only
@@ -130,7 +108,6 @@ our rows attributed to this SDK rather than left for them to work out:
     Email address ........ DifferentRequests
     Name ................. DifferentRequests
     Other user content ... DifferentRequests
-    Other data ........... DifferentRequests
     Device ID ............ DifferentRequests
 ```
 
@@ -142,7 +119,7 @@ platform-specific, because what the SDK sends does not vary by platform.
 ## Which tests walk the chart
 
 There is no test target in this package. Walked by parsing the manifest with `plistlib` and checking
-it against the rpcs above — six declared types, `NSPrivacyTracking` false, both API-type and
+it against the rpcs above — five declared types, `NSPrivacyTracking` false, both API-type and
 tracking-domain arrays empty — and by building the package with the resource declared.
 
 The check that matters over time is not a test but a rule: **a new rpc that sends something new is a

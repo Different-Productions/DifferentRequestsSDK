@@ -6,9 +6,9 @@ extension View {
   /// a `List` has no height of its own. Nothing on iOS, where a sheet fills its space.
   func sheetMinimumSize() -> some View {
     #if os(macOS)
-      frame(minWidth: SheetMinimumSize.width, minHeight: SheetMinimumSize.height)
+    frame(minWidth: SheetMinimumSize.width, minHeight: SheetMinimumSize.height)
     #else
-      self
+    self
     #endif
   }
 }

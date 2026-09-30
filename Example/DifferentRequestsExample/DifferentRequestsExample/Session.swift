@@ -88,30 +88,31 @@ final class Session {
   /// Push permission is asked for only when `pushEnabled`: on a plan that sends no push, asking
   /// the person is asking for something that never arrives.
   func start() async {
-    if DemoConfig.isConfigured == false {
+    if DemoConfig.isConfigured {
+      phase = .reading
+      await signIn()
+      await loadConfig()
+    } else {
       phase = .unconfigured
-      return
     }
+  }
 
-    phase = .reading
-    await signIn()
-
+  /// Reads the app's configuration, then the badge and the board's first page once it is known.
+  private func loadConfig() async {
     do {
       let configured = try await client.config()
       phase = .ready(configured.config)
       if configured.config.pushEnabled {
         await registerForRemoteNotifications()
       }
+      await refreshUnreadCount()
+      // The board's first page is a round trip. Started here, while the person is still looking at
+      // the settings list, it is held by the time they open the board.
+      await hub.readTheBoardBeforeItIsShown()
     } catch {
       NSLog("What this app offers could not be read: %@", error.localizedDescription)
       phase = .configUnreadable
-      return
     }
-
-    await refreshUnreadCount()
-    // The board's first page is a round trip. Started here, while the person is still looking at
-    // the settings list, it is held by the time they open the board.
-    await hub.readTheBoardBeforeItIsShown()
   }
 
   /// Creates the session for the demo person, carrying a proof when this app has a signing secret.
@@ -127,7 +128,6 @@ final class Session {
         externalID: externalID,
         email: nil,
         displayName: ProcessInfo.processInfo.demoDisplayName,
-        traits: DemoConfig.traits,
         proof: backend.vouchFor(externalID: externalID)
       )
       NSLog("Signed in as %@", signedIn.user.id)

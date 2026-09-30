@@ -69,7 +69,7 @@ public struct RoadmapView: View {
         await store.load()
       }
     case .excluded:
-      AbsentSurface(surface: .roadmap)
+      AbsentSurface(surface: .roadmap, isShowingRequests: isShowingRequests)
     case .included:
       columns
     }

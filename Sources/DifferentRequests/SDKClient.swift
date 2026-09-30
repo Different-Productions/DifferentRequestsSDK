@@ -13,9 +13,9 @@ enum SDKClient {
   /// The released version of this package.
   ///
   /// The one place it is written down, and it is written down rather than derived because SwiftPM
-  /// gives a package no way to read its own tag at runtime. **Bump this in the release commit**;
-  /// a version that lags its tag is worse than none, because it is believed.
-  static let version = "0.11.0"
+  /// gives a package no way to read its own tag at runtime. The release workflow refuses a tag
+  /// this does not match.
+  static let version = "0.14.0"
 
   /// The value of the `X-DR-Client` header, shaped as the contract describes it.
   static let header = "differentrequests-swift/\(version) (\(platform) \(osVersion))"
@@ -37,7 +37,7 @@ enum SDKClient {
   }
 
   private static var osVersion: String {
-    let v = ProcessInfo.processInfo.operatingSystemVersion
-    return "\(v.majorVersion).\(v.minorVersion)"
+    let system = ProcessInfo.processInfo.operatingSystemVersion
+    return "\(system.majorVersion).\(system.minorVersion)"
   }
 }

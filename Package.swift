@@ -26,7 +26,7 @@ let package = Package(
   dependencies: [
     .package(
       url: "https://github.com/Different-Productions/differentrequests-proto.git",
-      exact: "0.40.0"
+      exact: "0.41.0"
     ),
     // Declared directly, not leaned on transitively: this target names `Message` and
     // `serializedData()` itself. The range matches the contract package's own, so one

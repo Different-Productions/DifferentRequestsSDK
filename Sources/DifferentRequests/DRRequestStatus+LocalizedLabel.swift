@@ -20,13 +20,20 @@ extension DRRequestStatus {
   /// per status, so a language can order the words its own way.
   var movedHeadline: String {
     switch self {
-    case .open: return String(localized: "Now waiting", bundle: .module, comment: "Inbox headline: the request moved back to waiting")
-    case .planned: return String(localized: "Now planned", bundle: .module, comment: "Inbox headline: the request is now planned")
-    case .inProgress: return String(localized: "Now in progress", bundle: .module, comment: "Inbox headline: the request is now being built")
-    case .shipped: return String(localized: "Now shipped", bundle: .module, comment: "Inbox headline: the request has been released")
-    case .declined: return String(localized: "Now declined", bundle: .module, comment: "Inbox headline: the team won't build the request")
-    case .duplicate: return String(localized: "Already asked for", bundle: .module, comment: "Inbox headline: the request was merged into another")
-    case .unspecified, .UNRECOGNIZED: return String(localized: "Something changed", bundle: .module, comment: "Inbox headline for news this version can't name")
+    case .open:
+      return String(localized: "Now waiting", bundle: .module, comment: "Inbox headline: the request moved back to waiting")
+    case .planned:
+      return String(localized: "Now planned", bundle: .module, comment: "Inbox headline: the request is now planned")
+    case .inProgress:
+      return String(localized: "Now in progress", bundle: .module, comment: "Inbox headline: the request is now being built")
+    case .shipped:
+      return String(localized: "Now shipped", bundle: .module, comment: "Inbox headline: the request has been released")
+    case .declined:
+      return String(localized: "Now declined", bundle: .module, comment: "Inbox headline: the team won't build the request")
+    case .duplicate:
+      return String(localized: "Already asked for", bundle: .module, comment: "Inbox headline: the request was merged into another")
+    case .unspecified, .UNRECOGNIZED:
+      return String(localized: "Something changed", bundle: .module, comment: "Inbox headline for news this version can't name")
     }
   }
 }

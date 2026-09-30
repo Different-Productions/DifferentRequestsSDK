@@ -21,7 +21,7 @@ Or in `Package.swift`:
 dependencies: [
   .package(
     url: "https://github.com/Different-Productions/DifferentRequestsSDK",
-    from: "0.11.0"
+    from: "0.14.0"
   ),
 ]
 ```
@@ -36,7 +36,7 @@ the process.
 import DifferentRequests
 
 let requests = DifferentRequestsHub(
-  client: .make(appKey: "your-app-key"),
+  client: DifferentRequestsClient(appKey: "your-app-key", baseURL: .production),
   appearance: .standard,
   emptyBoard: .standard,
   notificationPermission: .askedBySDK
@@ -54,15 +54,15 @@ A SwiftUI view is a value that is thrown away and rebuilt whenever anything
 above it redraws. A hub built inside a view would take the board's page, the
 search text and a half-written request with it every time.
 
-Production is where it points when you say nothing. A staging server takes a
-``SecureBaseURL``, which refuses anything that is not `https` rather than
-letting an app ship talking over plain text:
+``SecureBaseURL/production`` is the live service. A staging server takes a
+``SecureBaseURL`` of its own, which refuses anything that is not `https` rather
+than letting an app ship talking over plain text:
 
 ```swift
 @main
 struct MyApp: App {
   private let requests = DifferentRequestsHub(
-    client: .make(
+    client: DifferentRequestsClient(
       appKey: "your-app-key",
       baseURL: SecureBaseURL(literal: "https://staging.example.com")
     ),
@@ -87,7 +87,7 @@ build ships, which is what the trap at launch reports. Where the address
 arrives at runtime instead, ``SecureBaseURL/init(_:)`` throws and you handle it.
 
 Your app key is not a secret. It ships inside your binary and identifies the
-app, not a person — which is what ``DifferentRequestsClient/createSession(externalID:email:displayName:traits:proof:)``
+app, not a person — which is what ``DifferentRequestsClient/createSession(externalID:email:displayName:proof:)``
 is for.
 
 ## Sign your person in
@@ -103,7 +103,6 @@ do {
     externalID: currentUser.id,
     email: currentUser.email,
     displayName: currentUser.name,
-    traits: ["plan": currentUser.plan],
     proof: nil
   )
   logger.info("DifferentRequests: signed in as \(signedIn.user.id)")
@@ -156,7 +155,6 @@ let signedIn = try await requests.client.createSession(
   externalID: currentUser.id,
   email: currentUser.email,
   displayName: currentUser.name,
-  traits: ["plan": currentUser.plan],
   proof: DRIdentityProof(
     signature: vouched.signature,
     expiresAt: Date(timeIntervalSince1970: TimeInterval(vouched.expiresAt))

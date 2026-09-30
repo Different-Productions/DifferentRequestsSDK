@@ -213,15 +213,15 @@ final class BoardStore {
   /// rather than cleared before the question, so a pull-to-refresh does not take away the list
   /// that is running it.
   func load() async {
-    if read.isReading { return }
-
-    repeat {
-      read = read.whileReading
-      asked = question
-      cursor = ""
-      page = .more
-      await readFirstPage(asked)
-    } while asked != question
+    if read.isReading == false {
+      repeat {
+        read = read.whileReading
+        asked = question
+        cursor = ""
+        page = .more
+        await readFirstPage(asked)
+      } while asked != question
+    }
   }
 
   /// Appends the next page.
@@ -234,18 +234,18 @@ final class BoardStore {
   /// that question, and handing it to a different one asks the server to continue a list it never
   /// started.
   func loadMore() async {
-    if page.isReading || page.isDone { return }
-    if read.isReading { return }
-    page = .reading
+    if page.isReading == false, page.isDone == false, read.isReading == false {
+      page = .reading
 
-    do {
-      let answer = try await fetch(asked, cursor: cursor)
-      read = read.appending(answer.requests)
-      cursor = answer.nextCursor
-      page = PageState(nextCursor: answer.nextCursor)
-    } catch {
-      // The cursor is left where it was, so the retry asks for this page rather than skipping it.
-      page = .failed(error)
+      do {
+        let answer = try await fetch(asked, cursor: cursor)
+        read = read.appending(answer.requests)
+        cursor = answer.nextCursor
+        page = PageState(nextCursor: answer.nextCursor)
+      } catch {
+        // The cursor is left where it was, so the retry asks for this page rather than skipping it.
+        page = .failed(error)
+      }
     }
   }
 
@@ -286,32 +286,31 @@ final class BoardStore {
   /// What the write returned replaces the row whole. A count incremented locally is wrong the
   /// moment anyone else votes.
   func toggleVote(requestID: String) async {
-    if write.isWriting { return }
-    guard let current = read.held.first(where: { $0.id == requestID }) else { return }
-
-    let attempt: WriteAttempt
-    if current.viewer.voted {
-      attempt = .clearVote
-    } else {
-      attempt = .vote
-    }
-    write = .writing(attempt)
-
-    do {
-      let written: DRFeatureRequest
+    if write.isWriting == false, let current = read.held.first(where: { $0.id == requestID }) {
+      let attempt: WriteAttempt
       if current.viewer.voted {
-        written = try await client.clearVote(requestID: requestID).request
+        attempt = .clearVote
       } else {
-        written = try await client.vote(requestID: requestID).request
+        attempt = .vote
       }
-      read = read.replacing(written, identifiedBy: { $0.id })
-      news.heard(aboutRequest: requestID, at: Date())
-      write = .idle
-      if written.viewer.voted {
-        await notificationOffer.votedOrFollowed(requestID: requestID)
+      write = .writing(attempt)
+
+      do {
+        let written: DRFeatureRequest
+        if current.viewer.voted {
+          written = try await client.clearVote(requestID: requestID).request
+        } else {
+          written = try await client.vote(requestID: requestID).request
+        }
+        read = read.replacing(written, identifiedBy: { $0.id })
+        news.heard(aboutRequest: requestID, at: Date())
+        write = .idle
+        if written.viewer.voted {
+          await notificationOffer.votedOrFollowed(requestID: requestID)
+        }
+      } catch {
+        write = .failed(WriteFailure(attempt: attempt, error: error))
       }
-    } catch {
-      write = .failed(WriteFailure(attempt: attempt, error: error))
     }
   }
 

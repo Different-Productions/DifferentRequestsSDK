@@ -96,8 +96,7 @@ public enum DifferentRequestsError: Error, Sendable, LocalizedError {
       return false
     }
     switch error.reason {
-    case .invalidArgument, .malformed, .failedPrecondition, .conflict, .permissionDenied,
-         .planRequired, .notFound:
+    case .invalidArgument, .malformed, .failedPrecondition, .conflict, .permissionDenied, .planRequired, .notFound:
       return true
     case .unauthenticated, .rateLimited, .internalFailure, .none:
       return false

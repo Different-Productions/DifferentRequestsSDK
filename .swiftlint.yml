@@ -1,0 +1,208 @@
+# Lint enforcement for the Different Requests SDK and its example app.
+#
+# The same rules as DifferentRequests-Server: SwiftLint's default rule set, the
+# opt-ins below, and `custom_rules` for the bans no built-in rule expresses.
+#
+# Warning and error thresholds are the same number throughout, so no violation is
+# advisory. The repo is at zero, and there is no `swiftlint:disable` in it. Fix
+# the code, not the rule.
+#
+# Run from the repo root — the config is the CWD's.
+
+disabled_rules:
+  # The minimum-length check renames `id` and the loop conventions. A request's
+  # identifier is `id` in the contract this SDK compiles against, and SwiftUI's
+  # `Identifiable` requires the name.
+  - identifier_name
+  # `master` is the default branch on this repo. Identifiers like `defaultBranch`
+  # already make the role explicit, so the rule has nothing to add.
+  - inclusive_language
+
+opt_in_rules:
+  - indentation_width
+  - redundant_type_annotation
+  - operator_usage_whitespace
+  - force_unwrapping
+  - force_cast
+  - force_try
+  - implicitly_unwrapped_optional
+
+indentation_width:
+  severity: error
+  indentation_width: 2
+  include_multiline_strings: false
+  include_comments: false
+  include_compiler_directives: false
+
+force_unwrapping:
+  severity: error
+
+force_cast:
+  severity: error
+
+force_try:
+  severity: error
+
+implicitly_unwrapped_optional:
+  severity: error
+
+vertical_whitespace:
+  max_empty_lines: 1
+  severity: error
+
+# Size ceilings, not budgets: a file at 500 lines needs decomposing into the
+# types it is already carrying, never a raised limit.
+#
+# `warning` and `error` are two separate thresholds, so both are set to the same
+# number on purpose — it collapses the gap and makes the ceiling a single hard
+# error.
+file_length:
+  warning: 500
+  error: 500
+
+type_body_length:
+  warning: 250
+  error: 250
+
+function_body_length:
+  warning: 100
+  error: 100
+
+line_length:
+  warning: 140
+  error: 140
+
+cyclomatic_complexity:
+  warning: 10
+  error: 10
+  # An exhaustive switch over a generated enum is not complexity written here:
+  # the compiler guarantees totality and the branches share no state.
+  ignores_case_statements: true
+
+function_parameter_count:
+  warning: 5
+  error: 5
+
+large_tuple:
+  warning: 2
+  error: 2
+
+type_name:
+  min_length:
+    warning: 3
+    error: 3
+  max_length:
+    warning: 40
+    error: 40
+
+nesting:
+  type_level: 0
+  # Swift's grammar puts these inside a type and nowhere else: `CodingKeys` only
+  # works nested, and an `associatedtype` or the `typealias` that witnesses one
+  # only exists inside the protocol or the conformance. Every other nested type
+  # is still an error.
+  ignore_coding_keys: true
+  ignore_typealiases_and_associatedtypes: true
+
+todo:
+  severity: error
+
+shorthand_operator:
+  severity: error
+
+class_delegate_protocol:
+  severity: error
+
+included:
+  - Sources
+  - Example
+
+excluded:
+  - .build
+
+custom_rules:
+  xctest_quarantine:
+    # There is no test target. A test file reappearing is a decision, not a patch.
+    name: "XCTest import"
+    regex: '^import[ \t]+XCTest\b'
+    message: >
+      There is no test target in this package. Changes are proven by walking the
+      example app in the simulator.
+    severity: error
+
+  nil_coalescing_banned:
+    name: "?? Nil Coalescing"
+    regex: '\?\?'
+    match_kinds:
+      - keyword
+      - identifier
+    message: >
+      ?? is banned. Use clear if/else branching — either we have the data or we
+      do not. A defaulted-away absence is a failure the caller never sees.
+    severity: error
+
+  try_questionmark_banned:
+    name: "try? Optional Try"
+    regex: 'try\?'
+    match_kinds:
+      - keyword
+    message: >
+      try? is banned. Handle the error with do/catch or propagate with throws.
+    severity: error
+
+  underscore_await_discard_banned:
+    name: "_ = try await Discard"
+    regex: '_\s*=\s*try\s+await'
+    message: >
+      `_ = try await ...` is banned. Change the API shape so the unwanted value
+      is not offered — return Void, or bind it and consume it.
+    severity: error
+
+  discardable_result_banned:
+    name: "@discardableResult"
+    regex: '@discardableResult'
+    message: >
+      @discardableResult is banned. Every function either throws or returns a
+      value the caller consumes. If callers ignore the return, make it Void.
+    severity: error
+
+  default_nil_param_banned:
+    name: "Default-nil parameter"
+    regex: ':\s*[A-Za-z_][\w<>\.\[\]]*\?\s*=\s*nil'
+    message: >
+      `param: T? = nil` is banned. A defaulted-away parameter hides that the
+      caller had nothing to pass. Make the caller state it. (Optional *types*
+      are fine — this bans the default, not the optionality.)
+    severity: error
+
+  underscore_discard_banned:
+    name: "Underscore discard"
+    regex: '(?<![\w)])_\s*='
+    message: >
+      Discarding a result with `_ =` is banned. Change the API shape so the
+      unwanted value is not offered, or consume it.
+    severity: error
+
+  valueless_return_banned:
+    name: "Value-less return"
+    # A `return` that ends its line or closes its block: the own-line form and the
+    # inline `if x { return }` / `guard … else { return }` forms alike.
+    regex: '\breturn(?=[ \t]*(\}|$))'
+    match_kinds:
+      - keyword
+    message: >
+      A value-less `return` skip is banned. Restructure to `throw`, `#require`,
+      or `if let` so the path states what it produced.
+    severity: error
+
+  long_lived_factory_banned:
+    # Nothing returns a long-lived object. A `make`/`build`/`create` handing back
+    # a client, a store or a service is the composition root done somewhere that
+    # is not the composition root.
+    name: "Factory returning a long-lived object"
+    regex: 'static func (make|build|create)[A-Za-z]*\s*\('
+    message: >
+      A static `make`/`build`/`create` is banned. Long-lived objects are built
+      once, in the hub, in dependency order — never handed back from a function.
+      Constants and operator requirements are what statics are for.
+    severity: error

@@ -1,5 +1,6 @@
+import SwiftUI
+
 #if canImport(UIKit)
-  import SwiftUI
   import UIKit
 
   /// Finds, each time its screen appears, whether that screen is the first one of a navigation

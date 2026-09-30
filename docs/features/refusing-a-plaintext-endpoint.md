@@ -11,7 +11,7 @@ wrong. **It works, which is the problem.**
 The built-in production URL is `https`, so this only ever fires on an address a developer supplied
 themselves: a staging endpoint, a local server, or a typo.
 
-**Refused where it is written, not where it is dialled.** `SecureBaseURL` is a type rather than a
+**Refused where it is written, not where it is dialed.** `SecureBaseURL` is a type rather than a
 check inside the client, so the failure lands on the line that wrote the URL and names it. A check
 on the first call would report a broken request instead of a wrong address, and by then a key has
 already been sent.
@@ -20,25 +20,25 @@ already been sent.
 
 | Surface | Ships this? |
 |---|---|
-| `DifferentRequestsClient` | **Yes** — `init(appKey:baseURL:session:)` and `make(appKey:baseURL:)` take `SecureBaseURL` |
+| `DifferentRequestsClient` | **Yes** — `init(appKey:baseURL:)` takes `SecureBaseURL` |
 | `SecureBaseURL` | **Yes** — `init(_:) throws`, and `.production` |
-| `make(appKey:)` | **Unchanged and still non-throwing.** Production is known `https`, so it is built through the trusted path and cannot fail |
+| `.production` | **Non-throwing.** Production is known `https`, so it is built through the trusted path and cannot fail |
 | The example app | Reads `DIFFERENT_REQUESTS_BASE_URL` and refuses a non-https one loudly |
 | The server | **None.** This is a client-side refusal; the server never sees the call it prevents |
 
 ## How to find it, trigger it, and what happens
 
-**The ordinary case is untouched.**
+**The ordinary case needs no `try`.**
 
 ```swift
-let client = DifferentRequestsClient.make(appKey: "dr_…")
+let client = DifferentRequestsClient(appKey: "dr_…", baseURL: .production)
 ```
 
 **A staging endpoint now says so:**
 
 ```swift
 let staging = try SecureBaseURL(URL(string: "https://api-dev.differentrequests.com")!)
-let client = DifferentRequestsClient.make(appKey: "dr_…", baseURL: staging)
+let client = DifferentRequestsClient(appKey: "dr_…", baseURL: staging)
 ```
 
 **And a plaintext one throws where it is written:**
@@ -58,7 +58,7 @@ The error already existed for a URL this client will not use; nothing new was in
 
 | Given | When | Then |
 |---|---|---|
-| No base URL named | `make(appKey:)` | Production, and no `try` at the call site |
+| `.production` named | `init(appKey:baseURL:)` | Production, and no `try` at the call site |
 | An `https` URL | `SecureBaseURL(_:)` | Wrapped, and the client dials it |
 | `HTTPS://` in capitals | `SecureBaseURL(_:)` | Accepted — the scheme is compared lowercased |
 | The example app with no `DIFFERENT_REQUESTS_BASE_URL` | It launches | Production |
@@ -86,12 +86,12 @@ The error already existed for a URL this client will not use; nothing new was in
                                                      │
     ┌────────────────────────────────────────────────┘
     ▼
-  DifferentRequestsClient.init(appKey:baseURL:session:)
+  DifferentRequestsClient.init(appKey:baseURL:)
        assigns baseURL.url and nothing else — the check already happened
 
   .production ....................................... SecureBaseURL.swift
        built through the private trusted path from DifferentRequestsClient.productionBaseURL,
-       which is a known https literal, so make(appKey:) needs no try
+       which is a known https literal, so passing it needs no try
 ```
 
 ## The screen

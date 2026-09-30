@@ -15,15 +15,23 @@ struct NotificationOfferCard: View {
       HStack(spacing: Self.headingSpacing) {
         Image(systemName: "bell")
           .foregroundStyle(.tint)
-        Text("Get told when this changes?", bundle: .module, comment: "Heading of the card offering notifications after a first vote or follow")
-          .font(.headline)
+        Text(
+          "Get told when this changes?",
+          bundle: .module,
+          comment: "Heading of the card offering notifications after a first vote or follow"
+        )
+        .font(.headline)
       }
 
       switch offer.state {
       case .hidden, .offered:
-        Text("We'll send a notification when it's planned, shipped or someone replies.", bundle: .module, comment: "Body of the card offering notifications")
-          .font(.subheadline)
-          .foregroundStyle(.secondary)
+        Text(
+          "We'll send a notification when it's planned, shipped or someone replies.",
+          bundle: .module,
+          comment: "Body of the card offering notifications"
+        )
+        .font(.subheadline)
+        .foregroundStyle(.secondary)
 
         HStack(spacing: Self.headingSpacing) {
           Button {
@@ -46,9 +54,13 @@ struct NotificationOfferCard: View {
         }
         .controlSize(.large)
       case .failed:
-        Text("Notifications couldn't be turned on. You can turn them on in Settings.", bundle: .module, comment: "Shown when the system prompt could not be asked")
-          .font(.subheadline)
-          .foregroundStyle(.secondary)
+        Text(
+          "Notifications couldn't be turned on. You can turn them on in Settings.",
+          bundle: .module,
+          comment: "Shown when the system prompt could not be asked"
+        )
+        .font(.subheadline)
+        .foregroundStyle(.secondary)
 
         Button {
           offer.decline()

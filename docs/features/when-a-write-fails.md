@@ -307,8 +307,8 @@ A WRITE THAT FAILS — the defect, and where it now goes
 A READ, AND ITS FOUR OUTCOMES
 
   DifferentRequestsView.body
-    .firstRead(store.read) ──► FirstRead.swift
-                                 task(id: state.hasRead) { hasRead ? return : read() }
+    .firstRead(store.read) ──► View+FirstRead.swift
+                                 task { if hasRead == false { read() } }
                                     │        ▲
                                     │        └── false only until the FIRST answer, so the
                                     │            task's own progress cannot cancel it

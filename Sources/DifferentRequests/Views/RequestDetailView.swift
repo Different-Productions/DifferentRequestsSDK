@@ -15,24 +15,20 @@ import SwiftUI
 /// holding a link to it is owed that instead of a dead end. A request that has actually gone says
 /// so, which is a different screen from one that could not be reached: there is nothing to retry.
 ///
-/// The hub hands back the same store for the same request every time, so a screen pushed from a
-/// board that redraws keeps its thread, its place in it, and the comment being written.
+/// The screen owns its store as `@State`, so it keeps its thread, its place in it and the comment
+/// being written while the board that pushed it redraws, and the store is freed when the screen is
+/// popped.
 public struct RequestDetailView: View {
 
   private static let headerSpacing: CGFloat = 10
   private static let actionSpacing: CGFloat = 16
   private static let metadataSpacing: CGFloat = 8
 
-  /// The height the composer occupies, which whatever stands in for it keeps: a strip that grows
-  /// and shrinks as the answer arrives moves the thread above it under the reader's eye.
-  private static let composerSpacing: CGFloat = 4
-  private static let composerPadding: CGFloat = 8
-
   /// What the screen reads from, and what a push from here is built against.
   private let hub: DifferentRequestsHub
 
-  /// Bindable for the composer, which edits the draft the store holds.
-  @Bindable private var store: RequestDetailStore
+  /// This screen's own store, alive exactly as long as the screen is on the navigation stack.
+  @State var store: RequestDetailStore
 
   /// Which request this screen is about, so news about it can be asked for by id.
   private let requestID: String
@@ -43,7 +39,14 @@ public struct RequestDetailView: View {
   public init(hub: DifferentRequestsHub, requestID: String) {
     self.hub = hub
     self.requestID = requestID
-    self._store = Bindable(hub.detail(requestID: requestID))
+    self._store = State(
+      initialValue: RequestDetailStore(
+        client: hub.client,
+        requestID: requestID,
+        notificationOffer: hub.notificationOffer,
+        firstVoteNote: hub.firstVoteNote
+      )
+    )
   }
 
   public var body: some View {
@@ -89,7 +92,11 @@ public struct RequestDetailView: View {
           Image(systemName: "questionmark.folder")
         }
       } description: {
-        Text("It was removed, or the link that got you here is out of date.", bundle: .module, comment: "Message when a request no longer exists")
+        Text(
+          "It was removed, or the link that got you here is out of date.",
+          bundle: .module,
+          comment: "Message when a request no longer exists"
+        )
       }
     case .loaded(let request), .refreshing(let request):
       loaded(request)
@@ -117,6 +124,7 @@ public struct RequestDetailView: View {
           Text("Comments", bundle: .module, comment: "Header over a request's comments")
         }
       }
+      .scrollDismissesKeyboard(.interactively)
       .refreshable {
         await store.load()
       }
@@ -128,59 +136,6 @@ public struct RequestDetailView: View {
         composer
       }
     }
-  }
-
-  // MARK: - Answering
-
-  /// Four outcomes on a question the composer cannot answer for itself: whether this app takes
-  /// comments at all.
-  ///
-  /// A field with a Send that has one possible answer is worse than no field — someone writes a
-  /// reply, sends it, and is told by a failure that the discussion was never open. So the slot is
-  /// the composer only once the app has said it takes them, and says what is there instead
-  /// otherwise. Voting is on the screen above either way, which is what the absent case points at.
-  @ViewBuilder
-  private var composer: some View {
-    switch store.commenting {
-    case .unread, .reading:
-      ProgressView()
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, Self.composerPadding)
-    case .failed:
-      RetryRow(message: String(localized: "Comments didn't load.", bundle: .module, comment: "Row where the comment field goes when the app's comment setting failed to load")) {
-        await store.loadCommenting()
-      }
-      .padding(.horizontal)
-      .padding(.vertical, Self.composerPadding)
-    case .excluded:
-      commentsOff
-    case .included:
-      CommentComposer(
-        draft: $store.draft,
-        canSend: store.canPostComment,
-        charactersLeft: store.commentCharactersLeft,
-        isWriting: store.write.isWriting
-      ) {
-        await store.postComment()
-      }
-    }
-  }
-
-  /// The same words `AbsentSurface` gives a whole screen, in the strip the composer would have
-  /// had. A screen-sized empty state cannot go here: there is a request above it that is still
-  /// worth reading, and it is what the reader came for.
-  private var commentsOff: some View {
-    VStack(alignment: .leading, spacing: Self.composerSpacing) {
-      Label(PlanSurface.comments.absentTitle, systemImage: PlanSurface.comments.absentSymbol)
-        .font(.subheadline)
-
-      Text(PlanSurface.comments.absentDescription)
-        .font(.caption)
-        .foregroundStyle(.secondary)
-    }
-    .frame(maxWidth: .infinity, alignment: .leading)
-    .padding(.horizontal)
-    .padding(.vertical, Self.composerPadding)
   }
 
   // MARK: - The request
@@ -350,38 +305,5 @@ public struct RequestDetailView: View {
       return String(localized: "Anonymous", bundle: .module, comment: "Author name for a request whose person gave no name")
     }
     return request.author.displayName
-  }
-
-  // MARK: - The thread
-
-  /// Four outcomes again, on the read that is not the request's. A discussion that could not be
-  /// read says so and offers to try again; one that is genuinely empty says that instead. Drawn
-  /// as one thing they are blank space under a heading that says "Discussion", which reads as a
-  /// request nobody has replied to whichever of the two is true.
-  @ViewBuilder
-  private var thread: some View {
-    switch store.thread {
-    case .unread, .reading:
-      ProgressView()
-        .frame(maxWidth: .infinity)
-    case .failed:
-      RetryRow(message: String(localized: "Couldn't load the comments.", bundle: .module, comment: "Row where a request's comments go when they failed to load")) {
-        await store.load()
-      }
-    case .empty:
-      Text("No comments yet.", bundle: .module, comment: "Shown under a request with no comments")
-        .font(.subheadline)
-        .foregroundStyle(.secondary)
-    case .loaded(let comments), .refreshing(let comments):
-      ForEach(comments, id: \.id) { comment in
-        CommentRow(comment: comment)
-      }
-
-      if store.page.isDone == false {
-        NextPageRow(state: store.page) {
-          await store.loadMore()
-        }
-      }
-    }
   }
 }

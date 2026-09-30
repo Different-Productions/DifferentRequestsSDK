@@ -21,9 +21,6 @@ enum WriteState {
 
   /// The last write did not land.
   case failed(WriteFailure)
-}
-
-extension WriteState {
 
   /// Whether a write is in flight. What a store checks before starting another one, and what the
   /// controls on a surface disable themselves from.

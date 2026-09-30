@@ -1,7 +1,8 @@
+import SwiftUI
+
 #if os(iOS)
 
   import SafariServices
-  import SwiftUI
 
   /// Safari, over the host app rather than instead of it.
   ///

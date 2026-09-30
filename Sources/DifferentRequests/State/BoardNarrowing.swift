@@ -26,9 +26,6 @@ enum BoardNarrowing: CaseIterable {
   /// Narrowed by both, which is the one case where a duplicate can be hidden from the person about
   /// to file it.
   case queryAndStatuses
-}
-
-extension BoardNarrowing {
 
   /// What a question is holding back, read off the contract's own request.
   init(question: DRListRequestsRequest) {
@@ -77,9 +74,17 @@ extension BoardNarrowing {
     case .query:
       return String(localized: "Nothing matches", bundle: .module, comment: "Heading over the request board when a search finds nothing")
     case .statuses:
-      return String(localized: "Nothing in this filter", bundle: .module, comment: "Heading over the request board when the status filter leaves nothing")
+      return String(
+        localized: "Nothing in this filter",
+        bundle: .module,
+        comment: "Heading over the request board when the status filter leaves nothing"
+      )
     case .queryAndStatuses:
-      return String(localized: "No matches in this filter", bundle: .module, comment: "Heading over the request board when a search inside a status filter finds nothing")
+      return String(
+        localized: "No matches in this filter",
+        bundle: .module,
+        comment: "Heading over the request board when a search inside a status filter finds nothing"
+      )
     }
   }
 
@@ -91,11 +96,23 @@ extension BoardNarrowing {
     case .nothing:
       return EmptyBoard.standard.message
     case .query:
-      return String(localized: "Nobody has asked for this yet.", bundle: .module, comment: "Message on the request board when a search finds nothing")
+      return String(
+        localized: "Nobody has asked for this yet.",
+        bundle: .module,
+        comment: "Message on the request board when a search finds nothing"
+      )
     case .statuses:
-      return String(localized: "No requests match this filter. Tap All to see every request.", bundle: .module, comment: "Message on the request board when the status filter leaves nothing; All is the filter chip's name")
+      return String(
+        localized: "No requests match this filter.",
+        bundle: .module,
+        comment: "Message on the request board when the status filter leaves nothing; a Show all button sits under it"
+      )
     case .queryAndStatuses:
-      return String(localized: "Nothing matches this search with this filter. Tap All to search every request.", bundle: .module, comment: "Message on the request board when a search inside a status filter finds nothing; All is the filter chip's name")
+      return String(
+        localized: "Nothing matches this search with this filter.",
+        bundle: .module,
+        comment: "Message on the request board when a search inside a status filter finds nothing; a Show all button sits under it"
+      )
     }
   }
 
@@ -110,9 +127,17 @@ extension BoardNarrowing {
     case .nothing:
       return nil
     case .query:
-      return String(localized: "If a request already says this, vote for it instead, so the votes stay in one place.", bundle: .module, comment: "Warning above the new request form after a search")
+      return String(
+        localized: "If a request already says this, vote for it instead, so the votes stay in one place.",
+        bundle: .module,
+        comment: "Warning above the new request form after a search"
+      )
     case .statuses, .queryAndStatuses:
-      return String(localized: "You're only seeing some requests. Tap All first, so you don't ask for something that's already here.", bundle: .module, comment: "Warning above the new request form while a status filter is on; All is the filter chip's name")
+      return String(
+        localized: "You're only seeing some requests. Tap All first, so you don't ask for something that's already here.",
+        bundle: .module,
+        comment: "Warning above the new request form while a status filter is on; All is the filter chip's name"
+      )
     }
   }
 }

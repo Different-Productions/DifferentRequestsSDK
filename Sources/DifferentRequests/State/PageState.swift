@@ -22,9 +22,6 @@ enum PageState {
 
   /// The server reported no further page. It leaves the cursor empty to say so.
   case done
-}
-
-extension PageState {
 
   /// What the answer to a page says about the page after it.
   init(nextCursor: String) {

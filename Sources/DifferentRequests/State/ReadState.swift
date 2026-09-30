@@ -36,9 +36,6 @@ enum ReadState<Content> {
 
   /// A read is in flight over content already on screen, which stays up while it runs.
   case refreshing(Content)
-}
-
-extension ReadState {
 
   /// Whether a read has finished, whatever it found.
   ///

@@ -25,8 +25,20 @@ struct PoweredByBadge: View {
         label
       }
       .buttonStyle(.plain)
-      .accessibilityLabel(Text("Powered by Different Requests", bundle: .module, comment: "VoiceOver label for the badge; Different Requests is the product's name"))
-      .accessibilityHint(Text("Says what Different Requests is", bundle: .module, comment: "VoiceOver hint for the badge; Different Requests is the product's name"))
+      .accessibilityLabel(
+        Text(
+          "Powered by Different Requests",
+          bundle: .module,
+          comment: "VoiceOver label for the badge; Different Requests is the product's name"
+        )
+      )
+      .accessibilityHint(
+        Text(
+          "Says what Different Requests is",
+          bundle: .module,
+          comment: "VoiceOver hint for the badge; Different Requests is the product's name"
+        )
+      )
       .sheet(isPresented: $isShowingAbout) {
         PoweredByPage(appConfig: appConfig)
       }

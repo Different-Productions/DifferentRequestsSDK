@@ -27,6 +27,10 @@ struct CommentComposer: View {
   /// Posts the draft.
   let send: () async -> Void
 
+  /// Whether the field holds the keyboard. Given up once a comment lands, so the reader sees the
+  /// thread it joined.
+  @FocusState private var isFocused: Bool
+
   var body: some View {
     HStack(alignment: .bottom, spacing: Self.spacing) {
       TextField(
@@ -38,6 +42,7 @@ struct CommentComposer: View {
       }
         .lineLimit(Self.lineLimit)
         .textFieldStyle(.plain)
+        .focused($isFocused)
 
       CharactersLeft(left: charactersLeft)
 
@@ -46,6 +51,10 @@ struct CommentComposer: View {
       } else {
         AsyncButton {
           await send()
+          // A failed post leaves the draft as typed, so an empty one means it landed.
+          if draft.isEmpty {
+            isFocused = false
+          }
         } label: {
           Image(systemName: "arrow.up.circle.fill")
             .font(.title2)

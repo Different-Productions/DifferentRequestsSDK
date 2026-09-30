@@ -25,11 +25,9 @@ final class NewsAboutRequests {
   /// Older news is dropped rather than written: an inbox re-read hands over every notification it
   /// holds, and the newest is the only one that says anything a held copy does not already know.
   func heard(aboutRequest requestID: String, at instant: Date) {
-    guard let already = heardAt[requestID] else {
-      heardAt[requestID] = instant
-      return
-    }
-    if instant > already {
+    if let already = heardAt[requestID] {
+      heardAt[requestID] = max(already, instant)
+    } else {
       heardAt[requestID] = instant
     }
   }

@@ -136,7 +136,7 @@ Host app (composition root, built once and held)
         ▼
   DifferentRequestsHub.swift ─── init assigns, in dependency order:
     client · board(BoardStore) · roadmap · changelog · inbox
-    submission(SubmitStore) · details(RequestDetailStores)
+    submission(SubmitStore)
         │
         │  RootView.swift:  NavigationStack { DifferentRequestsView(hub:) }
         ▼
@@ -145,7 +145,7 @@ Host app (composition root, built once and held)
     body
      ├── .searchable(text: $store.query) ──► BoardStore.query
      ├── .toolbar { primaryAction: askButton.labelStyle(.iconOnly) }    ── always present
-     ├── .firstRead(store.read)  ──► FirstRead.swift ──► BoardStore.load()   once per store
+     ├── .firstRead(store.read)  ──► View+FirstRead.swift ──► BoardStore.load()   once per store
      ├── .task(id: store.query)  ──► runSearch()
      │        ├── store.isShowingQuery == true  ──► return   (a redraw is not a search)
      │        ├── query non-empty ──► Task.sleep(300ms)      (canceled by the next keystroke)
@@ -201,14 +201,15 @@ DifferentRequestsView  (isComposing == false)
                          .task ──► SubmitStore.putAwayPosted(after: 4 s) ──► submitted = nil (fades)
 ```
 
-Pushing a request off the board walks the same lifetime rule:
+Pushing a request off the board gives the screen its own store, Apple's `@State` model pattern:
 
 ```
-DifferentRequestsView.row ──► RequestDetailView(hub:requestID:)
-                                 init ──► hub.detail(requestID:)
-                                            └──► RequestDetailStores.store(requestID:)
-                                                   held? ──► the same store as last time
-                                                   new?  ──► RequestDetailStore(client:requestID:)
+DifferentRequestsView.row ──► RequestDetailView(hub:requestID:)          RequestDetailView.swift
+                                 init ──► _store = State(initialValue:
+                                            RequestDetailStore(client:requestID:
+                                              notificationOffer:firstVoteNote:))   RequestDetailStore.swift
+                                 the board redraws ──► SwiftUI keeps the same store
+                                 the screen is popped ──► SwiftUI frees it
 ```
 
 ## The screens
@@ -298,6 +299,7 @@ The walk, and what it answered:
 | Type a title past 200 characters | "24 too many" in red, and Send refused while it is over |
 | Cut it back and press Send | The sheet dismisses and the row is on the board, one vote, Open |
 | 2026-09-26, iOS 27 simulator: send "Walk: the board says it is posted" | The sheet closed; a green "Your request is posted. You're following it." sat under the filter bar above the new row, and was gone five seconds later |
-| Open the same request again after a redraw of the board | The thread and any half-written comment are still there |
+| 2026-09-27, iOS 27 simulator "DR Permission Walk", development: type a comment on a request, leave the app and come back, then vote (which redraws the board beneath) | The half-written comment is still in the box both times |
+| Back out of that request and open it again | A fresh screen: the comment box is empty, the vote is still yours. The screen's store went when it was popped |
 | Send with the network down | The composer keeps what was typed and says it did not send |
 

@@ -32,9 +32,6 @@ enum PlanState {
 
   /// The configuration answered and this app has it.
   case included
-}
-
-extension PlanState {
 
   /// What an answer to `getConfig` says about one surface.
   ///

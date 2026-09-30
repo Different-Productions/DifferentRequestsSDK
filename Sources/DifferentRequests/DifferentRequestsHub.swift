@@ -16,7 +16,7 @@ import Foundation
 /// @main
 /// struct MyApp: App {
 ///   private let requests = DifferentRequestsHub(
-///     client: .make(appKey: "…"),
+///     client: DifferentRequestsClient(appKey: "…", baseURL: .production),
 ///     appearance: .standard,
 ///     emptyBoard: .standard,
 ///     notificationPermission: .askedBySDK
@@ -82,10 +82,6 @@ public final class DifferentRequestsHub {
   /// Read once, by everything that needs it.
   let appConfig: AppConfigStore
 
-  /// One store per request opened, so a pushed screen keeps its thread and its half-written
-  /// comment when whatever pushed it redraws.
-  let details: RequestDetailStores
-
   /// When each request was last heard to have changed, so a screen holding an old copy re-reads it
   /// instead of drawing what it read before the change.
   let news: NewsAboutRequests
@@ -102,10 +98,11 @@ public final class DifferentRequestsHub {
   // MARK: - Init
 
   /// - Parameter client: The client every screen reads and writes through. Build it with
-  ///   ``DifferentRequestsClient/make(appKey:)``.
+  ///   ``DifferentRequestsClient/init(appKey:baseURL:)``.
   ///
   /// This is the SDK's composition root: the one place its long-lived objects are built, each
-  /// exactly once and in dependency order. Nothing else in the package constructs a store.
+  /// exactly once and in dependency order. The one store built elsewhere is a request screen's own,
+  /// which lives as long as that screen does.
   /// - Parameters:
   ///   - client: The client every screen reads and writes through.
   ///   - appearance: What the screens are drawn in. ``Appearance/standard`` is the SDK's own look,
@@ -145,11 +142,6 @@ public final class DifferentRequestsHub {
     self.whoIsHere = WhoIsHere(client: client)
     self.inbox = InboxStore(client: client, news: news)
     self.submission = SubmitStore(client: client)
-    self.details = RequestDetailStores(
-      client: client,
-      notificationOffer: notificationOffer,
-      firstVoteNote: firstVoteNote
-    )
   }
 
   // MARK: - The look
@@ -200,8 +192,9 @@ public final class DifferentRequestsHub {
   /// in flight is not started twice, so a button that warms on every appearance costs one round
   /// trip rather than one per appearance.
   public func readTheBoardBeforeItIsShown() async {
-    if board.read.hasRead { return }
-    await board.load()
+    if board.read.hasRead == false {
+      await board.load()
+    }
   }
 
   // MARK: - Filing a request
@@ -226,15 +219,9 @@ public final class DifferentRequestsHub {
   /// now one request out of date.
   func fileRequest() async {
     await submission.submit()
-    if submission.submitted == nil { return }
-    await board.load()
-  }
-
-  // MARK: - Reading one request
-
-  /// The store behind one request's screen — the same one every time that request is asked for.
-  func detail(requestID: String) -> RequestDetailStore {
-    details.store(requestID: requestID)
+    if submission.submitted != nil {
+      await board.load()
+    }
   }
 
   // MARK: - News from outside

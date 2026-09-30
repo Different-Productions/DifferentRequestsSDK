@@ -13,7 +13,7 @@ This SDK only carries the proof. It cannot make one — nothing on the device ho
 | Half | Where |
 |---|---|
 | Making the proof | The host developer's backend, HMAC-SHA256 |
-| Carrying it | `createSession(externalID:email:displayName:traits:proof:)` |
+| Carrying it | `createSession(externalID:email:displayName:proof:)` |
 | Checking it | The server, `IdentityProofVerifier` (server #236) |
 
 ## Surfaces
@@ -39,7 +39,6 @@ try await requests.client.createSession(
   externalID: currentUser.id,
   email: currentUser.email,
   displayName: currentUser.name,
-  traits: [:],
   proof: nil
 )
 ```
@@ -74,7 +73,7 @@ Unset the secret and the app sends no proof, which is what an app without one do
 |---|---|---|
 | An app with no signing secret, `proof: nil` | Signing in | A session, as before this existed |
 | An app with no signing secret, a proof sent anyway | Signing in | A session. The server has nothing to check it against and ignores it |
-| An app with a secret, a proof signed with it | Signing in | A session, and the person's email, name and traits are refreshed |
+| An app with a secret, a proof signed with it | Signing in | A session, and the person's email and name are refreshed |
 | A proof expiring in five minutes | Signing in | Accepted. An hour is the longest the server accepts |
 | A `Date` carrying fractions of a second | Building the proof | The whole second is sent — the number that was signed |
 
@@ -111,7 +110,7 @@ perform(.createSession, body:)
   ▼
 the server                                        (DifferentRequests-Server, server #236)
   ├─ no secret for this app ──────────────────► answered as before, proof ignored
-  ├─ secret, proof adds up ───────────────────► session, and traits refreshed
+  ├─ secret, proof adds up ───────────────────► session, email and name refreshed
   └─ secret, proof missing or wrong ──────────► RPCFailure(unauthenticated:)
                                                    │
        DifferentRequestsError.api(DRApiError) ◄────┘
