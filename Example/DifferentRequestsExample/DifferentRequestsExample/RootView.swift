@@ -42,18 +42,7 @@ struct RootView: View {
     case .reading:
       ProgressView("Starting…")
 
-    case .configUnreadable:
-      ContentUnavailableView {
-        Label("Can't reach Different Requests", systemImage: "wifi.exclamationmark")
-      } description: {
-        Text("Couldn't load this app's settings. Check the log for the server's answer.")
-      } actions: {
-        Button("Try again") {
-          Task { await session.start() }
-        }
-      }
-
-    case .ready:
+    case .ready, .configUnreadable:
       home
     }
   }

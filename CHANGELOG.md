@@ -3,6 +3,13 @@
 Every released version, newest first. Versions are tags on the public repository,
 `Different-Productions/DifferentRequestsSDK`.
 
+## 0.15.1 — 2026-10-26
+
+No source changes to make.
+
+- Requests opened before your app's configuration has loaded, or after it failed to load, now
+  has its close button. In 0.15.0 that sheet could not be closed until the configuration answered.
+
 ## 0.15.0 — 2026-10-26
 
 The screens are redrawn from Apple's Human Interface Guidelines, on one set of named sizes, text

@@ -15,7 +15,7 @@ enum SDKClient {
   /// The one place it is written down, and it is written down rather than derived because SwiftPM
   /// gives a package no way to read its own tag at runtime. The release workflow refuses a tag
   /// this does not match.
-  static let version = "0.15.0"
+  static let version = "0.15.1"
 
   /// The value of the `X-DR-Client` header, shaped as the contract describes it.
   static let header = "differentrequests-swift/\(version) (\(platform) \(osVersion))"

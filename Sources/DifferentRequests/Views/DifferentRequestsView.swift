@@ -101,7 +101,7 @@ public struct DifferentRequestsView: View {
       text: $board.query,
       prompt: Text("Search requests", bundle: .module, comment: "Placeholder in the request board's search field")
     )
-    .worn(by: hub)
+    .wornAsTabs(by: hub)
     .sheetMinimumSize()
     .task {
       await hub.appConfig.load()

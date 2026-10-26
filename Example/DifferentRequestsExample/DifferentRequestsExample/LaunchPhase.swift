@@ -15,7 +15,7 @@ enum LaunchPhase {
   /// What this app offers, which is what decides its rows.
   case ready(DRAppConfig)
 
-  /// The config could not be read, so which screens exist is unknown. What the server said is in
-  /// the log.
+  /// The config could not be read. The rows every plan carries are offered, and the SDK's own
+  /// screens say they couldn't load and offer Try again. What the server said is in the log.
   case configUnreadable
 }

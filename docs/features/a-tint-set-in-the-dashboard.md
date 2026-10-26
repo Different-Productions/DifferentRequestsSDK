@@ -52,7 +52,7 @@ window, so the answer is normally held before anybody opens a screen.
 
 | When it fails | What happens |
 |---|---|
-| The configuration read failed | "Requests couldn't load" with the reason and **Try again**, in place of the screen. Nothing is drawn in a guessed color |
+| The configuration read failed | "Requests couldn't load" with the reason and **Try again**, in place of the screen, with the sheet's close button. Nothing is drawn in a guessed color |
 | A tint with one color missing, or a component over 255 | Read as no tint. The accent passed in code is drawn |
 | A server on a contract older than 0.42.0 | No tint arrives. The accent passed in code is drawn |
 
@@ -73,8 +73,11 @@ host app launch: await hub.configure()                 DifferentRequestsHub.swif
         ▼
 every screen: .worn(by: hub)                           Views/View+WornBy.swift
   └─ WornLook                                          Views/WornLook.swift
-       appConfig.badge .unread / .reading ─▶ ProgressView, untinted; .task loads
-       appConfig.badge .failed ─▶ LoadFailure, Try again re-reads   Views/LoadFailure.swift
+       appConfig.badge .unread / .reading / .failed ─▶ ConfigPending       Views/ConfigPending.swift
+            .unread / .reading ─▶ ProgressView, untinted; .task loads
+            .failed ─▶ LoadFailure, Try again re-reads          Views/LoadFailure.swift
+       the tab bar: TabsWornLook puts ConfigPending in a stack   Views/TabsWornLook.swift
+            with the sheet's close button, since the tabs have no stack of their own
        appConfig.badge .bought / .carried ─▶ the screen, worn:
        @Environment(\.colorScheme)
        .tint(hub.tintDrawn(in: colorScheme))           DifferentRequestsHub.swift
@@ -114,3 +117,11 @@ component over 255, which the dashboard cannot write. Nor macOS, which was built
 
 Seen on the walk: the plus on New request is drawn by the system's prominent toolbar button, which
 picks its own label color. It was white on `1F8A4C`, where the SDK's own rule gives black.
+
+Walked on 2026-10-26 against development (`api-dev`), iPhone 17 Pro simulator, iOS 27.0:
+
+| Step | Answer |
+|---|---|
+| Save `123A7A` and `FFE600` on the dashboard's Appearance tab, launch, open Requests | Light mode: navy on the first frame, four tabs. Dark mode: yellow, with a black plus |
+| Launch with the server unreachable, open Requests | "Requests couldn't load", "You're offline. Check your connection and try again.", **Try again**, and the close button |
+| Tap the close button | The sheet closes |

@@ -57,7 +57,12 @@ final class Session {
       return ExampleScreen.allCases.filter { screen in
         screen.isCarried(by: config)
       }
-    case .unconfigured, .reading, .configUnreadable:
+    case .configUnreadable:
+      // An unread config is an empty one: only what every plan carries is offered.
+      return ExampleScreen.allCases.filter { screen in
+        screen.isCarried(by: DRAppConfig())
+      }
+    case .unconfigured, .reading:
       return []
     }
   }
