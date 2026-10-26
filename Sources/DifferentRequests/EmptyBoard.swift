@@ -19,10 +19,10 @@ public struct EmptyBoard: Sendable, Equatable {
 
   /// The SDK's own words, for an app that sets none.
   public static let standard = EmptyBoard(
-    symbol: "lightbulb.max",
-    title: String(localized: "What should we build?", bundle: .module, comment: "Heading on a request board with no requests yet"),
+    symbol: "bubble.left.fill",
+    title: String(localized: "No requests yet", bundle: .module, comment: "Heading on a request board with no requests yet"),
     message: String(
-      localized: "Nobody has asked for anything yet. Tell us what you want and everyone can vote on it.",
+      localized: "Ask for what you want in this app, and everyone can vote on it.",
       bundle: .module,
       comment: "Message on a request board with no requests yet"
     ),

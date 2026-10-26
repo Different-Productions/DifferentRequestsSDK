@@ -1,5 +1,6 @@
 import DifferentRequestsProtos
 import Foundation
+import SwiftUI
 
 /// Everything the SDK's screens read from, built once by the app that hosts them.
 ///
@@ -10,7 +11,7 @@ import Foundation
 /// writing. The screens here therefore construct nothing. They are handed this, and it outlives
 /// them because the host app is what holds it.
 ///
-/// Build one where the app builds everything else it keeps:
+/// Build one where the app builds everything else it keeps, and await ``configure()`` at launch:
 ///
 /// ```swift
 /// @main
@@ -24,9 +25,10 @@ import Foundation
 ///
 ///   var body: some Scene {
 ///     WindowGroup {
-///       NavigationStack {
-///         DifferentRequestsView(hub: requests)
-///       }
+///       DifferentRequestsView(hub: requests)
+///         .task {
+///           await requests.configure()
+///         }
 ///     }
 ///   }
 /// }
@@ -89,10 +91,11 @@ public final class DifferentRequestsHub {
   /// Who the host app signed in. Read by every screen that offers a control acting for a person.
   let whoIsHere: WhoIsHere
 
-  /// The "Get told when this changes?" card, offered after a first vote or follow.
+  /// The "Get notified when this request changes?" card, offered after a first vote or follow.
   let notificationOffer: NotificationOffer
 
-  /// The one-time "You'll be told when this changes." line after the first vote on this phone.
+  /// The one-time "You'll get an update in Inbox when this request changes." line after the first
+  /// vote on this phone.
   let firstVoteNote: FirstVoteNote
 
   // MARK: - Init
@@ -144,14 +147,43 @@ public final class DifferentRequestsHub {
     self.submission = SubmitStore(client: client)
   }
 
+  // MARK: - Launch
+
+  /// Reads what this app includes: its plan's screens, the badge, and the tint chosen in the
+  /// dashboard.
+  ///
+  /// Await it once at launch, before your first window, the way you would any other launch work.
+  /// No screen is drawn until this has answered, so a screen opened after it draws the right tabs,
+  /// badge and color on its first frame:
+  ///
+  /// ```swift
+  /// @main
+  /// struct MyApp: App {
+  ///   private let requests = DifferentRequestsHub(…)
+  ///
+  ///   var body: some Scene {
+  ///     WindowGroup {
+  ///       ContentView(requests: requests)
+  ///         .task {
+  ///           await requests.configure()
+  ///         }
+  ///     }
+  ///   }
+  /// }
+  /// ```
+  ///
+  /// A read that fails is read again by the next screen that opens. One that answered is not read
+  /// again for the life of the client.
+  public func configure() async {
+    await appConfig.load()
+  }
+
   // MARK: - The look
 
   /// What every screen is drawn in: the host app's look where this app's plan includes it, and the
   /// SDK's own where it does not.
   ///
-  /// Until the configuration has answered, the host app's look is drawn — the same side the badge
-  /// errs on, so an app paying for its look never sees ours. Read by each screen as it draws, so the
-  /// look follows the configuration the moment it answers.
+  /// Read only once the configuration has answered: `WornLook` draws no screen before then.
   var appearanceDrawn: Appearance {
     if usesHostAppearance {
       return appearance
@@ -159,8 +191,21 @@ public final class DifferentRequestsHub {
     return .standard
   }
 
+  /// The color every screen is tinted with in the mode being drawn.
+  ///
+  /// A tint chosen in the dashboard wins over the accent the host app passed in code. With neither,
+  /// it is the system tint. The dashboard's tint is held only for an app whose plan includes its own
+  /// look, so a Free app is never drawn in one.
+  func tintDrawn(in colorScheme: ColorScheme) -> Color {
+    if let dashboardTint = appConfig.dashboardTint {
+      return dashboardTint.color(in: colorScheme)
+    }
+    return appearanceDrawn.accent
+  }
+
   /// What a board with nothing on it says: the host app's words where its plan includes its own
-  /// look, and the SDK's where it does not. Errs the same way as ``appearanceDrawn``.
+  /// look, and the SDK's where it does not. Read only once the configuration has answered, like
+  /// ``appearanceDrawn``.
   var emptyBoardDrawn: EmptyBoard {
     if usesHostAppearance {
       return emptyBoard.filledIn
@@ -168,14 +213,13 @@ public final class DifferentRequestsHub {
     return .standard
   }
 
-  /// Whether the host app's own look is drawn: its plan includes it, or the configuration has not
-  /// answered yet.
+  /// Whether the host app's own look is drawn: the configuration answered and the plan includes it.
   private var usesHostAppearance: Bool {
     switch appConfig.badge {
     case .bought, .carried:
       return appConfig.config.appearanceEnabled
     case .unread, .reading, .failed:
-      return true
+      return false
     }
   }
 

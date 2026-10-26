@@ -42,6 +42,9 @@ final class BoardStore {
   /// Offered the notification card after a vote cast from a row.
   let notificationOffer: NotificationOffer
 
+  /// How long a search settles before it is sent, so a typed word is one read and not five.
+  let searchSettleDelay: Duration = .milliseconds(300)
+
   // MARK: - What is being asked
 
   /// Which statuses the board covers. Empty means everything still on it.
@@ -224,6 +227,25 @@ final class BoardStore {
     }
   }
 
+  /// Reads the board again when what is held does not answer the question now being asked, after
+  /// letting a burst of typing settle.
+  ///
+  /// Run from a task keyed on the question, which SwiftUI cancels and restarts on every keystroke.
+  /// A canceled wait sends nothing, and a board that already answers the question is left alone, so
+  /// a redraw does not throw away the pages after the first.
+  func search() async {
+    if isCurrent == false {
+      do {
+        if query.isEmpty == false {
+          try await Task.sleep(for: searchSettleDelay)
+        }
+        await load()
+      } catch {
+        // The wait throws only when it is canceled, and a canceled search sends nothing.
+      }
+    }
+  }
+
   /// Appends the next page.
   ///
   /// Returns immediately when the server reported no further page, when one is already in flight,
@@ -283,8 +305,9 @@ final class BoardStore {
   /// found again by id after the write answers, rather than by an index taken before it: a
   /// `load()` can replace the whole board while the call is suspended.
   ///
-  /// What the write returned replaces the row whole. A count incremented locally is wrong the
-  /// moment anyone else votes.
+  /// The row flips before the call, so the tile answers the tap at once. What the write returned
+  /// then replaces the row whole, because a count incremented locally is wrong the moment anyone
+  /// else votes, and a refused write puts back the row as it was held.
   func toggleVote(requestID: String) async {
     if write.isWriting == false, let current = read.held.first(where: { $0.id == requestID }) {
       let attempt: WriteAttempt
@@ -294,6 +317,7 @@ final class BoardStore {
         attempt = .vote
       }
       write = .writing(attempt)
+      read = read.replacing(withVoteFlipped(current), identifiedBy: { $0.id })
 
       do {
         let written: DRFeatureRequest
@@ -309,9 +333,26 @@ final class BoardStore {
           await notificationOffer.votedOrFollowed(requestID: requestID)
         }
       } catch {
+        read = read.replacing(current, identifiedBy: { $0.id })
         write = .failed(WriteFailure(attempt: attempt, error: error))
       }
     }
+  }
+
+  /// The row as it reads the moment its tile is tapped, held until the write answers with the
+  /// server's own row or is refused.
+  private func withVoteFlipped(_ request: DRFeatureRequest) -> DRFeatureRequest {
+    var flipped = request
+    if request.viewer.voted {
+      flipped.viewer.voted = false
+      if request.voteCount > 0 {
+        flipped.voteCount = request.voteCount - 1
+      }
+    } else {
+      flipped.viewer.voted = true
+      flipped.voteCount = request.voteCount + 1
+    }
+    return flipped
   }
 
   /// Puts away the notice about the last failed vote.

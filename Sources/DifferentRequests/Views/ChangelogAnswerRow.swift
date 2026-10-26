@@ -1,28 +1,26 @@
 import DifferentRequestsProtos
 import SwiftUI
 
-/// One request an update answers: shipped, its title, and how many asked for it.
+/// One request an update answers, as its own row that opens the request: the shipped mark and the
+/// request's title.
 struct ChangelogAnswerRow: View {
 
-  private static let spacing: CGFloat = 10
+  /// What a push from this row is built against.
+  let hub: DifferentRequestsHub
 
   let answer: DRChangelogAnswer
 
   var body: some View {
-    HStack(spacing: Self.spacing) {
-      Image(systemName: "checkmark")
-        .fontWeight(.semibold)
-        .foregroundStyle(.green)
-        .accessibilityHidden(true)
-
-      Text(answer.title)
-        .font(.subheadline)
-        .frame(maxWidth: .infinity, alignment: .leading)
-
-      Text("\(Int(answer.voteCount)) votes", bundle: .module, comment: "VoiceOver count of a request's votes")
-        .font(.footnote)
-        .monospacedDigit()
-        .foregroundStyle(.secondary)
+    NavigationLink {
+      RequestDetailView(hub: hub, requestID: answer.requestID)
+    } label: {
+      HStack(alignment: .firstTextBaseline, spacing: Spacing.small.rawValue) {
+        Image(systemName: "checkmark.circle.fill")
+          .accessibilityHidden(true)
+        Text(answer.title)
+      }
+      .textRole(.reading)
+      .foregroundStyle(ColorRole.label)
     }
   }
 }

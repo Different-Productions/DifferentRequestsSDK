@@ -42,8 +42,8 @@ Declaring otherwise would be false.
 company's apps, and nothing goes to a data broker. `NSPrivacyTrackingDomains` is empty.
 
 **`NSPrivacyAccessedAPITypes` names `UserDefaults`, reason `CA92.1`** — read and written by this
-app alone. Two keys, both remembered on this phone and never sent: that the "Get told when this
-changes?" card was answered (`DifferentRequests.notificationOfferAnswered`, in
+app alone. Two keys, both remembered on this phone and never sent: that the "Get notified when
+this request changes?" card was answered (`DifferentRequests.notificationOfferAnswered`, in
 `NotificationOffer.swift`) and that a first vote was made (`DifferentRequests.firstVoteNoted`, in
 `FirstVoteNote.swift`). Added 2026-09-26 with the owner's rulings for those two pieces.
 

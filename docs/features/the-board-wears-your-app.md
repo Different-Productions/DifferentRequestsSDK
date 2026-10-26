@@ -18,21 +18,23 @@ cannot: the system decides contrast, sizes and weights, and Dynamic Type still w
 which takes each label's size and weight with it — a board where a title, a vote count and a caption
 are all one size. `fontDesign` keeps text styles intact, so that is the half of it worth having.
 
-**Why it is handed over rather than fetched.** It is the host app's own look. Reading it from the
-console would make a color change a deploy of ours, and a round trip on every launch, to answer a
-question the app already knows the answer to. What *is* fetched is whether the app's plan includes
-it: `appearance_enabled` on the config the SDK already reads.
+**Handed over, and since contract 0.42.0 also chosen in the dashboard.** The look passed in code is
+the host app's own, and it is drawn with no round trip. What is fetched is whether the app's plan
+includes it, `appearance_enabled` on the config the SDK already reads, and the tint a developer
+chose in the dashboard, which wins over the accent passed here (`a-tint-set-in-the-dashboard.md`).
+The font is only ever the one passed in code.
 
-**Before the config answers**, the host app's look is drawn — the same side the badge errs on, so an
-app paying for its look never sees ours.
+**Before the config answers, no screen is drawn.** A spinner stands in, untinted, so nobody sees a
+look the answer then replaces. `hub.configure()` is the launch read the host awaits before its
+first window, so the answer is normally held before a screen opens.
 
 ## Surfaces
 
 | Surface | Ships this? |
 |---|---|
-| Swift SDK | **Yes** — `Appearance`, handed to `DifferentRequestsHub(client:appearance:emptyBoard:)`; every screen wears `hub.appearanceDrawn` |
+| Swift SDK | **Yes** — `Appearance`, handed to `DifferentRequestsHub(client:appearance:emptyBoard:)`; every screen wears the hub's look with `.worn(by: hub)` |
 | API (the rpcs) | **Reads it** — `GetConfig` answers `appearance_enabled` (server #251) |
-| Web console | **none.** The console is ours and is drawn in ours |
+| Web console | **Chooses a tint that wins over the accent**, on its Appearance tab (`a-tint-set-in-the-dashboard.md`). The console itself is drawn in ours |
 | Push notifications | **none** — Apple draws those |
 
 ## How to find it, trigger it, and what happens
@@ -51,7 +53,7 @@ let requests = DifferentRequestsHub(
 so an app that has not thought about it says so at the call site.
 
 **What wears it.** Every screen the SDK ships: the board, a request, the composer, the roadmap, the
-changelog and the inbox. One modifier at the top of each, reading `hub.appearanceDrawn` as it draws,
+changelog and the inbox. One modifier at the top of each, reading the hub as it draws,
 so a control added later is worn without anybody remembering to say so, and the look follows the
 config the moment it answers.
 
@@ -63,8 +65,8 @@ config the moment it answers.
 |---|---|
 | A Pro app, `Appearance(accent: .purple, font: .rounded)` | Vote controls, prominent buttons, links and spinners are purple; every label is rounded |
 | A Free app, the same appearance passed | The system tint and the system font, once the config has answered |
-| Any app, before the config has answered | The appearance passed |
-| Any app, the config read failed | The appearance passed — a failed read never takes a paying app's look away |
+| Any app, before the config has answered | A spinner, untinted, in place of the screen |
+| Any app, the config read failed | "Requests couldn't load", the reason, and **Try again**, in place of the screen |
 | `Appearance.standard`, any plan | The system tint and the system font |
 | Dynamic Type at any size | Unchanged: the family moves, the text styles do not |
 | Dark mode | Unchanged: the accent is a `Color`, so it resolves per scheme like any other |
@@ -78,20 +80,22 @@ drawn in the SDK's own look.
 ```
 DifferentRequestsHub(client:appearance:emptyBoard:)
   ├─ appearance: Appearance ── what the host app asked for
-  └─ appConfig: AppConfigStore ── GetConfig, read by the board and the inbox (.task → load())
+  └─ appConfig: AppConfigStore ── GetConfig, read by hub.configure() at launch
        │
        ▼
-hub.appearanceDrawn                                  DifferentRequestsHub.swift
+WornLook                                             Views/WornLook.swift
   switch appConfig.badge            (how far the config read got)
-    .bought / .carried ─► config.appearanceEnabled ? appearance : .standard
-    .unread / .reading / .failed ─► appearance
+    .unread / .reading ─► ProgressView, untinted; .task → load()
+    .failed ─► LoadFailure "Requests couldn't load", Try again → load()
+    .bought / .carried ─► the screen, in hub.appearanceDrawn:
+       config.appearanceEnabled ? appearance : .standard
        │
        ├─ DifferentRequestsView ─┐
        ├─ RequestDetailView      │
-       ├─ SubmitRequestView      ├─ .worn(by: hub.appearanceDrawn)      View+WornBy.swift
-       ├─ InboxView              │     ├─ .tint(accent)
-       ├─ RoadmapView            │     └─ .fontDesign(font)
-       └─ ChangelogView         ─┘
+       ├─ SubmitRequestView      ├─ .worn(by: hub)      View+WornBy.swift → WornLook.swift
+       ├─ InboxView              │     ├─ .tint(hub.tintDrawn(in: colorScheme))
+       ├─ RoadmapView            │     │     the dashboard's tint, or appearanceDrawn.accent
+       └─ ChangelogView         ─┘     └─ .fontDesign(hub.appearanceDrawn.font)
 ```
 
 Every screen reads the hub as it draws. `AppConfigStore` is `@Observable`, so the screens redraw when
@@ -109,7 +113,7 @@ Pro app, purple + rounded           Free app, purple + rounded passed
 └──────────────────────────┘        └──────────────────────────┘
 ```
 
-No in-flight state of its own: before the config answers, the passed look is drawn.
+Before the config answers, a spinner stands in for the screen, so no look is drawn and then replaced.
 
 ## Platform differences
 

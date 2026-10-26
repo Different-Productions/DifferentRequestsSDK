@@ -1,10 +1,9 @@
 import SwiftUI
 
-/// A request's demand, and the caller's own vote in it.
+/// A request's demand, and the caller's own vote in it, as one tile.
 ///
-/// One control for both directions: the count is what the board measures, and whether it includes
-/// your vote is the whole difference between a form and a room — so the button has to already
-/// look pressed.
+/// Voted, the tile is filled with the tint and its triangle is solid. Not voted, it is filled gray
+/// with an outline triangle. Its width and height are minimums, so it grows with larger text.
 ///
 /// ```swift
 /// VoteControl(
@@ -17,21 +16,14 @@ import SwiftUI
 /// ```
 public struct VoteControl: View {
 
-  private static let width: CGFloat = 44
-  private static let spacing: CGFloat = 2
-
   /// How much demand the request has, as the server counts it.
   public let voteCount: Int
 
   /// Whether the caller's own vote is among them.
   public let voted: Bool
 
-  /// Whether a write is already running on the surface this sits on.
-  ///
-  /// A surface writes one vote at a time, so a control tapped during someone else's round trip is
-  /// refused before it reaches the network. Stated here rather than left to the store, because a
-  /// refusal the store makes silently is a tap that does nothing and says nothing — which is the
-  /// thing this control is on screen to avoid.
+  /// Whether a write is already running on the surface this sits on. The tile takes no tap while
+  /// one is.
   public let isWriting: Bool
 
   /// Adds the caller's vote, or takes it back.
@@ -58,18 +50,9 @@ public struct VoteControl: View {
     AsyncButton {
       await toggle()
     } label: {
-      VStack(spacing: Self.spacing) {
-        Image(systemName: voted ? "chevron.up.circle.fill" : "chevron.up.circle")
-          .font(.title3)
-        Text(voteCount.formatted())
-          .font(.subheadline)
-          .fontWeight(.semibold)
-          .monospacedDigit()
-      }
-      .frame(width: Self.width, alignment: .leading)
-      .foregroundStyle(tint)
+      VoteMark(voteCount: voteCount, voted: voted)
     }
-    .buttonStyle(.plain)
+    .buttonStyle(VoteTileStyle(voted: voted))
     .disabled(isWriting)
     .accessibilityLabel(
       voted
@@ -77,18 +60,5 @@ public struct VoteControl: View {
         : Text("Vote for this", bundle: .module, comment: "VoiceOver label for the vote button")
     )
     .accessibilityValue(Text("\(voteCount) votes", bundle: .module, comment: "VoiceOver count of a request's votes"))
-  }
-
-  /// `.buttonStyle(.plain)` renders its own label, so a disabled plain button looks exactly like
-  /// an enabled one. The dim is stated here instead, or the inert control would be inert in
-  /// secret.
-  private var tint: AnyShapeStyle {
-    if isWriting {
-      return AnyShapeStyle(HierarchicalShapeStyle.tertiary)
-    }
-    if voted {
-      return AnyShapeStyle(Color.accentColor)
-    }
-    return AnyShapeStyle(Color.secondary)
   }
 }

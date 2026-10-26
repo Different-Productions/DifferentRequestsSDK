@@ -30,10 +30,8 @@ struct MyApp: App {
 
   var body: some Scene {
     WindowGroup {
-      // The NavigationStack is yours. Every screen here needs one.
-      NavigationStack {
-        DifferentRequestsView(hub: requests)
-      }
+      // Tabs, each with its own NavigationStack. Do not wrap it in one.
+      DifferentRequestsView(hub: requests)
     }
   }
 }

@@ -148,14 +148,13 @@ Inside the board, with nobody signed in
 │  ^ 12  Dark mode on the widget               │ ← VoteTally: the count, nothing to press
 │  ^  4  Export to CSV                         │
 └──────────────────────────────────────────────┘
-  no "+", and the "…" menu offers neither New request nor Inbox;
-  with no Roadmap or What's New either, the menu is not drawn at all
+  no "+". Since 2026-10-09 the Inbox is a tab that is always there, and it says "No updates yet"
 
 A request, with nobody signed in
   the count as a VoteTally, no Follow, and no comment strip
 
 The Inbox, with nobody signed in
-  "Nothing yet", and nothing is read from the server
+  "No updates yet", and nothing is read from the server
 
 In flight
   Starting…            the whole root, while the session and the config are read
@@ -195,9 +194,9 @@ given a signing secret and launched without a proof (#110):
 |---|---|
 | The board | No "+", no "…" menu (a Free app, so it would hold nothing), and each row's count drawn with nothing to press |
 | A request | "4 votes" and nothing to press: no Follow, no comment strip |
-| The Inbox | "Nothing yet", not "Couldn't load… Check your connection" |
+| The Inbox | "No updates yet", not "Inbox couldn't load… Check your connection" |
 | The secret removed, relaunched | Signed in: "+", "…", Vote, Follow and the comment strip are all back |
 
 Before the fix the same walk found the menu offering New request, and Vote, Follow and the
-comment box on screen, each answering "Your vote didn't go through. Try it again." or "That didn't
-send. It's still written — send it again." when pressed.
+comment box on screen, each answering "Your vote didn't go through. Try again." or "Your comment
+didn't send. What you wrote is still here. Choose Send to try again." when pressed.

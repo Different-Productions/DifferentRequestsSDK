@@ -1,15 +1,10 @@
 import SwiftUI
 
-/// The field a comment is written in, pinned under a thread.
+/// The field a comment is written in and its Send circle, 12 pt apart, with the character count on
+/// its own line over them once it is worth showing.
 ///
-/// The draft it edits belongs to the store, not to this view: a redraw must not be able to lose
-/// what someone typed, and whether the draft is worth sending is the store's judgement rather
-/// than a second rule written here.
+/// The draft belongs to the store, so a redraw cannot lose what someone typed.
 struct CommentComposer: View {
-
-  private static let lineLimit: ClosedRange<Int> = 1...4
-  private static let spacing: CGFloat = 8
-  private static let verticalPadding: CGFloat = 8
 
   /// What is being written, held by the store.
   @Binding var draft: String
@@ -17,54 +12,61 @@ struct CommentComposer: View {
   /// Whether there is anything worth sending.
   let canSend: Bool
 
-  /// The limit minus what is typed, shown once it is close. Negative once it is over.
+  /// The limit minus what is typed. Negative once it is over.
   let charactersLeft: Int
 
-  /// `true` while a write on this request is in flight. Only one runs at a time, so the composer
-  /// waits out a vote as well as a comment.
+  /// Whether a write on this request is in flight. Only one runs at a time.
   let isWriting: Bool
 
   /// Posts the draft.
   let send: () async -> Void
 
-  /// Whether the field holds the keyboard. Given up once a comment lands, so the reader sees the
-  /// thread it joined.
+  /// Whether the field holds the keyboard. Given up once a comment lands.
   @FocusState private var isFocused: Bool
 
   var body: some View {
-    HStack(alignment: .bottom, spacing: Self.spacing) {
-      TextField(
-        text: $draft,
-        prompt: Text("Add a comment", bundle: .module, comment: "Placeholder in the comment field under a request"),
-        axis: .vertical
-      ) {
-        Text("Add a comment", bundle: .module, comment: "Placeholder in the comment field under a request")
-      }
-        .lineLimit(Self.lineLimit)
-        .textFieldStyle(.plain)
-        .focused($isFocused)
-
+    VStack(alignment: .leading, spacing: Spacing.xxSmall.rawValue) {
       CharactersLeft(left: charactersLeft)
+        .padding(.horizontal, Spacing.medium.rawValue)
 
-      if isWriting {
-        ProgressView()
-      } else {
-        AsyncButton {
-          await send()
-          // A failed post leaves the draft as typed, so an empty one means it landed.
-          if draft.isEmpty {
-            isFocused = false
-          }
-        } label: {
-          Image(systemName: "arrow.up.circle.fill")
-            .font(.title2)
+      HStack(alignment: .bottom, spacing: Spacing.small.rawValue) {
+        TextField(
+          text: $draft,
+          prompt: Text("Add a comment", bundle: .module, comment: "Placeholder in the comment field under a request"),
+          axis: .vertical
+        ) {
+          Text("Add a comment", bundle: .module, comment: "Placeholder in the comment field under a request")
         }
-        .buttonStyle(.plain)
-        .disabled(canSend == false)
-        .accessibilityLabel(Text("Send comment", bundle: .module, comment: "VoiceOver label for the button that sends a comment"))
+        .lineLimit(1...4)
+        .textFieldStyle(.plain)
+        .textRole(.reading)
+        .focused($isFocused)
+        .padding(.horizontal, Spacing.medium.rawValue)
+        .padding(.vertical, Spacing.xSmall.rawValue)
+        .frame(minHeight: TargetSize.minimum.rawValue)
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: TargetSize.minimum.rawValue / 2))
+
+        if isWriting {
+          ProgressView()
+            .frame(width: TargetSize.minimum.rawValue, height: TargetSize.minimum.rawValue)
+        } else {
+          AsyncButton {
+            await send()
+          } label: {
+            Image(systemName: "arrow.up")
+              .fontWeight(.semibold)
+          }
+          .buttonStyle(SendButtonStyle())
+          .disabled(canSend == false)
+          .accessibilityLabel(Text("Send comment", bundle: .module, comment: "VoiceOver label for the button that sends a comment"))
+        }
       }
     }
-    .padding(.horizontal)
-    .padding(.vertical, Self.verticalPadding)
+    .onChange(of: isWriting) {
+      // A refused post leaves the draft as typed, so an empty one after a write means it landed.
+      if isWriting == false, draft.isEmpty {
+        isFocused = false
+      }
+    }
   }
 }

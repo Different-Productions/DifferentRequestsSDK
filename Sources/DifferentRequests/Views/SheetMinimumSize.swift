@@ -1,10 +1,10 @@
 import CoreGraphics
 
-/// The smallest a full SDK screen is drawn on macOS: room for the filter bar on one line and a
+/// The smallest a full SDK screen is drawn on macOS: room for the bar's buttons on one line and a
 /// screenful of rows.
-enum SheetMinimumSize {
+enum SheetMinimumSize: CGFloat {
 
-  static let width: CGFloat = 520
+  case width = 520
 
-  static let height: CGFloat = 600
+  case height = 600
 }

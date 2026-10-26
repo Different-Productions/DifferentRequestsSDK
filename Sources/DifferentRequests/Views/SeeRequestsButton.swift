@@ -11,8 +11,6 @@ struct SeeRequestsButton: View {
       isShowingRequests = true
     } label: {
       Text("See requests", bundle: .module, comment: "Button on an empty Roadmap or What's New that opens the request list")
-        .foregroundStyle(.background)
-        .frame(maxWidth: CallToActionSize.width)
     }
     .buttonStyle(.borderedProminent)
     .controlSize(.large)

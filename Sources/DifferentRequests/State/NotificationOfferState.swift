@@ -1,4 +1,4 @@
-/// Where the "Get told when this changes?" card is, for the request it was offered under.
+/// Where the "Get notified when this request changes?" card is, for the request it was offered under.
 enum NotificationOfferState {
 
   /// No card is up.

@@ -1,11 +1,9 @@
-import DifferentRequestsProtos
 import SwiftUI
 
-/// The board: what people have asked for, ranked by demand, and the way in to asking for
-/// something new.
+/// Everything the SDK draws, as tabs: Requests and Inbox always, Roadmap and What's New where the
+/// app's plan includes them, with the system search button beside them.
 ///
-/// Presented over the host app rather than embedded in it, reading from the hub the host built
-/// once:
+/// Presented over the host app, reading from the hub the host built once:
 ///
 /// ```swift
 /// .sheet(isPresented: $isShowingRequests) {
@@ -13,351 +11,106 @@ import SwiftUI
 /// }
 /// ```
 ///
-/// It brings its own `NavigationStack`, so the screen is ours from the title down: the chrome
-/// reads the same in every app that ships it, and neither the bar it draws into nor the space its
-/// search field needs is shared with anything the host put there.
+/// Each tab brings its own `NavigationStack`, so do not put this inside one.
 ///
-/// The other surfaces are reached from the menu in its toolbar and pushed onto the same stack. A
-/// surface this app does not include is not in the menu — an entry that is refused when tapped
-/// tells the person using the app that something is broken, when nothing is.
+/// A tab exists only once the app's configuration says its plan includes the screen. An unread
+/// configuration includes neither, so no tab appears and then goes away.
 ///
-/// Searching, ranking, filtering and reading the board are all the same screen, because they are
-/// the same rpc with the same page shape. Each of the three narrowings is one query parameter, and
-/// the answer to all of them is a list of requests.
-///
-/// Asking is reachable from every state the board can be in, the populated one included: a board
-/// full of other people's requests is exactly where someone finds out that theirs is not on it,
-/// and an affordance that appears only once the board is empty, or only once a search has come
-/// back with nothing, is missing at the moment it is most wanted. Whatever is in the search field
-/// goes into the composer with them, because the cheapest moment to catch a duplicate is before it
-/// is written, and a search that did not answer is already the title.
-///
-/// The filter bar is reachable from every state for the same reason turned inside out. It is drawn
-/// above the content rather than within it, so narrowing the board to a status nothing is in leaves
-/// the control that undoes the narrowing exactly where it was.
+/// Search is the Requests list narrowed by what is typed. The text is cleared on leaving search, so
+/// the Requests tab is always the whole board.
 public struct DifferentRequestsView: View {
 
-  /// How long a search settles before it is sent. Long enough that a typed word is one read
-  /// rather than five.
-  private static let searchSettleDelay: Duration = .milliseconds(300)
-
-  private static let rowSpacing: CGFloat = 12
-
-  private static let callToActionInset: CGFloat = 32
-
-  /// What the screen reads from, and what its pushes and its sheet are built against.
+  /// What every tab reads from.
   let hub: DifferentRequestsHub
 
-  /// Bindable for the search field, which writes the query the board reads on. The store belongs
-  /// to the hub; this only takes bindings from it.
-  @Bindable private var store: BoardStore
+  /// The tab being shown.
+  @State private var tab = ScreenTab.requests
 
-  /// Whether the composer is up.
-  @State var isComposing: Bool = false
-
-  /// Closes the sheet the host presented this in.
-  @Environment(\.dismiss) private var dismiss
-
-  /// Whether something presented this screen, which decides whether Done is drawn at all.
-  @Environment(\.isPresented) private var isPresented
-
-  /// - Parameter hub: What the host app built once and holds. The board's state lives on it.
+  /// - Parameter hub: What the host app built once and holds. Every screen's state lives on it.
   public init(hub: DifferentRequestsHub) {
     self.hub = hub
-    self._store = Bindable(hub.board)
   }
 
   public var body: some View {
-    NavigationStack {
-      board
-    }
-    .searchable(
-      text: $store.query,
-      prompt: Text("Search requests", bundle: .module, comment: "Placeholder in the request board's search field")
-    )
-    .searchPresentationToolbarBehavior(.avoidHidingContent)
-    .worn(by: hub.appearanceDrawn)
-    .sheetMinimumSize()
-  }
+    @Bindable var board = hub.board
 
-  /// The board itself, inside the stack this view owns.
-  private var board: some View {
-    VStack(spacing: 0) {
-      // Under the title, the same place the inbox draws it. Pinned to the bottom it read as an
-      // advertisement laid over somebody else's app, which is the thing it is not.
-      PoweredByBadge(appConfig: hub.appConfig)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal)
-        .padding(.bottom, 6)
-
-      BoardFilterBar(store: store)
-
-      // Only once the composer is closed, so its few seconds start when the board can be seen.
-      if isComposing == false {
-        PostedNotice(hub: hub)
-          .padding(.horizontal)
-          .padding(.top, 8)
+    TabView(selection: $tab) {
+      Tab(value: ScreenTab.requests) {
+        NavigationStack {
+          RequestsScreen(hub: hub)
+        }
+      } label: {
+        Label {
+          Text("Requests", bundle: .module, comment: "Title of the request board")
+        } icon: {
+          Image(systemName: "bubble.left.fill")
+        }
       }
 
-      content
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+      if hub.appConfig.config.roadmapEnabled {
+        Tab(value: ScreenTab.roadmap) {
+          NavigationStack {
+            RoadmapView(hub: hub)
+          }
+        } label: {
+          Label {
+            Text("Roadmap", bundle: .module, comment: "Title of the roadmap screen")
+          } icon: {
+            Image(systemName: "map.fill")
+          }
+        }
+      }
+
+      if hub.appConfig.config.changelogEnabled {
+        Tab(value: ScreenTab.changelog) {
+          NavigationStack {
+            ChangelogView(hub: hub)
+          }
+        } label: {
+          Label {
+            Text("What's New", bundle: .module, comment: "Tab and title of the app's release notes screen")
+          } icon: {
+            Image(systemName: "sparkles")
+          }
+        }
+      }
+
+      Tab(value: ScreenTab.inbox) {
+        NavigationStack {
+          InboxView(hub: hub)
+        }
+      } label: {
+        Label {
+          Text("Inbox", bundle: .module, comment: "Tab and title of the screen listing updates on requests")
+        } icon: {
+          Image(systemName: "tray.fill")
+        }
+      }
+      .badge(hub.inbox.unreadCount)
+
+      Tab(value: ScreenTab.search, role: .search) {
+        NavigationStack {
+          RequestsScreen(hub: hub)
+        }
+        .onDisappear {
+          hub.board.query = ""
+        }
+      }
     }
-    .animation(.easeOut, value: hub.submission.submitted)
-    .navigationTitle(Text("Requests", bundle: .module, comment: "Title of the request board"))
+    .searchable(
+      text: $board.query,
+      prompt: Text("Search requests", bundle: .module, comment: "Placeholder in the request board's search field")
+    )
+    .worn(by: hub)
+    .sheetMinimumSize()
     .task {
       await hub.appConfig.load()
       await hub.whoIsHere.read()
-    }
-    .toolbar {
-      // Only where something presented this. As the root of a host app's own NavigationStack —
-      // which is what the documentation tells a developer to build — Done had nothing to dismiss
-      // and did nothing when pressed.
-      if isPresented {
-        ToolbarItem(placement: .cancellationAction) {
-          Button {
-            dismiss()
-          } label: {
-            Text("Done", bundle: .module, comment: "Button that closes the request board")
-          }
-        }
-      }
-      // Asking acts for a person. With nobody signed in it can only be refused, and a control that
-      // can only fail is worse than one that is not there — see #84.
+      // The Inbox tab's badge is the server's own unread count, which the inbox reads with its
+      // first page.
       if hub.whoIsHere.somebodyIsHere {
-        ToolbarItem(placement: .primaryAction) {
-          // A Mac sheet draws its toolbar as a row of buttons at the bottom, where an icon alone
-          // does not read as asking.
-          #if os(macOS)
-          askButton
-            .labelStyle(.titleAndIcon)
-          #else
-          askButton
-            .labelStyle(.iconOnly)
-          #endif
-        }
+        await hub.inbox.load()
       }
-      if hub.whoIsHere.somebodyIsHere
-        || hub.appConfig.config.roadmapEnabled
-        || hub.appConfig.config.changelogEnabled {
-        ToolbarItem(placement: .primaryAction) {
-          everythingElse
-        }
-      }
-    }
-    .firstRead(store.read) {
-      await store.load()
-    }
-    .task(id: store.query) {
-      await runSearch()
-    }
-    .sheet(isPresented: $isComposing) {
-      SubmitRequestView(hub: hub)
-    }
-  }
-
-  // MARK: - Searching
-
-  /// Reloads the board when the field says something the page on screen does not answer, after
-  /// letting a burst of typing settle.
-  ///
-  /// SwiftUI cancels and restarts this on every keystroke, which is what makes the wait a
-  /// debounce; a canceled wait sends nothing. It also runs again every time this view is built
-  /// again, which is why it asks the store what it is already showing first: the board outlives
-  /// its own screen now, and reloading it on a redraw would throw away every page after the first
-  /// along with where the reader had got to.
-  ///
-  /// Keyed on the search text alone, and only the search text is debounced here. A chip on the
-  /// filter bar is one tap rather than a burst of them, so it sets and re-reads through the store
-  /// in one call and waits for nothing.
-  private func runSearch() async {
-    if store.isCurrent == false {
-      do {
-        if store.query.isEmpty == false {
-          try await Task.sleep(for: Self.searchSettleDelay)
-        }
-        await store.load()
-      } catch {
-        // The wait throws only when it is canceled, and a canceled search sends nothing.
-      }
-    }
-  }
-
-  // MARK: - Content
-
-  /// Four outcomes, from one state. A board that has read and found nothing looks nothing like
-  /// one still reading, and the list stays up through a refresh even while its rows are being
-  /// replaced — a pull-to-refresh runs on the list's own task, and a list that disappears takes
-  /// that task with it.
-  @ViewBuilder
-  private var content: some View {
-    switch store.read {
-    case .unread, .reading:
-      ProgressView()
-    case .failed(let error):
-      LoadFailure(error: error) {
-        await store.load()
-      }
-    case .empty:
-      empty
-    case .loaded(let requests), .refreshing(let requests):
-      list(requests)
-    }
-  }
-
-  /// Nothing to show, and four reasons it can be nothing — read off ``BoardNarrowing``, which is
-  /// where the sentence for each of them is written.
-  ///
-  /// A board narrowed to a status has one more thing left to try than a board that is simply
-  /// empty, and it is the more likely of the two to work: the requests are there, behind a control
-  /// the reader set themselves and may have scrolled past since. So widening leads, and asking
-  /// follows it.
-  private var empty: some View {
-    ContentUnavailableView {
-      Label(emptyTitle, systemImage: emptySymbol)
-    } description: {
-      Text(emptyMessage)
-    } actions: {
-      if store.narrowing.isStatusFiltered {
-        AsyncButton {
-          await store.showEveryStatus()
-        } label: {
-          Text("Show all", bundle: .module, comment: "Button that clears the status filter on an empty board")
-            .foregroundStyle(.background)
-            .frame(maxWidth: CallToActionSize.width)
-        }
-        .buttonStyle(.borderedProminent)
-        .controlSize(.large)
-
-        if hub.whoIsHere.somebodyIsHere {
-          askButton
-            .labelStyle(.titleOnly)
-            .buttonStyle(.bordered)
-            .controlSize(.large)
-        }
-      } else if hub.whoIsHere.somebodyIsHere {
-        Button {
-          hub.beginSubmission()
-          isComposing = true
-        } label: {
-          Text(emptyButton)
-            .frame(maxWidth: CallToActionSize.width)
-        }
-        .foregroundStyle(.background)
-        .buttonStyle(.borderedProminent)
-        .controlSize(.large)
-      }
-    }
-    .padding(.horizontal, Self.callToActionInset)
-  }
-
-  // Only the board with nothing narrowing it is the host app's to word; the others describe what
-  // the reader did.
-
-  private var emptySymbol: String {
-    if store.narrowing == .nothing {
-      return hub.emptyBoardDrawn.symbol
-    }
-    return store.narrowing.emptyIcon
-  }
-
-  private var emptyTitle: String {
-    if store.narrowing == .nothing {
-      return hub.emptyBoardDrawn.title
-    }
-    return store.narrowing.emptyTitle
-  }
-
-  private var emptyMessage: String {
-    if store.narrowing == .nothing {
-      return hub.emptyBoardDrawn.message
-    }
-    return store.narrowing.emptyMessage
-  }
-
-  /// Read only on the board with nothing narrowing it: the one empty screen whose button is this.
-  private var emptyButton: String {
-    hub.emptyBoardDrawn.button
-  }
-
-  private func list(_ requests: [DRFeatureRequest]) -> some View {
-    List {
-      if let failure = store.write.failure {
-        Section {
-          WriteFailureNotice(failure: failure) {
-            store.acknowledgeWriteFailure()
-          }
-        }
-      }
-
-      ForEach(requests, id: \.id) { request in
-        row(request)
-
-        if hub.notificationOffer.isOffered(on: request.id) {
-          NotificationOfferCard(offer: hub.notificationOffer)
-        }
-      }
-
-      if store.page.isDone == false {
-        NextPageRow(state: store.page) {
-          await store.loadMore()
-        }
-      }
-    }
-    .listStyle(.plain)
-    .refreshable {
-      await store.load()
-    }
-  }
-
-  /// The vote control sits beside the link rather than inside its label: a button inside a
-  /// `NavigationLink` label never receives the tap, so a vote there would push the detail
-  /// instead.
-  ///
-  /// Every control on the board goes inert while any one of them is writing, because the store
-  /// takes one vote at a time. Without that, a tap on a second row during the first row's round
-  /// trip is refused by the store and nothing at all happens on screen — the same silence this
-  /// surface exists to stop.
-  private func row(_ request: DRFeatureRequest) -> some View {
-    HStack(alignment: .top, spacing: Self.rowSpacing) {
-      if hub.whoIsHere.somebodyIsHere {
-        VoteControl(
-          voteCount: Int(request.voteCount),
-          voted: request.viewer.voted,
-          isWriting: store.write.isWriting
-        ) {
-          await store.toggleVote(requestID: request.id)
-        }
-      } else {
-        VoteTally(voteCount: Int(request.voteCount), voted: request.viewer.voted)
-      }
-
-      NavigationLink {
-        RequestDetailView(hub: hub, requestID: request.id)
-      } label: {
-        RequestSummary(request: request)
-      }
-    }
-    .alignmentGuide(.listRowSeparatorLeading) { viewDimensions in
-      viewDimensions[.leading]
-    }
-  }
-
-  /// The way in to the composer.
-  ///
-  /// In the toolbar, so it is one tap away in every state the board can be in and takes no room
-  /// from the list. Drawn again in the middle of the empty state, which is the one screen with
-  /// room for it and nothing else to offer.
-  private var askButton: some View {
-    Button {
-      hub.beginSubmission()
-      isComposing = true
-    } label: {
-      Label {
-        Text("New request", bundle: .module, comment: "Button that opens the form for a new feature request")
-      } icon: {
-        Image(systemName: "plus.bubble")
-      }
-      .frame(maxWidth: CallToActionSize.width)
     }
   }
 }

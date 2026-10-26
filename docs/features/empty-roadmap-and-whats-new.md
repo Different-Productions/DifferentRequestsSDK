@@ -14,12 +14,12 @@ RoadmapView(hub: requests, isShowingRequests: $isShowingRequests)
 ChangelogView(hub: requests, isShowingRequests: $isShowingRequests)
 ```
 
-**See requests** sets it to `true`. `nil` means no button: pushed from the board's **…** menu, the
-back button already goes to the list, so the board passes `nil`.
+**See requests** sets it to `true`. `RoadmapView(hub:)` and `ChangelogView(hub:)` draw no button.
+The SDK's own sheet builds both that way, because Requests is the tab beside them.
 
 The server answers a roadmap with every column even when all are empty, so `RoadmapStore` reads a
 roadmap whose every column has a `totalCount` of 0 as empty. Before this, an empty roadmap drew three
-headers each saying "Nothing here yet."
+headers each saying "No requests here yet."
 
 Trigger: open Roadmap or What's New on an app whose plan has them (Pro) and nothing planned or
 published.
@@ -31,12 +31,12 @@ published.
 | Empty Roadmap, host passed a binding | Map picture, "Nothing planned yet", "When the team plans something, it shows up here.", **See requests** |
 | Empty What's New, host passed a binding | Sparkles, "Nothing new yet", "When the app gets something new, you'll read about it here.", **See requests** |
 | Taps **See requests** | The host's requests list opens (in the example, the sheet swaps to the board) |
-| Pushed from the board's **…** menu | The same words, no button; the back button returns to the board |
+| The Roadmap or What's New tab of the SDK's sheet | The same words, no button; Requests is the tab beside it |
 | A roadmap with anything on it | The columns, as before |
 
 | When it fails | Exact error text the user sees |
 |---|---|
-| The read fails | "Couldn't load" with **Try again**, as before |
+| The read fails | "Roadmap couldn't load" or "What's New couldn't load" with **Try again** |
 
 ## Flow chart
 
@@ -57,7 +57,8 @@ ChangelogView.entries case .empty                   ChangelogView.swift
 Host opens its requests list                        RootView.swift  session.show(.requests)
 ```
 
-Board pushes: `DifferentRequestsView.swift` builds both with `isShowingRequests: nil`.
+The SDK's own tabs: `DifferentRequestsView.swift` builds both with `init(hub:)`, which has no
+**See requests**.
 
 ## What was walked
 
@@ -67,4 +68,7 @@ Board pushes: `DifferentRequestsView.swift` builds both with `isShowingRequests:
   requests**. Tapping it swapped the sheet to the board ("What would make this app better?").
   **…** › Roadmap from the board: same words, no button, back button. What's New from the list:
   "Nothing new yet" with **See requests**.
+- 2026-10-09, iOS 26.0 simulator, the two screens as tabs of the SDK's sheet on a Pro app ("Calls
+  Walk"): both opened with the close button and no **See requests**. Neither was empty there, so the
+  empty words inside a tab were not seen.
 - The owner's real walk: not yet.

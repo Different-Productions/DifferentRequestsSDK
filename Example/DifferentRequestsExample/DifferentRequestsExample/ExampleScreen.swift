@@ -7,9 +7,8 @@ import SwiftUI
 /// of them from a host app's own settings list, which is the integration a developer is deciding
 /// whether to write.
 ///
-/// The board reaches the other three through its own menu. They are here as well because a menu
-/// behind an ellipsis is not a demonstration — somebody evaluating this should see what they get
-/// without hunting for it.
+/// The Requests sheet holds the other three as tabs. They are here as well because each can also be
+/// presented alone, and somebody evaluating this should see that.
 enum ExampleScreen: String, Identifiable, CaseIterable {
   /// Everything people asked for, ranked, searchable, with the composer behind it.
   case requests

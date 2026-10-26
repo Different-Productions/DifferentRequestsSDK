@@ -1,19 +1,11 @@
 import SwiftUI
 
-/// What a surface shows when something the reader did was not written.
+/// What a surface shows when something the reader did was not written: a symbol, the sentence, and
+/// a Dismiss button, in a row beside the control that failed. VoiceOver reads it when it appears.
 ///
-/// A vote, a follow, a comment, a notification marked read: each of them can be refused, and a
-/// refusal a surface does not render is a control that does not move and no explanation of why.
-/// This is what every one of them renders it through.
-///
-/// It sits inside the content rather than over it, next to the control that was tapped, because
-/// the control is still there and tapping it again is the whole remedy. The failure itself is
-/// never rendered: the contract states an `ApiError`'s message is written for whoever is
-/// debugging and may name internals, so the sentence comes from ``WriteAttempt/failureMessage``
-/// and the error stays on the store for a developer.
+/// The failure itself is never rendered: an `ApiError`'s message is written for whoever is
+/// debugging, so the sentence comes from ``WriteFailure/message``.
 struct WriteFailureNotice: View {
-
-  private static let spacing: CGFloat = 8
 
   /// Which write failed, and what to say about it.
   let failure: WriteFailure
@@ -22,22 +14,23 @@ struct WriteFailureNotice: View {
   let acknowledge: () -> Void
 
   var body: some View {
-    HStack(alignment: .firstTextBaseline, spacing: Self.spacing) {
-      Image(systemName: "exclamationmark.triangle")
-        .foregroundStyle(.orange)
+    HStack(alignment: .center, spacing: Spacing.xSmall.rawValue) {
+      Image(systemName: "exclamationmark.triangle.fill")
+        .textRole(.supporting)
+        .foregroundStyle(ColorRole.failure)
+        .accessibilityHidden(true)
 
       Text(failure.message)
-        .font(.subheadline)
+        .textRole(.supporting)
+        .foregroundStyle(ColorRole.label)
         .frame(maxWidth: .infinity, alignment: .leading)
 
-      Button {
+      DismissButton {
         acknowledge()
-      } label: {
-        Text("Dismiss", bundle: .module, comment: "Button that hides a failure notice")
-          .font(.subheadline)
       }
-      .buttonStyle(.borderless)
     }
-    .accessibilityElement(children: .combine)
+    .onAppear {
+      AccessibilityNotification.Announcement(failure.message).post()
+    }
   }
 }

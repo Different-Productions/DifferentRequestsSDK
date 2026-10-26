@@ -51,9 +51,9 @@ enum PlanSurface: CaseIterable {
       return String(localized: "This app has no roadmap", bundle: .module, comment: "Heading when the app doesn't publish a roadmap")
     case .changelog:
       return String(
-        localized: "This app has no What's New",
+        localized: "This app doesn't post updates",
         bundle: .module,
-        comment: "Heading when the app doesn't publish release notes; What's New is the screen's name"
+        comment: "Heading when the app doesn't publish release notes"
       )
     case .comments:
       return String(localized: "Comments are off", bundle: .module, comment: "Heading when the app doesn't take comments on requests")
@@ -65,10 +65,14 @@ enum PlanSurface: CaseIterable {
   var absentDescription: String {
     switch self {
     case .roadmap:
-      return String(localized: "Its plans aren't shared here.", bundle: .module, comment: "Message when the app doesn't publish a roadmap")
+      return String(
+        localized: "This app doesn't share its plans.",
+        bundle: .module,
+        comment: "Message when the app doesn't publish a roadmap"
+      )
     case .changelog:
       return String(
-        localized: "This app doesn't share news about its updates.",
+        localized: "If that changes, its updates will show up here.",
         bundle: .module,
         comment: "Message when the app doesn't publish release notes"
       )

@@ -1,110 +1,398 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "%lld left" : {
+    "%lld characters left" : {
       "comment" : "Characters left before a field's limit",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "المتبقي: %lld"
+          "variations" : {
+            "plural" : {
+              "zero" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "لا أحرف متبقية"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "حرف واحد متبقٍ"
+                }
+              },
+              "two" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "حرفان متبقيان"
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld أحرف متبقية"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld حرفًا متبقيًا"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld حرف متبقٍ"
+                }
+              }
+            }
           }
         },
         "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Noch %lld"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Noch %lld Zeichen"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Noch %lld Zeichen"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld character left"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld characters left"
+                }
+              }
+            }
           }
         },
         "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Restan: %lld"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Queda %lld carácter"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Quedan %lld caracteres"
+                }
+              }
+            }
           }
         },
         "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reste : %lld"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld caractère restant"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld caractères restants"
+                }
+              }
+            }
           }
         },
         "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rimasti: %lld"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld carattere rimasto"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld caratteri rimasti"
+                }
+              }
+            }
           }
         },
         "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "残り%lld"
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "残り%lld文字"
+                }
+              }
+            }
           }
         },
         "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pozostało: %lld"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Pozostał %lld znak"
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Pozostały %lld znaki"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Pozostało %lld znaków"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Pozostało %lld znaku"
+                }
+              }
+            }
           }
         },
         "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Restam: %lld"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Resta %lld caractere"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Restam %lld caracteres"
+                }
+              }
+            }
           }
         }
       }
     },
-    "%lld too many" : {
+    "%lld characters too many" : {
       "comment" : "Characters over a field's limit",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "زائد: %lld"
+          "variations" : {
+            "plural" : {
+              "zero" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "لا أحرف زائدة"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "حرف واحد زائد"
+                }
+              },
+              "two" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "حرفان زائدان"
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld أحرف زائدة"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld حرفًا زائدًا"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld حرف زائد"
+                }
+              }
+            }
           }
         },
         "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld zu viel"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Zeichen zu viel"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Zeichen zu viel"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld character too many"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld characters too many"
+                }
+              }
+            }
           }
         },
         "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sobran: %lld"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Sobra %lld carácter"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Sobran %lld caracteres"
+                }
+              }
+            }
           }
         },
         "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "En trop : %lld"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld caractère en trop"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld caractères en trop"
+                }
+              }
+            }
           }
         },
         "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "In eccesso: %lld"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld carattere di troppo"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld caratteri di troppo"
+                }
+              }
+            }
           }
         },
         "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld文字オーバー"
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld文字オーバー"
+                }
+              }
+            }
           }
         },
         "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Za dużo: %lld"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "O %lld znak za dużo"
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "O %lld znaki za dużo"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "O %lld znaków za dużo"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "O %lld znaku za dużo"
+                }
+              }
+            }
           }
         },
         "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Excesso: %lld"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld caractere a mais"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld caracteres a mais"
+                }
+              }
+            }
           }
         }
       }
@@ -296,7 +584,7 @@
       }
     },
     "All" : {
-      "comment" : "Filter chip that shows requests in every status",
+      "comment" : "Filter menu item that shows requests in every status",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
@@ -345,60 +633,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Todos"
-          }
-        }
-      }
-    },
-    "All statuses" : {
-      "comment" : "VoiceOver label for the All filter chip",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "كل الحالات"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alle Status"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Todos los estados"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tous les statuts"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tutti gli stati"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "すべてのステータス"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wszystkie statusy"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Todos os status"
           }
         }
       }
@@ -453,60 +687,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Anônimo"
-          }
-        }
-      }
-    },
-    "Anything else?" : {
-      "comment" : "Header over a new request's detail field",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "شيء آخر؟"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Noch etwas?"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "¿Algo más?"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Autre chose ?"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Altro?"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ほかにありますか？"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Coś jeszcze?"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Algo mais?"
           }
         }
       }
@@ -727,164 +907,56 @@
         }
       }
     },
-    "Couldn't load" : {
-      "comment" : "Heading on a screen that failed to load",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تعذّر التحميل"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Konnte nicht laden"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No se pudo cargar"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Chargement impossible"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Impossibile caricare"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "読み込めませんでした"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nie udało się wczytać"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Não foi possível carregar"
-          }
-        }
-      }
-    },
-    "Couldn't load any more." : {
-      "comment" : "Row at the end of a list when the next page failed to load",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تعذّر تحميل المزيد."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mehr konnte nicht geladen werden."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No se pudo cargar más."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Impossible d'en charger davantage."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Impossibile caricarne altri."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "これ以上読み込めませんでした。"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nie udało się wczytać więcej."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Não foi possível carregar mais."
-          }
-        }
-      }
-    },
-    "Couldn't load right now. Try again in a moment." : {
+    "Something went wrong on the server. Try again in a moment." : {
       "comment" : "Why a screen couldn't load: any other failure",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "تعذّر التحميل الآن. حاول مجددًا بعد قليل."
+            "value" : "حدث خطأ في الخادم. حاول مجددًا بعد قليل."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gerade konnte nichts geladen werden. Versuch es gleich noch einmal."
+            "value" : "Auf dem Server ist etwas schiefgegangen. Versuch es gleich noch einmal."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No se pudo cargar ahora. Vuelve a intentarlo en un momento."
+            "value" : "Algo salió mal en el servidor. Vuelve a intentarlo en un momento."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Chargement impossible pour l'instant. Réessayez dans un moment."
+            "value" : "Un problème est survenu sur le serveur. Réessayez dans un moment."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Impossibile caricare ora. Riprova tra poco."
+            "value" : "Qualcosa è andato storto sul server. Riprova tra poco."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "今は読み込めません。少ししてからもう一度お試しください。"
+            "value" : "サーバーで問題が発生しました。少ししてからもう一度お試しください。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nie udało się teraz wczytać. Spróbuj ponownie za chwilę."
+            "value" : "Coś poszło nie tak na serwerze. Spróbuj ponownie za chwilę."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Não foi possível carregar agora. Tente de novo daqui a pouco."
+            "value" : "Algo deu errado no servidor. Tente de novo daqui a pouco."
           }
         }
       }
@@ -943,115 +1015,115 @@
         }
       }
     },
-    "Couldn't mark everything read. Try it again." : {
+    "Couldn't mark every update as read. Try again." : {
       "comment" : "Marking every notification read failed",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "تعذّر تعليم الكل كمقروء. حاول مجددًا."
+            "value" : "تعذّر تعليم كل التحديثات كمقروءة. حاول مجددًا."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Konnte nicht alles als gelesen markieren. Versuch es noch einmal."
+            "value" : "Nicht alle Updates konnten als gelesen markiert werden. Versuch es noch einmal."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No se pudo marcar todo como leído. Inténtalo de nuevo."
+            "value" : "No se pudieron marcar todas las novedades como leídas. Inténtalo de nuevo."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Impossible de tout marquer comme lu. Réessayez."
+            "value" : "Impossible de marquer toutes les mises à jour comme lues. Réessayez."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Impossibile segnare tutto come letto. Riprova."
+            "value" : "Impossibile segnare tutti gli aggiornamenti come letti. Riprova."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "すべてを既読にできませんでした。もう一度お試しください。"
+            "value" : "すべてのお知らせを既読にできませんでした。もう一度お試しください。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nie udało się oznaczyć wszystkiego jako przeczytane. Spróbuj ponownie."
+            "value" : "Nie udało się oznaczyć wszystkich aktualizacji jako przeczytanych. Spróbuj ponownie."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Não foi possível marcar tudo como lido. Tente de novo."
+            "value" : "Não foi possível marcar todas as atualizações como lidas. Tente de novo."
           }
         }
       }
     },
-    "Couldn't mark that read. Try it again." : {
+    "Couldn't mark this update as read. Try again." : {
       "comment" : "Marking one notification read failed",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "تعذّر تعليمه كمقروء. حاول مجددًا."
+            "value" : "تعذّر تعليم هذا التحديث كمقروء. حاول مجددًا."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Konnte das nicht als gelesen markieren. Versuch es noch einmal."
+            "value" : "Dieses Update konnte nicht als gelesen markiert werden. Versuch es noch einmal."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No se pudo marcar como leído. Inténtalo de nuevo."
+            "value" : "No se pudo marcar esta novedad como leída. Inténtalo de nuevo."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Impossible de le marquer comme lu. Réessayez."
+            "value" : "Impossible de marquer cette mise à jour comme lue. Réessayez."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Impossibile segnarlo come letto. Riprova."
+            "value" : "Impossibile segnare questo aggiornamento come letto. Riprova."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "既読にできませんでした。もう一度お試しください。"
+            "value" : "このお知らせを既読にできませんでした。もう一度お試しください。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nie udało się oznaczyć jako przeczytane. Spróbuj ponownie."
+            "value" : "Nie udało się oznaczyć tej aktualizacji jako przeczytanej. Spróbuj ponownie."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Não foi possível marcar como lido. Tente de novo."
+            "value" : "Não foi possível marcar esta atualização como lida. Tente de novo."
           }
         }
       }
     },
-    "Couldn't start following this. Try it again." : {
+    "Couldn't follow this request. Try again." : {
       "comment" : "Following a request failed to send",
       "extractionState" : "manual",
       "localizations" : {
@@ -1064,7 +1136,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Folgen hat nicht geklappt. Versuch es noch einmal."
+            "value" : "Dieser Anfrage konnte nicht gefolgt werden. Versuch es noch einmal."
           }
         },
         "es" : {
@@ -1088,7 +1160,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "フォローできませんでした。もう一度お試しください。"
+            "value" : "このリクエストをフォローできませんでした。もう一度お試しください。"
           }
         },
         "pl" : {
@@ -1105,7 +1177,7 @@
         }
       }
     },
-    "Couldn't stop following this. Try it again." : {
+    "Couldn't unfollow this request. Try again." : {
       "comment" : "Unfollowing a request failed to send",
       "extractionState" : "manual",
       "localizations" : {
@@ -1118,7 +1190,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Entfolgen hat nicht geklappt. Versuch es noch einmal."
+            "value" : "Dieser Anfrage konnte nicht entfolgt werden. Versuch es noch einmal."
           }
         },
         "es" : {
@@ -1142,7 +1214,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "フォローを解除できませんでした。もう一度お試しください。"
+            "value" : "このリクエストのフォローを解除できませんでした。もう一度お試しください。"
           }
         },
         "pl" : {
@@ -1159,7 +1231,7 @@
         }
       }
     },
-    "Couldn't take your vote back. Try it again." : {
+    "Couldn't remove your vote. Try again." : {
       "comment" : "Removing a vote failed to send",
       "extractionState" : "manual",
       "localizations" : {
@@ -1178,7 +1250,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No se pudo retirar tu voto. Inténtalo de nuevo."
+            "value" : "No se pudo quitar tu voto. Inténtalo de nuevo."
           }
         },
         "fr" : {
@@ -1213,7 +1285,7 @@
         }
       }
     },
-    "Detail" : {
+    "Details" : {
       "comment" : "VoiceOver name of a new request's detail field",
       "extractionState" : "manual",
       "localizations" : {
@@ -1232,13 +1304,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Detalle"
+            "value" : "Detalles"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Détail"
+            "value" : "Détails"
           }
         },
         "it" : {
@@ -1317,60 +1389,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fechar"
-          }
-        }
-      }
-    },
-    "Done" : {
-      "comment" : "Button that closes the request board",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تم"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fertig"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "OK"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "OK"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fine"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "完了"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gotowe"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "OK"
           }
         }
       }
@@ -1537,62 +1555,62 @@
         }
       }
     },
-    "In a few words" : {
+    "What you want, in a few words" : {
       "comment" : "Placeholder in a new request's title field",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "بكلمات قليلة"
+            "value" : "ما تريده، بكلمات قليلة"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "In wenigen Worten"
+            "value" : "Dein Wunsch in wenigen Worten"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "En pocas palabras"
+            "value" : "Lo que quieres, en pocas palabras"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "En quelques mots"
+            "value" : "Ce que vous voulez, en quelques mots"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "In poche parole"
+            "value" : "Cosa vuoi, in poche parole"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ひとことで"
+            "value" : "欲しいものをひとことで"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "W kilku słowach"
+            "value" : "Czego chcesz, w kilku słowach"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Em poucas palavras"
+            "value" : "O que você quer, em poucas palavras"
           }
         }
       }
     },
     "Inbox" : {
-      "comment" : "Menu item and title of the screen listing updates on requests",
+      "comment" : "Tab and title of the screen listing updates on requests",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
@@ -1753,56 +1771,56 @@
         }
       }
     },
-    "Its plans aren't shared here." : {
+    "This app doesn't share its plans." : {
       "comment" : "Message when the app doesn't publish a roadmap",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "خططه غير منشورة هنا."
+            "value" : "هذا التطبيق لا يشارك خططه."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die Pläne werden hier nicht geteilt."
+            "value" : "Diese App teilt ihre Pläne nicht."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sus planes no se comparten aquí."
+            "value" : "Esta app no comparte sus planes."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ses projets ne sont pas partagés ici."
+            "value" : "Cette app ne partage pas ses projets."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "I suoi piani non sono condivisi qui."
+            "value" : "Questa app non condivide i suoi piani."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "計画はここでは公開されていません。"
+            "value" : "このアプリは計画を公開していません。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Jej plany nie są tu udostępniane."
+            "value" : "Ta aplikacja nie udostępnia swoich planów."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Os planos não são compartilhados aqui."
+            "value" : "Este app não compartilha seus planos."
           }
         }
       }
@@ -1916,7 +1934,7 @@
       }
     },
     "Mark as read" : {
-      "comment" : "VoiceOver label for the unread dot on an inbox update",
+      "comment" : "Swipe action that marks one inbox update read",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
@@ -1965,60 +1983,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Marcar como lido"
-          }
-        }
-      }
-    },
-    "More" : {
-      "comment" : "Menu holding the request board's other screens",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "المزيد"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mehr"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Más"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Plus"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Altro"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "その他"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Więcej"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mais"
           }
         }
       }
@@ -2239,56 +2203,56 @@
         }
       }
     },
-    "No matches in this filter" : {
+    "No requests match in this filter" : {
       "comment" : "Heading over the request board when a search inside a status filter finds nothing",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "لا نتائج في هذا الفلتر"
+            "value" : "لا طلبات مطابقة في هذا الفلتر"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Keine Treffer in diesem Filter"
+            "value" : "Keine passenden Anfragen in diesem Filter"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sin resultados en este filtro"
+            "value" : "Ninguna solicitud coincide en este filtro"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aucun résultat dans ce filtre"
+            "value" : "Aucune demande ne correspond dans ce filtre"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nessun risultato in questo filtro"
+            "value" : "Nessuna richiesta corrisponde in questo filtro"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "このフィルタに一致するものはありません"
+            "value" : "このフィルタに一致するリクエストはありません"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Brak wyników w tym filtrze"
+            "value" : "Żadna prośba nie pasuje w tym filtrze"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nenhum resultado neste filtro"
+            "value" : "Nenhum pedido corresponde neste filtro"
           }
         }
       }
@@ -2347,56 +2311,56 @@
         }
       }
     },
-    "Nobody has asked for anything yet. Tell us what you want and everyone can vote on it." : {
+    "Ask for what you want in this app, and everyone can vote on it." : {
       "comment" : "Message on a request board with no requests yet",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "لم يطلب أحد شيئًا بعد. أخبرنا بما تريد ليصوّت عليه الجميع."
+            "value" : "اطلب ما تريده في هذا التطبيق، وسيتمكن الجميع من التصويت عليه."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Noch hat niemand etwas angefragt. Sag uns, was du willst, und alle können dafür abstimmen."
+            "value" : "Wünsch dir etwas für diese App, und alle können dafür abstimmen."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nadie ha pedido nada todavía. Cuéntanos qué quieres y todos podrán votarlo."
+            "value" : "Pide lo que quieres en esta app y todos podrán votarlo."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Personne n'a encore rien demandé. Dites-nous ce que vous voulez et chacun pourra voter."
+            "value" : "Demandez ce que vous voulez dans cette app, et tout le monde pourra voter."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nessuno ha ancora chiesto nulla. Dicci cosa vuoi e tutti potranno votarlo."
+            "value" : "Chiedi quello che vuoi in questa app e tutti potranno votarlo."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "まだ誰もリクエストしていません。欲しいものを教えてくれれば、みんなが投票できます。"
+            "value" : "このアプリに欲しいものをリクエストすると、みんなが投票できます。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nikt jeszcze o nic nie poprosił. Powiedz, czego chcesz, a wszyscy będą mogli głosować."
+            "value" : "Poproś o to, czego chcesz w tej aplikacji, a wszyscy będą mogli na to głosować."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ninguém pediu nada ainda. Diga o que você quer e todos poderão votar."
+            "value" : "Peça o que você quer neste app e todos poderão votar."
           }
         }
       }
@@ -2455,164 +2419,164 @@
         }
       }
     },
-    "Nothing here yet." : {
+    "No requests here yet." : {
       "comment" : "A roadmap column with no requests in it",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "لا شيء هنا بعد."
+            "value" : "لا طلبات هنا بعد."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hier ist noch nichts."
+            "value" : "Hier gibt es noch keine Anfragen."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aún no hay nada aquí."
+            "value" : "Aún no hay solicitudes aquí."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rien ici pour l'instant."
+            "value" : "Pas encore de demandes ici."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Qui non c'è ancora nulla."
+            "value" : "Qui non ci sono ancora richieste."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "まだ何もありません。"
+            "value" : "ここにはまだリクエストがありません。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nic tu jeszcze nie ma."
+            "value" : "Nie ma tu jeszcze próśb."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ainda não há nada aqui."
+            "value" : "Ainda não há pedidos aqui."
           }
         }
       }
     },
-    "Nothing in this filter" : {
+    "No requests in this filter" : {
       "comment" : "Heading over the request board when the status filter leaves nothing",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "لا شيء في هذا الفلتر"
+            "value" : "لا طلبات في هذا الفلتر"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nichts in diesem Filter"
+            "value" : "Keine Anfragen in diesem Filter"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nada en este filtro"
+            "value" : "No hay solicitudes en este filtro"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rien dans ce filtre"
+            "value" : "Aucune demande dans ce filtre"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Niente in questo filtro"
+            "value" : "Nessuna richiesta in questo filtro"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "このフィルタには何もありません"
+            "value" : "このフィルタにリクエストはありません"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nic w tym filtrze"
+            "value" : "Brak próśb w tym filtrze"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nada neste filtro"
+            "value" : "Nenhum pedido neste filtro"
           }
         }
       }
     },
-    "Nothing matches" : {
+    "No requests match your search" : {
       "comment" : "Heading over the request board when a search finds nothing",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "لا نتائج"
+            "value" : "لا طلبات تطابق بحثك"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Keine Treffer"
+            "value" : "Keine Anfragen passen zu deiner Suche"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sin resultados"
+            "value" : "Ninguna solicitud coincide con tu búsqueda"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aucun résultat"
+            "value" : "Aucune demande ne correspond à votre recherche"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nessun risultato"
+            "value" : "Nessuna richiesta corrisponde alla tua ricerca"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "一致するものはありません"
+            "value" : "検索に一致するリクエストはありません"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Brak wyników"
+            "value" : "Żadna prośba nie pasuje do wyszukiwania"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nenhum resultado"
+            "value" : "Nenhum pedido corresponde à sua busca"
           }
         }
       }
@@ -2725,56 +2689,56 @@
         }
       }
     },
-    "Nothing yet" : {
+    "No updates yet" : {
       "comment" : "Heading on an empty inbox",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "لا شيء بعد"
+            "value" : "لا تحديثات بعد"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Noch nichts"
+            "value" : "Noch keine Updates"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nada por ahora"
+            "value" : "Aún no hay novedades"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rien pour l'instant"
+            "value" : "Pas encore de mises à jour"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ancora niente"
+            "value" : "Ancora nessun aggiornamento"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "まだありません"
+            "value" : "まだお知らせはありません"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Na razie nic"
+            "value" : "Nie ma jeszcze aktualizacji"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nada ainda"
+            "value" : "Ainda não há atualizações"
           }
         }
       }
@@ -3428,7 +3392,7 @@
       }
     },
     "Team" : {
-      "comment" : "Pill beside a comment written by the app's team",
+      "comment" : "Mark beside a comment written by the app's team",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
@@ -3481,272 +3445,272 @@
         }
       }
     },
-    "That couldn't be marked read." : {
+    "This update couldn't be marked as read. Open Inbox again to refresh it." : {
       "comment" : "The server refused marking one notification read",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "تعذّر تعليمه كمقروء."
+            "value" : "تعذّر تعليم هذا التحديث كمقروء. افتح صندوق الوارد مجددًا لتحديثه."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Das konnte nicht als gelesen markiert werden."
+            "value" : "Dieses Update konnte nicht als gelesen markiert werden. Öffne den Posteingang erneut, um ihn zu aktualisieren."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No se pudo marcar como leído."
+            "value" : "Esta novedad no se pudo marcar como leída. Vuelve a abrir la Bandeja de entrada para actualizarla."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Impossible de le marquer comme lu."
+            "value" : "Cette mise à jour n'a pas pu être marquée comme lue. Rouvrez la Boîte de réception pour l'actualiser."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Non è stato possibile segnarlo come letto."
+            "value" : "Non è stato possibile segnare questo aggiornamento come letto. Riapri In arrivo per aggiornare l'elenco."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "既読にできませんでした。"
+            "value" : "このお知らせを既読にできませんでした。受信箱を開き直して更新してください。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nie udało się oznaczyć jako przeczytane."
+            "value" : "Nie udało się oznaczyć tej aktualizacji jako przeczytanej. Otwórz Skrzynkę ponownie, aby ją odświeżyć."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Não foi possível marcar como lido."
+            "value" : "Não foi possível marcar esta atualização como lida. Abra a Caixa de entrada de novo para atualizá-la."
           }
         }
       }
     },
-    "That didn't send. We kept what you wrote, so tap Send to try again." : {
+    "Your request didn't send. What you wrote is still here. Choose Send to try again." : {
       "comment" : "A new request failed to send; Send is the button's name",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "لم يُرسَل. احتفظنا بما كتبت، فاضغط «إرسال» للمحاولة مجددًا."
+            "value" : "لم يُرسَل طلبك. ما كتبته ما زال هنا. اختر «إرسال» للمحاولة مجددًا."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Das wurde nicht gesendet. Dein Text ist noch da, tippe auf „Senden“, um es erneut zu versuchen."
+            "value" : "Deine Anfrage wurde nicht gesendet. Dein Text ist noch da. Wähle Senden, um es erneut zu versuchen."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No se envió. Guardamos lo que escribiste; toca Enviar para intentarlo de nuevo."
+            "value" : "Tu solicitud no se envió. Lo que escribiste sigue aquí. Elige Enviar para intentarlo de nuevo."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "L'envoi a échoué. Nous avons gardé votre texte : touchez Envoyer pour réessayer."
+            "value" : "Votre demande n'a pas été envoyée. Votre texte est toujours là. Choisissez Envoyer pour réessayer."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Non è stato inviato. Abbiamo tenuto quello che hai scritto: tocca Invia per riprovare."
+            "value" : "La tua richiesta non è stata inviata. Quello che hai scritto è ancora qui. Scegli Invia per riprovare."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "送信できませんでした。書いた内容は残っているので、「送信」をタップしてもう一度お試しください。"
+            "value" : "リクエストを送信できませんでした。書いた内容は残っています。「送信」を選んでもう一度お試しください。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nie wysłano. Zachowaliśmy to, co napisałeś — dotknij „Wyślij”, aby spróbować ponownie."
+            "value" : "Twoja prośba nie została wysłana. Twój tekst nadal tu jest. Wybierz Wyślij, aby spróbować ponownie."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Não foi enviado. Guardamos o que você escreveu; toque em Enviar para tentar de novo."
+            "value" : "Seu pedido não foi enviado. O que você escreveu continua aqui. Escolha Enviar para tentar de novo."
           }
         }
       }
     },
-    "That notification is gone." : {
+    "This update was removed." : {
       "comment" : "Marking read a notification that no longer exists",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "هذا الإشعار لم يعد موجودًا."
+            "value" : "أُزيل هذا التحديث."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Diese Mitteilung gibt es nicht mehr."
+            "value" : "Dieses Update wurde entfernt."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Esa notificación ya no existe."
+            "value" : "Esta novedad se eliminó."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cette notification n'existe plus."
+            "value" : "Cette mise à jour a été supprimée."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quella notifica non c'è più."
+            "value" : "Questo aggiornamento è stato rimosso."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "その通知はもうありません。"
+            "value" : "このお知らせは削除されました。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tego powiadomienia już nie ma."
+            "value" : "Ta aktualizacja została usunięta."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Essa notificação não existe mais."
+            "value" : "Esta atualização foi removida."
           }
         }
       }
     },
-    "The detail is too long. Shorten it and tap Send." : {
+    "The details are too long. Shorten them and choose Send." : {
       "comment" : "The server refused a new request's detail; Send is the button's name",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "التفاصيل طويلة جدًا. اختصرها واضغط «إرسال»."
+            "value" : "التفاصيل طويلة جدًا. اختصرها واختر «إرسال»."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die Details sind zu lang. Kürze sie und tippe auf „Senden“."
+            "value" : "Die Details sind zu lang. Kürze sie und wähle Senden."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El detalle es demasiado largo. Acórtalo y toca Enviar."
+            "value" : "Los detalles son demasiado largos. Acórtalos y elige Enviar."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Le détail est trop long. Raccourcissez-le et touchez Envoyer."
+            "value" : "Les détails sont trop longs. Raccourcissez-les et choisissez Envoyer."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "I dettagli sono troppo lunghi. Accorciali e tocca Invia."
+            "value" : "I dettagli sono troppo lunghi. Accorciali e scegli Invia."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "詳細が長すぎます。短くして「送信」をタップしてください。"
+            "value" : "詳細が長すぎます。短くして「送信」を選んでください。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Szczegóły są za długie. Skróć je i dotknij „Wyślij”."
+            "value" : "Szczegóły są za długie. Skróć je i wybierz Wyślij."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "O detalhe está longo demais. Encurte e toque em Enviar."
+            "value" : "Os detalhes estão longos demais. Encurte e escolha Enviar."
           }
         }
       }
     },
-    "The title is empty or too long. Change it and tap Send." : {
+    "The title is empty or too long. Change it and choose Send." : {
       "comment" : "The server refused a new request's title; Send is the button's name",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "العنوان فارغ أو طويل جدًا. عدّله واضغط «إرسال»."
+            "value" : "العنوان فارغ أو طويل جدًا. عدّله واختر «إرسال»."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Der Titel ist leer oder zu lang. Ändere ihn und tippe auf „Senden“."
+            "value" : "Der Titel ist leer oder zu lang. Ändere ihn und wähle Senden."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El título está vacío o es demasiado largo. Cámbialo y toca Enviar."
+            "value" : "El título está vacío o es demasiado largo. Cámbialo y elige Enviar."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Le titre est vide ou trop long. Modifiez-le et touchez Envoyer."
+            "value" : "Le titre est vide ou trop long. Modifiez-le et choisissez Envoyer."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Il titolo è vuoto o troppo lungo. Modificalo e tocca Invia."
+            "value" : "Il titolo è vuoto o troppo lungo. Modificalo e scegli Invia."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "タイトルが空か長すぎます。変更して「送信」をタップしてください。"
+            "value" : "タイトルが空か長すぎます。変更して「送信」を選んでください。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tytuł jest pusty albo za długi. Zmień go i dotknij „Wyślij”."
+            "value" : "Tytuł jest pusty albo za długi. Zmień go i wybierz Wyślij."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "O título está vazio ou longo demais. Altere e toque em Enviar."
+            "value" : "O título está vazio ou longo demais. Altere e escolha Enviar."
           }
         }
       }
@@ -3805,56 +3769,56 @@
         }
       }
     },
-    "This app doesn't share news about its updates." : {
+    "If that changes, its updates will show up here." : {
       "comment" : "Message when the app doesn't publish release notes",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "هذا التطبيق لا ينشر أخبار تحديثاته."
+            "value" : "إذا تغيّر ذلك، ستظهر تحديثاته هنا."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Diese App teilt keine Neuigkeiten zu ihren Updates."
+            "value" : "Falls sich das ändert, erscheinen ihre Neuigkeiten hier."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Esta app no comparte novedades de sus actualizaciones."
+            "value" : "Si eso cambia, sus novedades aparecerán aquí."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cette app ne partage pas de nouvelles sur ses mises à jour."
+            "value" : "Si cela change, ses nouveautés apparaîtront ici."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Questa app non condivide novità sui suoi aggiornamenti."
+            "value" : "Se le cose cambiano, le sue novità compariranno qui."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "このアプリはアップデートのお知らせを公開していません。"
+            "value" : "公開されるようになると、ここに表示されます。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ta aplikacja nie udostępnia informacji o aktualizacjach."
+            "value" : "Jeśli to się zmieni, jej nowości pojawią się tutaj."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Este app não compartilha novidades sobre as atualizações."
+            "value" : "Se isso mudar, as novidades vão aparecer aqui."
           }
         }
       }
@@ -3913,326 +3877,326 @@
         }
       }
     },
-    "This app has no What's New" : {
-      "comment" : "Heading when the app doesn't publish release notes; What's New is the screen's name",
+    "This app doesn't post updates" : {
+      "comment" : "Heading when the app doesn't publish release notes",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "لا يوجد «ما الجديد» في هذا التطبيق"
+            "value" : "هذا التطبيق لا ينشر تحديثات"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Diese App hat keine Neuigkeiten"
+            "value" : "Diese App veröffentlicht keine Neuigkeiten"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Esta app no tiene Novedades"
+            "value" : "Esta app no publica novedades"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cette app n'a pas de Nouveautés"
+            "value" : "Cette app ne publie pas de nouveautés"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Questa app non ha Novità"
+            "value" : "Questa app non pubblica novità"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "このアプリには新機能ページがありません"
+            "value" : "このアプリはアップデート情報を公開していません"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ta aplikacja nie ma sekcji Co nowego"
+            "value" : "Ta aplikacja nie publikuje nowości"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Este app não tem Novidades"
+            "value" : "Este app não publica novidades"
           }
         }
       }
     },
-    "This app isn't letting your account change your inbox right now." : {
+    "Your account can't change Inbox in this app right now." : {
       "comment" : "The app's settings block this account from changing the inbox",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "هذا التطبيق لا يسمح لحسابك بتغيير صندوق الوارد الآن."
+            "value" : "لا يمكن لحسابك تغيير صندوق الوارد في هذا التطبيق الآن."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Diese App lässt dein Konto den Posteingang gerade nicht ändern."
+            "value" : "Dein Konto kann den Posteingang in dieser App gerade nicht ändern."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Esta app no permite ahora que tu cuenta cambie la bandeja de entrada."
+            "value" : "Tu cuenta no puede cambiar la Bandeja de entrada en esta app ahora."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cette app ne permet pas à votre compte de modifier la boîte de réception pour l'instant."
+            "value" : "Votre compte ne peut pas modifier la Boîte de réception dans cette app pour l'instant."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Questa app al momento non consente al tuo account di modificare la posta in arrivo."
+            "value" : "Al momento il tuo account non può modificare In arrivo in questa app."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "このアプリでは現在、あなたのアカウントで受信箱を変更できません。"
+            "value" : "現在、このアプリではあなたのアカウントで受信箱を変更できません。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ta aplikacja nie pozwala teraz Twojemu kontu zmieniać skrzynki."
+            "value" : "Twoje konto nie może teraz zmieniać Skrzynki w tej aplikacji."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Este app não está permitindo que sua conta altere a caixa de entrada agora."
+            "value" : "Sua conta não pode alterar a Caixa de entrada neste app agora."
           }
         }
       }
     },
-    "This app isn't letting your account comment right now." : {
+    "Your account can't comment in this app right now." : {
       "comment" : "The app's settings block this account from commenting",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "هذا التطبيق لا يسمح لحسابك بالتعليق الآن."
+            "value" : "لا يمكن لحسابك التعليق في هذا التطبيق الآن."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Diese App lässt dein Konto gerade nicht kommentieren."
+            "value" : "Dein Konto kann in dieser App gerade nicht kommentieren."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Esta app no permite ahora que tu cuenta comente."
+            "value" : "Tu cuenta no puede comentar en esta app ahora."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cette app ne permet pas à votre compte de commenter pour l'instant."
+            "value" : "Votre compte ne peut pas commenter dans cette app pour l'instant."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Questa app al momento non consente al tuo account di commentare."
+            "value" : "Al momento il tuo account non può commentare in questa app."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "このアプリでは現在、あなたのアカウントでコメントできません。"
+            "value" : "現在、このアプリではあなたのアカウントでコメントできません。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ta aplikacja nie pozwala teraz Twojemu kontu komentować."
+            "value" : "Twoje konto nie może teraz komentować w tej aplikacji."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Este app não está permitindo que sua conta comente agora."
+            "value" : "Sua conta não pode comentar neste app agora."
           }
         }
       }
     },
-    "This app isn't letting your account follow requests right now." : {
+    "Your account can't follow requests in this app right now." : {
       "comment" : "The app's settings block this account from following",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "هذا التطبيق لا يسمح لحسابك بمتابعة الطلبات الآن."
+            "value" : "لا يمكن لحسابك متابعة الطلبات في هذا التطبيق الآن."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Diese App lässt dein Konto gerade keinen Anfragen folgen."
+            "value" : "Dein Konto kann in dieser App gerade keinen Anfragen folgen."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Esta app no permite ahora que tu cuenta siga solicitudes."
+            "value" : "Tu cuenta no puede seguir solicitudes en esta app ahora."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cette app ne permet pas à votre compte de suivre des demandes pour l'instant."
+            "value" : "Votre compte ne peut pas suivre de demandes dans cette app pour l'instant."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Questa app al momento non consente al tuo account di seguire le richieste."
+            "value" : "Al momento il tuo account non può seguire le richieste in questa app."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "このアプリでは現在、あなたのアカウントでリクエストをフォローできません。"
+            "value" : "現在、このアプリではあなたのアカウントでリクエストをフォローできません。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ta aplikacja nie pozwala teraz Twojemu kontu obserwować próśb."
+            "value" : "Twoje konto nie może teraz obserwować próśb w tej aplikacji."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Este app não está permitindo que sua conta siga pedidos agora."
+            "value" : "Sua conta não pode seguir pedidos neste app agora."
           }
         }
       }
     },
-    "This app isn't letting your account send requests right now. We kept what you wrote." : {
+    "Your account can't send requests in this app right now. What you wrote is still here." : {
       "comment" : "The app's settings block this account from sending requests",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "هذا التطبيق لا يسمح لحسابك بإرسال الطلبات الآن. احتفظنا بما كتبت."
+            "value" : "لا يمكن لحسابك إرسال الطلبات في هذا التطبيق الآن. ما كتبته ما زال هنا."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Diese App lässt dein Konto gerade keine Anfragen senden. Dein Text ist noch da."
+            "value" : "Dein Konto kann in dieser App gerade keine Anfragen senden. Dein Text ist noch da."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Esta app no permite ahora que tu cuenta envíe solicitudes. Guardamos lo que escribiste."
+            "value" : "Tu cuenta no puede enviar solicitudes en esta app ahora. Lo que escribiste sigue aquí."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cette app ne permet pas à votre compte d'envoyer des demandes pour l'instant. Nous avons gardé votre texte."
+            "value" : "Votre compte ne peut pas envoyer de demandes dans cette app pour l'instant. Votre texte est toujours là."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Questa app al momento non consente al tuo account di inviare richieste. Abbiamo tenuto quello che hai scritto."
+            "value" : "Al momento il tuo account non può inviare richieste in questa app. Quello che hai scritto è ancora qui."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "このアプリでは現在、あなたのアカウントでリクエストを送信できません。書いた内容は残っています。"
+            "value" : "現在、このアプリではあなたのアカウントでリクエストを送信できません。書いた内容は残っています。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ta aplikacja nie pozwala teraz Twojemu kontu wysyłać próśb. Zachowaliśmy to, co napisałeś."
+            "value" : "Twoje konto nie może teraz wysyłać próśb w tej aplikacji. Twój tekst nadal tu jest."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Este app não está permitindo que sua conta envie pedidos agora. Guardamos o que você escreveu."
+            "value" : "Sua conta não pode enviar pedidos neste app agora. O que você escreveu continua aqui."
           }
         }
       }
     },
-    "This app isn't letting your account vote right now." : {
+    "Your account can't vote in this app right now." : {
       "comment" : "The app's settings block this account from voting",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "هذا التطبيق لا يسمح لحسابك بالتصويت الآن."
+            "value" : "لا يمكن لحسابك التصويت في هذا التطبيق الآن."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Diese App lässt dein Konto gerade nicht abstimmen."
+            "value" : "Dein Konto kann in dieser App gerade nicht abstimmen."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Esta app no permite ahora que tu cuenta vote."
+            "value" : "Tu cuenta no puede votar en esta app ahora."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cette app ne permet pas à votre compte de voter pour l'instant."
+            "value" : "Votre compte ne peut pas voter dans cette app pour l'instant."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Questa app al momento non consente al tuo account di votare."
+            "value" : "Al momento il tuo account non può votare in questa app."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "このアプリでは現在、あなたのアカウントで投票できません。"
+            "value" : "現在、このアプリではあなたのアカウントで投票できません。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ta aplikacja nie pozwala teraz Twojemu kontu głosować."
+            "value" : "Twoje konto nie może teraz głosować w tej aplikacji."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Este app não está permitindo que sua conta vote agora."
+            "value" : "Sua conta não pode votar neste app agora."
           }
         }
       }
@@ -4453,164 +4417,164 @@
         }
       }
     },
-    "This request was removed, so that didn't go through." : {
+    "This request was removed, so your change wasn't saved." : {
       "comment" : "An action on a request that was deleted",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "أُزيل هذا الطلب، لذا لم يتم ذلك."
+            "value" : "أُزيل هذا الطلب، لذا لم يُحفظ تغييرك."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Diese Anfrage wurde entfernt, deshalb hat das nicht geklappt."
+            "value" : "Diese Anfrage wurde entfernt, deshalb wurde deine Änderung nicht gespeichert."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Esta solicitud se eliminó, así que no se completó."
+            "value" : "Esta solicitud se eliminó, así que tu cambio no se guardó."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cette demande a été supprimée, l'action n'a donc pas abouti."
+            "value" : "Cette demande a été supprimée, votre modification n'a donc pas été enregistrée."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Questa richiesta è stata rimossa, quindi l'azione non è andata a buon fine."
+            "value" : "Questa richiesta è stata rimossa, quindi la tua modifica non è stata salvata."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "このリクエストは削除されたため、完了しませんでした。"
+            "value" : "このリクエストは削除されたため、変更は保存されませんでした。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ta prośba została usunięta, więc się nie udało."
+            "value" : "Ta prośba została usunięta, więc Twoja zmiana nie została zapisana."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Este pedido foi removido, então isso não foi concluído."
+            "value" : "Este pedido foi removido, então sua alteração não foi salva."
           }
         }
       }
     },
-    "Those couldn't be marked read." : {
+    "These updates couldn't be marked as read. Open Inbox again to refresh it." : {
       "comment" : "The server refused marking every notification read",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "تعذّر تعليمها كمقروءة."
+            "value" : "تعذّر تعليم هذه التحديثات كمقروءة. افتح صندوق الوارد مجددًا لتحديثه."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Diese konnten nicht als gelesen markiert werden."
+            "value" : "Diese Updates konnten nicht als gelesen markiert werden. Öffne den Posteingang erneut, um ihn zu aktualisieren."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No se pudieron marcar como leídas."
+            "value" : "Estas novedades no se pudieron marcar como leídas. Vuelve a abrir la Bandeja de entrada para actualizarla."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Impossible de les marquer comme lues."
+            "value" : "Ces mises à jour n'ont pas pu être marquées comme lues. Rouvrez la Boîte de réception pour l'actualiser."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Non è stato possibile segnarle come lette."
+            "value" : "Non è stato possibile segnare questi aggiornamenti come letti. Riapri In arrivo per aggiornare l'elenco."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "既読にできませんでした。"
+            "value" : "これらのお知らせを既読にできませんでした。受信箱を開き直して更新してください。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nie udało się oznaczyć ich jako przeczytanych."
+            "value" : "Nie udało się oznaczyć tych aktualizacji jako przeczytanych. Otwórz Skrzynkę ponownie, aby ją odświeżyć."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Não foi possível marcá-las como lidas."
+            "value" : "Não foi possível marcar estas atualizações como lidas. Abra a Caixa de entrada de novo para atualizá-la."
           }
         }
       }
     },
-    "Those notifications are gone." : {
+    "These updates were removed." : {
       "comment" : "Marking read notifications that no longer exist",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "هذه الإشعارات لم تعد موجودة."
+            "value" : "أُزيلت هذه التحديثات."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Diese Mitteilungen gibt es nicht mehr."
+            "value" : "Diese Updates wurden entfernt."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Esas notificaciones ya no existen."
+            "value" : "Estas novedades se eliminaron."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ces notifications n'existent plus."
+            "value" : "Ces mises à jour ont été supprimées."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quelle notifiche non ci sono più."
+            "value" : "Questi aggiornamenti sono stati rimossi."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "それらの通知はもうありません。"
+            "value" : "これらのお知らせは削除されました。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tych powiadomień już nie ma."
+            "value" : "Te aktualizacje zostały usunięte."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Essas notificações não existem mais."
+            "value" : "Estas atualizações foram removidas."
           }
         }
       }
@@ -5071,116 +5035,62 @@
         }
       }
     },
-    "What do you want?" : {
-      "comment" : "Header over a new request's title field",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ماذا تريد؟"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Was wünschst du dir?"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "¿Qué quieres?"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Que voulez-vous ?"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cosa vuoi?"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "何が欲しいですか？"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Czego chcesz?"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O que você quer?"
-          }
-        }
-      }
-    },
-    "What should we build?" : {
+    "No requests yet" : {
       "comment" : "Heading on a request board with no requests yet",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ماذا نبني؟"
+            "value" : "لا طلبات بعد"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Was sollen wir bauen?"
+            "value" : "Noch keine Anfragen"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¿Qué deberíamos crear?"
+            "value" : "Aún no hay solicitudes"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Que devrions-nous créer ?"
+            "value" : "Pas encore de demandes"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cosa dovremmo creare?"
+            "value" : "Ancora nessuna richiesta"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "何を作りましょうか？"
+            "value" : "まだリクエストはありません"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Co powinniśmy zbudować?"
+            "value" : "Nie ma jeszcze próśb"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "O que devemos criar?"
+            "value" : "Ainda não há pedidos"
           }
         }
       }
     },
     "What's New" : {
-      "comment" : "Menu item and title of the app's release notes screen",
+      "comment" : "Tab and title of the app's release notes screen",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
@@ -5341,326 +5251,326 @@
         }
       }
     },
-    "You're only seeing some requests. Tap All first, so you don't ask for something that's already here." : {
+    "A filter is hiding some requests. Choose All to check that yours isn't already here." : {
       "comment" : "Warning above the new request form while a status filter is on; All is the filter chip's name",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "أنت ترى بعض الطلبات فقط. اضغط «الكل» أولًا حتى لا تطلب شيئًا موجودًا."
+            "value" : "هناك فلتر يُخفي بعض الطلبات. اختر «الكل» لتتأكد من أن طلبك ليس موجودًا من قبل."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Du siehst nur einige Anfragen. Tippe zuerst auf „Alle“, damit du nichts anfragst, das es schon gibt."
+            "value" : "Ein Filter blendet einige Anfragen aus. Wähle Alle, um zu prüfen, ob es deine schon gibt."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Solo ves algunas solicitudes. Toca Todas primero para no pedir algo que ya está."
+            "value" : "Un filtro oculta algunas solicitudes. Elige Todas para comprobar que la tuya no está ya aquí."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vous ne voyez qu'une partie des demandes. Touchez d'abord Toutes pour ne pas demander ce qui existe déjà."
+            "value" : "Un filtre masque certaines demandes. Choisissez Toutes pour vérifier que la vôtre n'existe pas déjà."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Stai vedendo solo alcune richieste. Tocca prima Tutte, così non chiedi qualcosa che c'è già."
+            "value" : "Un filtro nasconde alcune richieste. Scegli Tutte per controllare che la tua non ci sia già."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "一部のリクエストだけが表示されています。すでにあるものを頼まないよう、先に「すべて」をタップしてください。"
+            "value" : "フィルタで一部のリクエストが隠れています。「すべて」を選んで、同じリクエストがすでにないか確認してください。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Widzisz tylko część próśb. Najpierw dotknij „Wszystkie”, żeby nie prosić o coś, co już tu jest."
+            "value" : "Filtr ukrywa część próśb. Wybierz Wszystkie, aby sprawdzić, czy Twojej jeszcze tu nie ma."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Você está vendo só alguns pedidos. Toque em Todos antes, para não pedir algo que já está aqui."
+            "value" : "Um filtro está ocultando alguns pedidos. Escolha Todos para conferir se o seu já não está aqui."
           }
         }
       }
     },
-    "Your comment didn't send. We kept what you wrote, so tap Send to try again." : {
+    "Your comment didn't send. What you wrote is still here. Choose Send to try again." : {
       "comment" : "A comment failed to send; Send is the button's name",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "لم يُرسَل تعليقك. احتفظنا بما كتبت، فاضغط «إرسال» للمحاولة مجددًا."
+            "value" : "لم يُرسَل تعليقك. ما كتبته ما زال هنا. اختر «إرسال» للمحاولة مجددًا."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dein Kommentar wurde nicht gesendet. Dein Text ist noch da, tippe auf „Senden“, um es erneut zu versuchen."
+            "value" : "Dein Kommentar wurde nicht gesendet. Dein Text ist noch da. Wähle Senden, um es erneut zu versuchen."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu comentario no se envió. Guardamos lo que escribiste; toca Enviar para intentarlo de nuevo."
+            "value" : "Tu comentario no se envió. Lo que escribiste sigue aquí. Elige Enviar para intentarlo de nuevo."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Votre commentaire n'est pas parti. Nous avons gardé votre texte : touchez Envoyer pour réessayer."
+            "value" : "Votre commentaire n'a pas été envoyé. Votre texte est toujours là. Choisissez Envoyer pour réessayer."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Il tuo commento non è stato inviato. Abbiamo tenuto quello che hai scritto: tocca Invia per riprovare."
+            "value" : "Il tuo commento non è stato inviato. Quello che hai scritto è ancora qui. Scegli Invia per riprovare."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "コメントを送信できませんでした。書いた内容は残っているので、「送信」をタップしてもう一度お試しください。"
+            "value" : "コメントを送信できませんでした。書いた内容は残っています。「送信」を選んでもう一度お試しください。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Twój komentarz nie został wysłany. Zachowaliśmy to, co napisałeś — dotknij „Wyślij”, aby spróbować ponownie."
+            "value" : "Twój komentarz nie został wysłany. Twój tekst nadal tu jest. Wybierz Wyślij, aby spróbować ponownie."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Seu comentário não foi enviado. Guardamos o que você escreveu; toque em Enviar para tentar de novo."
+            "value" : "Seu comentário não foi enviado. O que você escreveu continua aqui. Escolha Enviar para tentar de novo."
           }
         }
       }
     },
-    "Your comment is empty or too long. Change it and tap Send." : {
+    "Your comment is empty or too long. Change it and choose Send." : {
       "comment" : "The server refused a comment's length; Send is the button's name",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "تعليقك فارغ أو طويل جدًا. عدّله واضغط «إرسال»."
+            "value" : "تعليقك فارغ أو طويل جدًا. عدّله واختر «إرسال»."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dein Kommentar ist leer oder zu lang. Ändere ihn und tippe auf „Senden“."
+            "value" : "Dein Kommentar ist leer oder zu lang. Ändere ihn und wähle Senden."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu comentario está vacío o es demasiado largo. Cámbialo y toca Enviar."
+            "value" : "Tu comentario está vacío o es demasiado largo. Cámbialo y elige Enviar."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Votre commentaire est vide ou trop long. Modifiez-le et touchez Envoyer."
+            "value" : "Votre commentaire est vide ou trop long. Modifiez-le et choisissez Envoyer."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Il tuo commento è vuoto o troppo lungo. Modificalo e tocca Invia."
+            "value" : "Il tuo commento è vuoto o troppo lungo. Modificalo e scegli Invia."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "コメントが空か長すぎます。変更して「送信」をタップしてください。"
+            "value" : "コメントが空か長すぎます。変更して「送信」を選んでください。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Twój komentarz jest pusty albo za długi. Zmień go i dotknij „Wyślij”."
+            "value" : "Twój komentarz jest pusty albo za długi. Zmień go i wybierz Wyślij."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Seu comentário está vazio ou longo demais. Altere e toque em Enviar."
+            "value" : "Seu comentário está vazio ou longo demais. Altere e escolha Enviar."
           }
         }
       }
     },
-    "Your comment wasn't accepted. We kept what you wrote." : {
+    "Your comment wasn't accepted. What you wrote is still here, so change it and send it again." : {
       "comment" : "The server refused a comment",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "لم يُقبل تعليقك. احتفظنا بما كتبت."
+            "value" : "لم يُقبل تعليقك. ما كتبته ما زال هنا، فعدّله وأرسله مجددًا."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dein Kommentar wurde nicht angenommen. Dein Text ist noch da."
+            "value" : "Dein Kommentar wurde nicht angenommen. Dein Text ist noch da, ändere ihn also und sende ihn noch einmal."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu comentario no se aceptó. Guardamos lo que escribiste."
+            "value" : "Tu comentario no se aceptó. Lo que escribiste sigue aquí, así que cámbialo y envíalo de nuevo."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Votre commentaire n'a pas été accepté. Nous avons gardé votre texte."
+            "value" : "Votre commentaire n'a pas été accepté. Votre texte est toujours là : modifiez-le et envoyez-le à nouveau."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Il tuo commento non è stato accettato. Abbiamo tenuto quello che hai scritto."
+            "value" : "Il tuo commento non è stato accettato. Quello che hai scritto è ancora qui: modificalo e invialo di nuovo."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "コメントは受け付けられませんでした。書いた内容は残っています。"
+            "value" : "コメントは受け付けられませんでした。書いた内容は残っているので、変更してもう一度送信してください。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Twój komentarz nie został przyjęty. Zachowaliśmy to, co napisałeś."
+            "value" : "Twój komentarz nie został przyjęty. Twój tekst nadal tu jest, więc zmień go i wyślij ponownie."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Seu comentário não foi aceito. Guardamos o que você escreveu."
+            "value" : "Seu comentário não foi aceito. O que você escreveu continua aqui, então altere e envie de novo."
           }
         }
       }
     },
-    "Your phone isn't connected. Check your connection and try again." : {
+    "You're offline. Check your connection and try again." : {
       "comment" : "Why a screen couldn't load: no connection",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "هاتفك غير متصل. تحقّق من الاتصال وحاول مجددًا."
+            "value" : "أنت غير متصل بالإنترنت. تحقّق من الاتصال وحاول مجددًا."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dein Telefon ist nicht verbunden. Prüfe deine Verbindung und versuch es noch einmal."
+            "value" : "Du bist offline. Prüfe deine Verbindung und versuch es noch einmal."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu teléfono no está conectado. Revisa la conexión e inténtalo de nuevo."
+            "value" : "No tienes conexión. Revisa la conexión e inténtalo de nuevo."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Votre téléphone n'est pas connecté. Vérifiez votre connexion et réessayez."
+            "value" : "Vous êtes hors ligne. Vérifiez votre connexion et réessayez."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Il telefono non è connesso. Controlla la connessione e riprova."
+            "value" : "Sei offline. Controlla la connessione e riprova."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "電話がネットに接続されていません。接続を確認してもう一度お試しください。"
+            "value" : "オフラインです。接続を確認してもう一度お試しください。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Telefon nie ma połączenia. Sprawdź połączenie i spróbuj ponownie."
+            "value" : "Jesteś offline. Sprawdź połączenie i spróbuj ponownie."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Seu telefone não está conectado. Verifique a conexão e tente de novo."
+            "value" : "Você está offline. Verifique a conexão e tente de novo."
           }
         }
       }
     },
-    "Your request wasn't accepted. We kept what you wrote." : {
+    "Your request wasn't accepted. What you wrote is still here, so change it and send it again." : {
       "comment" : "The server refused a new request",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "لم يُقبل طلبك. احتفظنا بما كتبت."
+            "value" : "لم يُقبل طلبك. ما كتبته ما زال هنا، فعدّله وأرسله مجددًا."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Deine Anfrage wurde nicht angenommen. Dein Text ist noch da."
+            "value" : "Deine Anfrage wurde nicht angenommen. Dein Text ist noch da, ändere ihn also und sende ihn noch einmal."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu solicitud no se aceptó. Guardamos lo que escribiste."
+            "value" : "Tu solicitud no se aceptó. Lo que escribiste sigue aquí, así que cámbialo y envíalo de nuevo."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Votre demande n'a pas été acceptée. Nous avons gardé votre texte."
+            "value" : "Votre demande n'a pas été acceptée. Votre texte est toujours là : modifiez-le et envoyez-le à nouveau."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La tua richiesta non è stata accettata. Abbiamo tenuto quello che hai scritto."
+            "value" : "La tua richiesta non è stata accettata. Quello che hai scritto è ancora qui: modificalo e invialo di nuovo."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "リクエストは受け付けられませんでした。書いた内容は残っています。"
+            "value" : "リクエストは受け付けられませんでした。書いた内容は残っているので、変更してもう一度送信してください。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Twoja prośba nie została przyjęta. Zachowaliśmy to, co napisałeś."
+            "value" : "Twoja prośba nie została przyjęta. Twój tekst nadal tu jest, więc zmień go i wyślij ponownie."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Seu pedido não foi aceito. Guardamos o que você escreveu."
+            "value" : "Seu pedido não foi aceito. O que você escreveu continua aqui, então altere e envie de novo."
           }
         }
       }
@@ -5719,7 +5629,7 @@
         }
       }
     },
-    "Your vote couldn't be taken back from this request." : {
+    "Your vote couldn't be removed from this request." : {
       "comment" : "The server refused removing a vote",
       "extractionState" : "manual",
       "localizations" : {
@@ -5738,7 +5648,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No se pudo retirar tu voto de esta solicitud."
+            "value" : "No se pudo quitar tu voto de esta solicitud."
           }
         },
         "fr" : {
@@ -5773,7 +5683,7 @@
         }
       }
     },
-    "Your vote didn't go through. Try it again." : {
+    "Your vote didn't go through. Try again." : {
       "comment" : "A vote failed to send",
       "extractionState" : "manual",
       "localizations" : {
@@ -5935,164 +5845,56 @@
         }
       }
     },
-    "What this answers" : {
+    "Requests in this update" : {
       "comment" : "Heading over the requests a What's New entry answers",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ما يجيب عنه هذا"
+            "value" : "الطلبات في هذا التحديث"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Was das beantwortet"
+            "value" : "Anfragen in diesem Update"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lo que responde"
+            "value" : "Solicitudes en esta novedad"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ce que cela résout"
+            "value" : "Demandes dans cette nouveauté"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A cosa risponde"
+            "value" : "Richieste in questa novità"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "このアップデートで対応したこと"
+            "value" : "このアップデートのリクエスト"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Na co odpowiada"
+            "value" : "Prośby w tej nowości"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "O que isso responde"
-          }
-        }
-      }
-    },
-    "Sort" : {
-      "comment" : "VoiceOver label for the board's sort menu",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ترتيب"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sortieren"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ordenar"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Trier"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ordina"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "並べ替え"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sortuj"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ordenar"
-          }
-        }
-      }
-    },
-    "Your request is posted. You're following it." : {
-      "comment" : "Note on the board after a person sends a request",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تم نشر طلبك. أنت تتابعه الآن."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Deine Anfrage ist veröffentlicht. Du folgst ihr."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tu solicitud se publicó. Ya la sigues."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ta demande est publiée. Tu la suis."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La tua richiesta è pubblicata. La stai seguendo."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "リクエストを投稿しました。フォロー中です。"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Twoja prośba została opublikowana. Obserwujesz ją."
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Seu pedido foi publicado. Você está seguindo."
+            "value" : "Pedidos nesta novidade"
           }
         }
       }
@@ -6313,56 +6115,56 @@
         }
       }
     },
-    "**Your requests go to the team behind %@.** We don't sell or share what you write." : {
+    "**Your requests go to the team behind %@.** What you write is never sold or shared." : {
       "comment" : "What is this? page; Markdown bold on the first sentence; the argument is the app's name",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "**تذهب طلباتك إلى الفريق الذي يقف وراء %@.** لا نبيع ما تكتبه ولا نشاركه."
+            "value" : "**تذهب طلباتك إلى الفريق الذي يقف وراء %@.** ما تكتبه لا يُباع ولا يُشارَك أبدًا."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "**Deine Anfragen gehen an das Team hinter %@.** Wir verkaufen oder teilen nicht, was du schreibst."
+            "value" : "**Deine Anfragen gehen an das Team hinter %@.** Was du schreibst, wird nie verkauft oder weitergegeben."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "**Tus solicitudes llegan al equipo detrás de %@.** No vendemos ni compartimos lo que escribes."
+            "value" : "**Tus solicitudes llegan al equipo detrás de %@.** Lo que escribes nunca se vende ni se comparte."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "**Tes demandes vont à l'équipe derrière %@.** Nous ne vendons ni ne partageons ce que tu écris."
+            "value" : "**Tes demandes vont à l'équipe derrière %@.** Ce que tu écris n'est jamais vendu ni partagé."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "**Le tue richieste vanno al team dietro %@.** Non vendiamo né condividiamo ciò che scrivi."
+            "value" : "**Le tue richieste vanno al team dietro %@.** Ciò che scrivi non viene mai venduto né condiviso."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "**リクエストは %@ のチームに届きます。**書いた内容を販売したり共有したりすることはありません。"
+            "value" : "**リクエストは %@ のチームに届きます。**書いた内容が販売または共有されることはありません。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "**Twoje prośby trafiają do zespołu stojącego za %@.** Nie sprzedajemy ani nie udostępniamy tego, co piszesz."
+            "value" : "**Twoje prośby trafiają do zespołu stojącego za %@.** To, co piszesz, nigdy nie jest sprzedawane ani udostępniane."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "**Seus pedidos vão para a equipe por trás de %@.** Não vendemos nem compartilhamos o que você escreve."
+            "value" : "**Seus pedidos vão para a equipe por trás de %@.** O que você escreve nunca é vendido nem compartilhado."
           }
         }
       }
@@ -6422,7 +6224,7 @@
       }
     },
     "What is this?" : {
-      "comment" : "Title of the page behind the Powered by badge",
+      "comment" : "Title of the page behind the Powered by row",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
@@ -6583,218 +6385,164 @@
         }
       }
     },
-    "Get told when this changes?" : {
+    "Get notified when this request changes?" : {
       "comment" : "Heading of the card offering notifications after a first vote or follow",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "هل تريد إشعارًا عندما يتغير هذا؟"
+            "value" : "هل تريد إشعارًا عندما يتغيّر هذا الطلب؟"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Benachrichtigen, wenn sich das ändert?"
+            "value" : "Mitteilung erhalten, wenn sich diese Anfrage ändert?"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¿Quieres saber cuando cambie?"
+            "value" : "¿Recibir una notificación cuando cambie esta solicitud?"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Être prévenu quand ça change ?"
+            "value" : "Recevoir une notification quand cette demande change ?"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vuoi sapere quando cambia?"
+            "value" : "Vuoi una notifica quando questa richiesta cambia?"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "変更があったときにお知らせしますか？"
+            "value" : "このリクエストに変更があったら通知を受け取りますか？"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Powiadomić cię, gdy coś się zmieni?"
+            "value" : "Chcesz dostać powiadomienie, gdy ta prośba się zmieni?"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Quer ser avisado quando isso mudar?"
+            "value" : "Receber uma notificação quando este pedido mudar?"
           }
         }
       }
     },
-    "We'll send a notification when it's planned, shipped or someone replies." : {
+    "You'll get a notification when this request is planned, shipped or replied to." : {
       "comment" : "Body of the card offering notifications",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "سنرسل إشعارًا عندما يُخطَّط له أو يُطلق أو يرد أحد."
+            "value" : "سيصلك إشعار عندما يُخطَّط لهذا الطلب أو يُطلق أو يُرَدّ عليه."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wir benachrichtigen dich, wenn es geplant oder veröffentlicht wird oder jemand antwortet."
+            "value" : "Du bekommst eine Mitteilung, wenn diese Anfrage geplant oder veröffentlicht wird oder jemand darauf antwortet."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Te avisaremos cuando se planifique, se lance o alguien responda."
+            "value" : "Recibirás una notificación cuando esta solicitud se planifique, se lance o reciba una respuesta."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nous t'enverrons une notification quand c'est prévu, livré ou que quelqu'un répond."
+            "value" : "Tu recevras une notification quand cette demande sera prévue, livrée ou recevra une réponse."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ti invieremo una notifica quando è pianificata, rilasciata o qualcuno risponde."
+            "value" : "Riceverai una notifica quando questa richiesta viene pianificata, rilasciata o riceve una risposta."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "計画されたとき、リリースされたとき、または誰かが返信したときに通知します。"
+            "value" : "このリクエストが計画されたとき、リリースされたとき、返信があったときに通知が届きます。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wyślemy powiadomienie, gdy zostanie zaplanowana, wydana lub ktoś odpowie."
+            "value" : "Dostaniesz powiadomienie, gdy ta prośba zostanie zaplanowana, wydana lub ktoś na nią odpowie."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vamos enviar uma notificação quando for planejado, lançado ou alguém responder."
+            "value" : "Você vai receber uma notificação quando este pedido for planejado, lançado ou respondido."
           }
         }
       }
     },
-    "Not now" : {
-      "comment" : "Button declining notifications",
-      "extractionState" : "manual",
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ليس الآن"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nicht jetzt"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ahora no"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pas maintenant"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Non ora"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "今はしない"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nie teraz"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Agora não"
-          }
-        }
-      }
-    },
-    "Turn on" : {
+    "Turn on notifications" : {
       "comment" : "Button accepting notifications",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "تشغيل"
+            "value" : "تشغيل الإشعارات"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Einschalten"
+            "value" : "Mitteilungen einschalten"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Activar"
+            "value" : "Activar notificaciones"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Activer"
+            "value" : "Activer les notifications"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Attiva"
+            "value" : "Attiva le notifiche"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "オンにする"
+            "value" : "通知をオンにする"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Włącz"
+            "value" : "Włącz powiadomienia"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ativar"
+            "value" : "Ativar notificações"
           }
         }
       }
@@ -6907,56 +6655,56 @@
         }
       }
     },
-    "You'll be told when this changes." : {
+    "You'll get an update in Inbox when this request changes." : {
       "comment" : "One-time line after a person's first vote on this phone",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "سيتم إخبارك عندما يتغير هذا."
+            "value" : "سيصلك تحديث في صندوق الوارد عندما يتغيّر هذا الطلب."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Du erfährst es, wenn sich das ändert."
+            "value" : "Du bekommst ein Update im Posteingang, wenn sich diese Anfrage ändert."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Te avisaremos cuando cambie."
+            "value" : "Recibirás una novedad en la Bandeja de entrada cuando cambie esta solicitud."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu seras prévenu quand ça changera."
+            "value" : "Tu recevras une mise à jour dans la Boîte de réception quand cette demande changera."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ti diremo quando cambia."
+            "value" : "Riceverai un aggiornamento nella sezione In arrivo quando questa richiesta cambia."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "変更があったらお知らせします。"
+            "value" : "このリクエストに変更があると、受信箱にお知らせが届きます。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dowiesz się, gdy coś się zmieni."
+            "value" : "Dostaniesz aktualizację w Skrzynce, gdy ta prośba się zmieni."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Você será avisado quando isso mudar."
+            "value" : "Você vai receber uma atualização na Caixa de entrada quando este pedido mudar."
           }
         }
       }
@@ -7069,110 +6817,110 @@
         }
       }
     },
-    "Says what Different Requests is" : {
+    "Opens a page about Different Requests." : {
       "comment" : "VoiceOver hint for the badge; Different Requests is the product's name",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "يوضح ما هو Different Requests"
+            "value" : "يفتح صفحة عن Different Requests."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Erklärt, was Different Requests ist"
+            "value" : "Öffnet eine Seite über Different Requests."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Explica qué es Different Requests"
+            "value" : "Abre una página sobre Different Requests."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Explique ce qu'est Different Requests"
+            "value" : "Ouvre une page sur Different Requests."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Spiega cos'è Different Requests"
+            "value" : "Apre una pagina su Different Requests."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Different Requests について説明します"
+            "value" : "Different Requests についてのページを開きます。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wyjaśnia, czym jest Different Requests"
+            "value" : "Otwiera stronę o Different Requests."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Explica o que é o Different Requests"
+            "value" : "Abre uma página sobre o Different Requests."
           }
         }
       }
     },
-    "Waiting" : {
+    "Open" : {
       "comment" : "Status of a request nobody has answered yet",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "في الانتظار"
+            "value" : "مفتوح"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wartend"
+            "value" : "Offen"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "En espera"
+            "value" : "Abierto"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "En attente"
+            "value" : "Ouvert"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "In attesa"
+            "value" : "Aperto"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "受付中"
+            "value" : "オープン"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Oczekuje"
+            "value" : "Otwarte"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aguardando"
+            "value" : "Aberto"
           }
         }
       }
@@ -7447,56 +7195,56 @@
         }
       }
     },
-    "Now waiting" : {
-      "comment" : "Inbox headline: the request moved back to waiting",
+    "Now open" : {
+      "comment" : "Inbox headline: the request moved back to open",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "الآن في الانتظار"
+            "value" : "مفتوح الآن"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Jetzt wartend"
+            "value" : "Jetzt offen"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ahora en espera"
+            "value" : "Ahora abierto"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Désormais en attente"
+            "value" : "Désormais ouvert"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ora in attesa"
+            "value" : "Ora aperto"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "受付中に戻りました"
+            "value" : "オープンに戻りました"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Znów oczekuje"
+            "value" : "Znów otwarte"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Agora aguardando"
+            "value" : "Agora aberto"
           }
         }
       }
@@ -7717,56 +7465,56 @@
         }
       }
     },
-    "Already asked for" : {
+    "Merged into an earlier request" : {
       "comment" : "Inbox headline: the request was merged into another",
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "طُلب من قبل"
+            "value" : "دُمج مع طلب سابق"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Schon gewünscht"
+            "value" : "Mit einer früheren Anfrage zusammengeführt"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ya pedido"
+            "value" : "Unido a una solicitud anterior"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Déjà demandé"
+            "value" : "Fusionné avec une demande antérieure"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Già richiesto"
+            "value" : "Unito a una richiesta precedente"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "既にリクエスト済み"
+            "value" : "以前のリクエストに統合されました"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Już zgłoszone"
+            "value" : "Połączono z wcześniejszą prośbą"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Já pedido"
+            "value" : "Mesclado com um pedido anterior"
           }
         }
       }
@@ -7875,6 +7623,1134 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Algo mudou"
+          }
+        }
+      }
+    },
+    "Requests couldn't load" : {
+      "comment" : "Heading when the Requests screen failed to load",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعذّر تحميل الطلبات"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anfragen konnten nicht geladen werden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudieron cargar las solicitudes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de charger les demandes"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossibile caricare le richieste"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リクエストを読み込めませんでした"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie udało się wczytać próśb"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não foi possível carregar os pedidos"
+          }
+        }
+      }
+    },
+    "This request couldn't load" : {
+      "comment" : "Heading when one request failed to load",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعذّر تحميل هذا الطلب"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Anfrage konnte nicht geladen werden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo cargar esta solicitud"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de charger cette demande"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossibile caricare questa richiesta"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このリクエストを読み込めませんでした"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie udało się wczytać tej prośby"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não foi possível carregar este pedido"
+          }
+        }
+      }
+    },
+    "Inbox couldn't load" : {
+      "comment" : "Heading when the Inbox screen failed to load",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعذّر تحميل صندوق الوارد"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Posteingang konnte nicht geladen werden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo cargar la Bandeja de entrada"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de charger la Boîte de réception"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossibile caricare In arrivo"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "受信箱を読み込めませんでした"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie udało się wczytać Skrzynki"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não foi possível carregar a Caixa de entrada"
+          }
+        }
+      }
+    },
+    "What's New couldn't load" : {
+      "comment" : "Heading when the What's New screen failed to load",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعذّر تحميل «ما الجديد»"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neuigkeiten konnten nicht geladen werden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo cargar Novedades"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de charger les Nouveautés"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossibile caricare Novità"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新機能を読み込めませんでした"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie udało się wczytać sekcji Co nowego"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não foi possível carregar Novidades"
+          }
+        }
+      }
+    },
+    "Roadmap couldn't load" : {
+      "comment" : "Heading when the Roadmap screen failed to load",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعذّر تحميل خارطة الطريق"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Roadmap konnte nicht geladen werden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo cargar la Hoja de ruta"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de charger la Feuille de route"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossibile caricare la Roadmap"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ロードマップを読み込めませんでした"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie udało się wczytać Planu rozwoju"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não foi possível carregar o Roteiro"
+          }
+        }
+      }
+    },
+    "Couldn't load more requests." : {
+      "comment" : "Row at the end of the Requests list when the next page failed to load",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعذّر تحميل المزيد من الطلبات."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weitere Anfragen konnten nicht geladen werden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudieron cargar más solicitudes."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de charger plus de demandes."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossibile caricare altre richieste."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リクエストをこれ以上読み込めませんでした。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie udało się wczytać więcej próśb."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não foi possível carregar mais pedidos."
+          }
+        }
+      }
+    },
+    "Couldn't load more updates." : {
+      "comment" : "Row at the end of the Inbox list when the next page failed to load",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعذّر تحميل المزيد من التحديثات."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weitere Updates konnten nicht geladen werden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudieron cargar más novedades."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de charger plus de mises à jour."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossibile caricare altri aggiornamenti."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "お知らせをこれ以上読み込めませんでした。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie udało się wczytać więcej aktualizacji."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não foi possível carregar mais atualizações."
+          }
+        }
+      }
+    },
+    "Couldn't load more comments." : {
+      "comment" : "Row at the end of a request's comments when the next page failed to load",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعذّر تحميل المزيد من التعليقات."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weitere Kommentare konnten nicht geladen werden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudieron cargar más comentarios."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de charger plus de commentaires."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossibile caricare altri commenti."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コメントをこれ以上読み込めませんでした。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie udało się wczytać więcej komentarzy."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não foi possível carregar mais comentários."
+          }
+        }
+      }
+    },
+    "Couldn't load more of What's New." : {
+      "comment" : "Row at the end of the What's New list when the next page failed to load",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعذّر تحميل المزيد من «ما الجديد»."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weitere Neuigkeiten konnten nicht geladen werden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo cargar más de Novedades."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de charger plus de Nouveautés."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossibile caricare altre Novità."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新機能をこれ以上読み込めませんでした。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie udało się wczytać więcej z sekcji Co nowego."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não foi possível carregar mais de Novidades."
+          }
+        }
+      }
+    },
+    "Filter and sort" : {
+      "comment" : "VoiceOver label for the button that opens the filter and sort menu",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تصفية وترتيب"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtern und sortieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtrar y ordenar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtrer et trier"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtra e ordina"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フィルタと並べ替え"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtruj i sortuj"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtrar e ordenar"
+          }
+        }
+      }
+    },
+    "%lld comments" : {
+      "comment" : "VoiceOver count of a request's comments",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld comment"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld comments"
+                }
+              }
+            }
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التعليقات: %lld"
+          }
+        },
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Kommentar"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Kommentare"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld comentario"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld comentarios"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld commentaire"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld commentaires"
+                }
+              }
+            }
+          }
+        },
+        "it" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld commento"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld commenti"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld件のコメント"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Komentarze: %lld"
+          }
+        },
+        "pt-BR" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld comentário"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld comentários"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Discard this request?" : {
+      "comment" : "Question when leaving the new request form with something typed",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "هل تريد تجاهل هذا الطلب؟"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Anfrage verwerfen?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Descartar esta solicitud?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abandonner cette demande ?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminare questa richiesta?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このリクエストを破棄しますか？"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odrzucić tę prośbę?"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descartar este pedido?"
+          }
+        }
+      }
+    },
+    "Discard request" : {
+      "comment" : "Button that leaves the new request form and loses what was typed",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تجاهل الطلب"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anfrage verwerfen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descartar solicitud"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abandonner la demande"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elimina richiesta"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リクエストを破棄"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odrzuć prośbę"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descartar pedido"
+          }
+        }
+      }
+    },
+    "Keep writing" : {
+      "comment" : "Button that stays on the new request form",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "متابعة الكتابة"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weiterschreiben"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seguir escribiendo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuer à écrire"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continua a scrivere"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "書き続ける"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pisz dalej"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar escrevendo"
+          }
+        }
+      }
+    },
+    "Clear" : {
+      "comment" : "VoiceOver label for the button that empties the title field",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مسح"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Löschen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borrar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effacer"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancella"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "消去"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyczyść"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Limpar"
+          }
+        }
+      }
+    },
+    "%lld requests" : {
+      "comment" : "How many requests a roadmap status holds",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld request"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld requests"
+                }
+              }
+            }
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الطلبات: %lld"
+          }
+        },
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Anfrage"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld Anfragen"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld solicitud"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld solicitudes"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld demande"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld demandes"
+                }
+              }
+            }
+          }
+        },
+        "it" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld richiesta"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld richieste"
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld件のリクエスト"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prośby: %lld"
+          }
+        },
+        "pt-BR" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld pedido"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld pedidos"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Version %@" : {
+      "comment" : "An update's version; the argument is the version number",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الإصدار %@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versión %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versione %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バージョン %@"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wersja %@"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versão %@"
+          }
+        }
+      }
+    },
+    "Unread" : {
+      "comment" : "VoiceOver value on an inbox update that has not been read",
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "غير مقروء"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ungelesen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No leído"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non lu"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non letto"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未読"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nieprzeczytane"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não lido"
           }
         }
       }

@@ -2,53 +2,53 @@
 
 ## What it is
 
-"Powered by Different Requests", under the title on the board and the inbox, in an app whose plan
-is Free. Paying makes it disappear, and that is the first thing $10 a month buys.
+"Powered by Different Requests", one row after the last request on the Requests screen, in an app
+whose plan is Free. Paying makes it disappear, and that is the first thing $10 a month buys.
 
 Three decisions shape it, and all three were taken against a mockup before any code:
 
-**Under the title, not pinned to the bottom.** It is a mark of where the screen came from rather
-than an advertisement laid over somebody else's product. A developer who resents it least is the
-one most likely to leave it there long enough to pay for its removal.
+**After the last request, as a row of the list.** Since 2026-10-09 (#167). Apple's rule is "Ensure
+branding always defers to content", and under the title it pushed the first request down. It is a
+44 pt row with a chevron, so it reads as something that opens, and it scrolls with the list. It is
+not pinned over the content.
 
 **A tap says what this is, in the app user's words.** Owner ruling 2026-09-26, piece 24: the badge
-opens a **"What is this?"** sheet — "[App name] uses Different Requests to hear what you want
-next.", then **Ask**, **Follow**, and **Your requests go to [App name]'s team.** "We don't sell or
-share what you write." — with **About Different Requests** at the bottom. The app name is
+pushes a **"What is this?"** page onto the same stack, never a second sheet: "[App name] uses Different Requests to hear what you want
+next.", then **Ask**, **Follow**, and **Your requests go to the team behind [App name].** "What you
+write is never sold or shared." — with **About Different Requests** at the bottom. The app name is
 `DRAppConfig.app.name`, or "This app" when it is empty.
 
-**About Different Requests opens Safari over the app, not instead of it.** `openURL` hands the
-reader to Safari and they have to find their way back — out of an app that is not ours, following a
-link we put there. A sheet is dismissed and they are where they were.
+**About Different Requests opens the browser.** Since 2026-10-09 (#167) it is a row that opens the
+site in the browser. Until then it raised Safari as a sheet over the page, which was a sheet over
+the SDK's own sheet, and Apple's rule is "Display only one sheet at a time".
 
-**Board and inbox only.** The two screens a reader returns to. On all five it starts reading as
-watermarking.
+**The Requests tab only.** One place. On every screen it starts reading as watermarking.
 
 ## Surfaces
 
 | Surface | Ships this? |
 |---|---|
-| Board (`DifferentRequestsView`) | **Yes** — under the title |
-| Inbox (`InboxView`) | **Yes** — under the title |
+| Requests (`RequestsScreen`, inside `DifferentRequestsView`) | **Yes**: the row after the last request |
+| Inbox (`InboxView`) | **none** since 2026-10-09 |
 | Roadmap, changelog, request detail | **none** — deliberately. Both are Pro surfaces anyway, so a badge there would only ever draw for an app that cannot open them |
-| Composer (`SubmitRequestView`) | **none** — a sheet, and a mark on a form is an advertisement |
+| New request form (`SubmitRequestView`) | **none** — a mark on a form is an advertisement |
 | Server | **Reads it** — since contract 0.38.0 the flag is `badge_removed`, which gates `PLAN_SURFACE_BADGE_REMOVAL` like every other Pro surface; `show_badge` is gone (server #251) |
 | Console | **none** |
 
 ## How to find it, trigger it, and what happens
 
-**Seeing it.** Open the board or the inbox in an app whose key resolves to a Free app. Under the
-navigation title sits a small mark and the words `Powered by Different Requests`.
+**Seeing it.** Open the Requests tab in an app whose key resolves to a Free app and scroll to the
+end of the list. Under the last request sits a row with the words `Powered by Different Requests`
+and a chevron. A board with no requests on it draws no row.
 
-**Not seeing it.** The same screens in an app on Pro. Nothing is drawn and nothing reserves space.
+**Not seeing it.** The same screen in an app on Pro. Nothing is drawn and nothing reserves space.
 
-**Tapping it.** "What is this?" rises as a sheet on both platforms, with **Done**. Its **About
-Different Requests** opens `https://differentrequests.com`: on iOS a Safari sheet over the page, and
-dismissing it returns the reader exactly where they were; on macOS the default browser, because
-there is no in-app browser on macOS and opening one is what a Mac app does.
+**Tapping it.** "What is this?" is pushed, with the back button. Its **About
+Different Requests** row opens `https://differentrequests.com` in the browser, on both platforms.
 
-**Before the answer arrives.** Nothing. The badge appears when the configuration answers, which is
-the first round trip either screen makes.
+**Before the answer arrives.** No screen at all: `WornLook` draws a spinner until the configuration
+answers, so the badge is in place on the screen's first frame. `hub.configure()`, awaited at launch,
+is normally that answer.
 
 ## Expectations
 
@@ -56,25 +56,26 @@ the first round trip either screen makes.
 
 | Situation | Expected |
 |---|---|
-| Free app, board or inbox | The badge, under the title |
+| Free app, Requests tab, at least one request | The row, after the last request |
+| Free app, Requests tab, no requests | Nothing drawn |
 | Pro app | Nothing drawn, no reserved space |
 | The configuration has not answered yet | Nothing drawn |
 | The configuration read **failed** | Nothing drawn, and the store will ask again |
 | Read once per launch | Yes. The client answers a repeat `config` from its first read, so both screens asking costs one round trip |
-| VoiceOver | One button, labeled `Powered by Different Requests`, hinted `Says what Different Requests is` |
+| VoiceOver | One button, labeled `Powered by Different Requests`, hinted `Opens a page about Different Requests.` |
 
 ### What it refuses
 
 | Situation | Expected | Why |
 |---|---|---|
 | Drawing on a failed read | Never | The two mistakes are not the same size. A badge missing for a moment costs nothing; one on an app paying to be rid of it is a support ticket from a customer who is right |
-| Leaving the host app on iOS | Never | The sheet is `SFSafariViewController`. `openURL` is the macOS path only |
+| A sheet over the SDK's sheet | Never | The page is pushed and the site opens in the browser |
 | Guessing from `badgeRemoved` alone | Never | ``BadgeState`` carries how far the asking got, not just the answer |
 
 ## The code path
 
 ```
-DifferentRequestsView / InboxView
+DifferentRequestsView ............................... Views/DifferentRequestsView.swift
   │
   ├─ .task { await hub.appConfig.load() }
   │    │
@@ -87,51 +88,30 @@ DifferentRequestsView / InboxView
   │         └─ badge = BadgeState(response:) ......... State/BadgeState.swift
   │              └─ config.badgeRemoved ? .bought : .carried
   │
-  └─ PoweredByBadge(appConfig: hub.appConfig) ....... Views/PoweredByBadge.swift
+  └─ RequestsScreen → RequestsContent → RequestsList .. Views/RequestsList.swift
        │
-       └─ appConfig.badge.isCarried == false → nothing at all
-          appConfig.badge.isCarried == true  → Button
-            ├─ label: chevron on the accent + the words
-            └─ tap → isShowingAbout = true
-                 └─ .sheet { PoweredByPage(appConfig:) } ........ Views/PoweredByPage.swift
+       └─ appConfig.badge.isCarried == false → no section at all
+          appConfig.badge.isCarried == true  → Section { PoweredByRow } .. Views/PoweredByRow.swift
+            ├─ label: the words, footnote; the list draws the chevron
+            └─ tap → push
+                 └─ PoweredByPage(appConfig:) ................... Views/PoweredByPage.swift
                       "What is this?" · appConfig.config.app.name, or "This app"
-                      Done → dismiss()
-                      About Different Requests
-                        ├─ iOS   → .sheet { SafariSheet(url:) } .. Views/SafariSheet.swift
-                        │            └─ SFSafariViewController
-                        └─ macOS → openURL(PoweredByPage.home)
+                      About Different Requests → Link → the browser
 ```
 
-The store is on the hub, not on either screen. Two screens draw it, and a second copy of the answer
-is a second thing to keep in step.
+The store is on the hub, not on the screen, because the plan also decides the look every screen is
+drawn in.
 
 ## The screens
 
-```
-┌─────────────────────────────────┐
-│ Requests                    [+] │  ← navigationTitle, toolbar
-│ ▲ Powered by Different Requests │  ← here. caption, secondary
-├─────────────────────────────────┤
-│ [ Most votes ] [ Open ] [ Planned ]    │  ← BoardFilterBar
-├─────────────────────────────────┤
-│ ▲12  Dark mode        PLANNED   │
-│ ▲ 9  Filter by tag    OPEN      │
-└─────────────────────────────────┘
-
-On Pro the second row is absent — not blank, absent. Nothing reserves the space, so a paying app's
-board is its own from the title down.
-```
+The mockup's Requests screen draws the row: `projects/different-requests/documents/2026-10-09-sdk-redesign-mockup.html`
+in the Second Brain. On Pro the row is absent, not blank.
 
 ## Platform differences
 
 | | |
 |---|---|
-| **iOS 18+** | `SFSafariViewController` in a `.sheet`, `.ignoresSafeArea()`. The reader never leaves the host app |
-| **macOS 15+** | `openURL`. `SFSafariViewController` is UIKit and does not exist here; `SafariSheet.swift` is inside `#if os(iOS)` in full |
-| **Both** | The same mark, the same words, the same placement. Only what a tap does differs |
-
-This is the first platform conditional in the package. It is here because the platforms genuinely
-differ, not because one of them was awkward.
+| **iOS 26 and macOS 26** | The same words, the same placement, and the same `Link` to the browser |
 
 ## Which tests walk the chart
 
@@ -146,7 +126,8 @@ The walk, and what it answered:
 | Move that app to Pro with `Entitle` and relaunch | Nothing is drawn |
 | Open the board with the network down | Nothing is drawn — an answer that never came is not a Free app |
 | Tap the badge on iOS | The site opens over the app and returns where it was |
-| 2026-09-26: tap the badge on a newly provisioned Free app ("Badge Walk"), iOS 27 simulator | "What is this?" with "Badge Walk uses Different Requests to hear what you want next." and "Your requests go to Badge Walk's team." |
+| 2026-09-26: tap the badge on a newly provisioned Free app ("Badge Walk"), iOS 27 simulator | "What is this?" with "Badge Walk uses Different Requests to hear what you want next." and "Your requests go to the team behind Badge Walk." |
 | Tap **About Different Requests** | differentrequests.com in a Safari sheet over the page; closing it returns to the page, and **Done** returns to the board |
+| 2026-10-09, iOS 26.0 simulator, a Free app ("Walk Provisioned App") | The row sits 12 pt under the last request, 370 by 44 pt, with a chevron. Tapping it pushed "What is this?" with a back button. A Pro app ("Calls Walk") drew no row. The rows above this one walked the badge under the title, which this replaced |
 | macOS | Builds; not walked — the Mac walk waits for the owner's go-ahead |
 

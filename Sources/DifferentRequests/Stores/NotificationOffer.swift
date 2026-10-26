@@ -6,8 +6,8 @@ import UserNotifications
   import AppKit
 #endif
 
-/// The "Get told when this changes?" card: offered after a person's first vote or follow, answered
-/// once per phone, and the door to Apple's own notification prompt.
+/// The "Get notified when this request changes?" card: offered after a person's first vote or
+/// follow, answered once per phone, and the door to Apple's own notification prompt.
 ///
 /// Offered only where the host app left permission to the SDK, the app's plan sends notifications,
 /// and Apple has not been asked yet. The device token Apple hands back reaches the host app's
@@ -72,13 +72,13 @@ final class NotificationOffer {
 
   // MARK: - Answering
 
-  /// "Not now": the card goes, and is not offered again on this phone.
+  /// Dismiss: the card goes, and is not offered again on this phone.
   func decline() {
     defaults.set(true, forKey: Self.answeredKey)
     state = .hidden
   }
 
-  /// "Turn on": the card goes, Apple's prompt comes up, and a yes registers for remote
+  /// "Turn on notifications": the card goes, Apple's prompt comes up, and a yes registers for remote
   /// notifications so the token reaches the host app's delegate.
   func accept() async {
     if let requestID = state.requestID {

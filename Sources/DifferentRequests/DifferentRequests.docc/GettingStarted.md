@@ -4,7 +4,7 @@ From an empty project to a board your users can post to.
 
 ## Overview
 
-Four steps: add the package, build the hub, sign your person in, show a screen.
+Four steps: add the package, build and configure the hub, sign your person in, show a screen.
 Only the last two involve any decisions.
 
 ## Add the package
@@ -21,7 +21,7 @@ Or in `Package.swift`:
 dependencies: [
   .package(
     url: "https://github.com/Different-Productions/DifferentRequestsSDK",
-    from: "0.14.0"
+    from: "0.15.0"
   ),
 ]
 ```
@@ -43,8 +43,24 @@ let requests = DifferentRequestsHub(
 )
 ```
 
+Then await ``DifferentRequestsHub/configure()`` at launch. It reads what your
+app includes: the screens on your plan, the badge, and the tint chosen in the
+dashboard. No screen draws until that has answered, so nobody sees a color or a
+tab that then changes:
+
+```swift
+WindowGroup {
+  ContentView(requests: requests)
+    .task {
+      await requests.configure()
+    }
+}
+```
+
 ``Appearance/standard`` is the SDK's own look. Pass an ``Appearance`` with your
 app's accent and a system font design to have every screen wear your app instead.
+On Pro, a tint chosen in the dashboard's Appearance tab wins over the accent passed
+here, and reaches your app the next time it calls `configure()`.
 
 ``NotificationPermission/askedBySDK`` lets the SDK ask for notification permission
 after a person's first vote or follow. If your app asks for permission itself, pass
@@ -73,9 +89,10 @@ struct MyApp: App {
 
   var body: some Scene {
     WindowGroup {
-      NavigationStack {
-        DifferentRequestsView(hub: requests)
-      }
+      DifferentRequestsView(hub: requests)
+        .task {
+          await requests.configure()
+        }
     }
   }
 }
@@ -168,25 +185,20 @@ the device, so the app cannot make one and nothing on it is worth stealing.
 
 ## Show a screen
 
-Every screen takes the hub, and every screen belongs inside a `NavigationStack`
-your app owns — that stack is what gives it a title bar, a search field, and
-somewhere to push a request's detail onto.
+Every screen takes the hub. ``DifferentRequestsView`` is all of them at once:
+tabs for Requests and Inbox, and for Roadmap and What's New where your plan
+includes them, each with its own `NavigationStack`. Present it in a sheet, and do not wrap it in a stack.
 
 ```swift
-struct FeatureRequestsScreen: View {
-  let requests: DifferentRequestsHub
-
-  var body: some View {
-    NavigationStack {
-      DifferentRequestsView(hub: requests)
-    }
-  }
+.sheet(isPresented: $isShowingRequests) {
+  DifferentRequestsView(hub: requests)
 }
 ```
 
-That is the board: a ranking control, status filters, search, pull to refresh,
-infinite scroll, voting, and a composer. ``RoadmapView``, ``ChangelogView`` and
-``InboxView`` are the other three, and all four take the same hub.
+The Requests tab is the board: filter and sort in one menu, search, pull to
+refresh, infinite scroll, voting, and the new request form. ``RoadmapView``,
+``ChangelogView`` and ``InboxView`` can also be shown alone, each inside a
+`NavigationStack` your app owns, and take the same hub.
 
 ## Open it without the wait
 

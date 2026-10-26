@@ -796,55 +796,55 @@
         }
       }
     },
-    "What this app offers could not be read. The log says what the server answered." : {
+    "Couldn't load this app's settings. Check the log for the server's answer." : {
       "extractionState" : "manual",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "تعذّرت قراءة ما يقدمه هذا التطبيق. السجل يوضح رد الخادم."
+            "value" : "تعذّر تحميل إعدادات هذا التطبيق. راجع السجل لمعرفة رد الخادم."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Das Angebot dieser App konnte nicht gelesen werden. Das Protokoll zeigt die Antwort des Servers."
+            "value" : "Die Einstellungen dieser App konnten nicht geladen werden. Die Antwort des Servers steht im Protokoll."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No se pudo leer lo que ofrece esta app. El registro muestra la respuesta del servidor."
+            "value" : "No se pudo cargar la configuración de esta app. Consulta el registro para ver la respuesta del servidor."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Impossible de lire ce que propose cette app. Le journal indique la réponse du serveur."
+            "value" : "Impossible de charger les réglages de cette app. Consulte le journal pour voir la réponse du serveur."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Impossibile leggere cosa offre questa app. Il log mostra la risposta del server."
+            "value" : "Impossibile caricare le impostazioni di questa app. Controlla il log per la risposta del server."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "このアプリの提供内容を読み込めませんでした。ログにサーバーの応答があります。"
+            "value" : "このアプリの設定を読み込めませんでした。サーバーの応答はログで確認してください。"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nie udało się odczytać oferty aplikacji. Log pokazuje odpowiedź serwera."
+            "value" : "Nie udało się wczytać ustawień tej aplikacji. Sprawdź w logu odpowiedź serwera."
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Não foi possível ler o que este app oferece. O log mostra a resposta do servidor."
+            "value" : "Não foi possível carregar as configurações deste app. Confira no log a resposta do servidor."
           }
         }
       }
@@ -1004,6 +1004,112 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "OK"
+          }
+        }
+      }
+    },
+    "No API key" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا يوجد مفتاح API"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein API-Schlüssel"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Falta la clave de API"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune clé API"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessuna chiave API"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "APIキーがありません"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brak klucza API"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nenhuma chave de API"
+          }
+        }
+      }
+    },
+    "Set %@ in the scheme's Run, Arguments, Environment Variables, then run again." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عيّن %@ في Run, Arguments, Environment Variables ضمن المخطط، ثم شغّل التطبيق مجددًا."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Setze %@ im Schema unter Run, Arguments, Environment Variables und starte dann erneut."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Define %@ en Run, Arguments, Environment Variables del esquema y vuelve a ejecutar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Définis %@ dans Run, Arguments, Environment Variables du schéma, puis relance."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imposta %@ in Run, Arguments, Environment Variables dello schema, poi esegui di nuovo."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スキームの Run, Arguments, Environment Variables で %@ を設定してから、もう一度実行してください。"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ustaw %@ w schemacie, w Run, Arguments, Environment Variables, i uruchom ponownie."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Defina %@ em Run, Arguments, Environment Variables do esquema e execute de novo."
           }
         }
       }

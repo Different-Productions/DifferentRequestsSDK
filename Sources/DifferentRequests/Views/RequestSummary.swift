@@ -1,43 +1,32 @@
 import DifferentRequestsProtos
 import SwiftUI
 
-/// What a request says and where it sits, as the tappable half of a board row.
+/// What a request says and where it sits, as the tappable half of a row: its title, one supporting
+/// line, and its facts, all on one leading edge.
+///
+/// At accessibility text sizes the supporting line wraps, because one line of very large text is a
+/// few words.
 struct RequestSummary: View {
-
-  private static let metadataSpacing: CGFloat = 8
-  private static let bodyLineLimit: Int = 2
 
   let request: DRFeatureRequest
 
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
   var body: some View {
-    VStack(alignment: .leading, spacing: 4) {
+    VStack(alignment: .leading, spacing: Spacing.xxSmall.rawValue) {
       Text(request.title)
-        .font(.headline)
+        .textRole(.rowTitle)
+        .foregroundStyle(ColorRole.label)
+        .lineLimit(2)
 
       if request.body.isEmpty == false {
         Text(request.body)
-          .font(.subheadline)
-          .foregroundStyle(.secondary)
-          .lineLimit(Self.bodyLineLimit)
+          .textRole(.supporting)
+          .foregroundStyle(ColorRole.secondaryLabel)
+          .lineLimit(dynamicTypeSize.isAccessibilitySize ? 3 : 1)
       }
 
-      HStack(spacing: Self.metadataSpacing) {
-        StatusBadge(state: request.state)
-
-        if request.commentCount > 0 {
-          Label(request.commentCount.formatted(), systemImage: "bubble.left")
-            .font(.caption)
-            .foregroundStyle(.secondary)
-        }
-
-        Spacer()
-
-        if request.hasCreatedAt {
-          Text(request.createdAt.date.ago)
-            .font(.caption)
-            .foregroundStyle(.tertiary)
-        }
-      }
+      RequestFacts(request: request)
     }
   }
 }

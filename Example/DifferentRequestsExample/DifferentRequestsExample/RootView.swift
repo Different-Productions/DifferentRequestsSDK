@@ -29,12 +29,12 @@ struct RootView: View {
     switch session.phase {
     case .unconfigured:
       ContentUnavailableView {
-        Label("No app key", systemImage: "key.slash")
+        Label("No API key", systemImage: "key.slash")
       } description: {
         Text(
           """
           Set \(DemoConfig.appKeyEnvironmentVariable) in the scheme's \
-          Run › Arguments › Environment Variables, then run again.
+          Run, Arguments, Environment Variables, then run again.
           """
         )
       }
@@ -46,7 +46,7 @@ struct RootView: View {
       ContentUnavailableView {
         Label("Can't reach Different Requests", systemImage: "wifi.exclamationmark")
       } description: {
-        Text("What this app offers could not be read. The log says what the server answered.")
+        Text("Couldn't load this app's settings. Check the log for the server's answer.")
       } actions: {
         Button("Try again") {
           Task { await session.start() }

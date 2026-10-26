@@ -1,28 +1,25 @@
 import SwiftUI
 
-/// How much room is left in a field, shown only once it is worth knowing.
-///
-/// Silent until somebody is close, because a counter under an empty field is a limit announced to
-/// people who were never going to reach it. Once it is over, the number goes red and says how much
-/// to cut — which is the thing the server's refusal could never say, because it arrives after the
-/// writing is already lost.
+/// How much room is left in a field, shown only once somebody is close to the limit. Past it, the
+/// line says how much to cut, with a symbol, so the change is never told by color alone.
 struct CharactersLeft: View {
 
   /// The limit minus what is typed. Negative once it is over.
   let left: Int
 
-  /// How close somebody has to be before the count appears.
-  private static let showFrom = 40
-
   var body: some View {
     if left < 0 {
-      Text("\(-left) too many", bundle: .module, comment: "Characters over a field's limit")
-        .font(.footnote)
-        .foregroundStyle(.red)
-    } else if left <= Self.showFrom {
-      Text("\(left) left", bundle: .module, comment: "Characters left before a field's limit")
-        .font(.footnote)
-        .foregroundStyle(.secondary)
+      Label {
+        Text("\(-left) characters too many", bundle: .module, comment: "Characters over a field's limit")
+      } icon: {
+        Image(systemName: "exclamationmark.circle")
+      }
+      .textRole(.meta)
+      .foregroundStyle(ColorRole.failure)
+    } else if left <= CharacterCountdown.shownFrom.rawValue {
+      Text("\(left) characters left", bundle: .module, comment: "Characters left before a field's limit")
+        .textRole(.meta)
+        .foregroundStyle(ColorRole.secondaryLabel)
     }
   }
 }

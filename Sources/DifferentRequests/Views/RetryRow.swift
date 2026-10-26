@@ -1,17 +1,11 @@
 import SwiftUI
 
-/// A line inside a list saying a read did not answer, and offering the one thing left to do.
+/// A row inside a list saying a read did not answer, and offering the one thing left to do. The
+/// whole row is the button.
 ///
-/// Sized to sit beside rows rather than to replace a screen, which is what ``LoadFailure`` does.
-/// A thread that could not be read still has a request above it worth reading, and a page that
-/// could not be read still has every page before it.
-///
-/// The failure itself is not rendered here either: the contract states an `ApiError`'s message is
-/// written for whoever is debugging and may name internals, so the caller passes copy written for
-/// a reader and the error stays on the store.
+/// The failure itself is never rendered: an `ApiError`'s message is written for whoever is
+/// debugging, so the caller passes words written for a reader.
 struct RetryRow: View {
-
-  private static let spacing: CGFloat = 4
 
   /// What could not be read, in words for a reader.
   let message: String
@@ -20,19 +14,20 @@ struct RetryRow: View {
   let retry: () async -> Void
 
   var body: some View {
-    VStack(alignment: .leading, spacing: Self.spacing) {
-      Text(message)
-        .font(.subheadline)
-        .foregroundStyle(.secondary)
+    AsyncButton {
+      await retry()
+    } label: {
+      VStack(alignment: .leading, spacing: Spacing.xxSmall.rawValue) {
+        Text(message)
+          .foregroundStyle(ColorRole.secondaryLabel)
 
-      AsyncButton {
-        await retry()
-      } label: {
         Text("Try again", bundle: .module, comment: "Button that reads something again after it failed")
-          .font(.subheadline)
+          .foregroundStyle(ColorRole.tint)
       }
-      .buttonStyle(.borderless)
+      .textRole(.supporting)
+      .frame(maxWidth: .infinity, minHeight: TargetSize.minimum.rawValue, alignment: .leading)
+      .contentShape(Rectangle())
     }
-    .frame(maxWidth: .infinity, alignment: .leading)
+    .buttonStyle(.borderless)
   }
 }

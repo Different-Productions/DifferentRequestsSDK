@@ -8,10 +8,11 @@ import SwiftUI
 /// unreadable — which a full theme can, in a hundred ways nobody would find before shipping.
 ///
 /// Held by the host app and handed over when the hub is built, because it is the host app's own
-/// look. Reading it from the console would mean a color change is a deploy of ours and a round trip
-/// on every launch, to answer a question the app already knows.
+/// look. On Pro, a tint chosen in the dashboard's Appearance tab wins over ``accent``; the font is
+/// always the one passed here.
 public struct Appearance: Sendable, Equatable {
-  /// What a vote, a follow and every prominent button are tinted with.
+  /// What a vote, a follow and every prominent button are tinted with, unless a tint was chosen in
+  /// the dashboard.
   public let accent: Color
 
   /// The family everything is set in, from the system's own: the default, rounded, serif or

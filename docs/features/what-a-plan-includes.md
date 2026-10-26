@@ -59,8 +59,8 @@ Every surface this package ships, and what plan gating does to it.
 | `RoadmapView` | Yes. `GetRoadmap` is one of the two plan-refused rpcs. Nothing is read until the app says it has a roadmap |
 | `ChangelogView` | Yes. `ListChangelog` is the other one |
 | `RequestDetailView` — the composer strip only | Yes, on `AppConfig.commentsEnabled`. The request, its thread, its vote and its follow are not gated and render as before |
-| `DifferentRequestsView` — the board | No. `ListRequests` is on every plan. Untouched by this change |
-| `SubmitRequestView` — the composer sheet | No. `CreateRequest` is on every plan |
+| `DifferentRequestsView` — the tabs | The Requests tab, no: `ListRequests` is on every plan. Its Roadmap and What's New tabs exist only when `AppConfig` says the plan includes them (owner ruling, 2026-10-09), so `AbsentSurface` is never reached from inside it |
+| `SubmitRequestView` — the New request form | No. `CreateRequest` is on every plan |
 | `InboxView` | No. Notifications are on every plan |
 | `AbsentSurface` — the component | This is the thing that says it, on the two Pro screens |
 | `CommentComposer` — the component | Unchanged. It is now rendered only when the app takes comments |
@@ -86,7 +86,7 @@ the roadmap.
 **What happens.** A `.task` on every appearance runs `RoadmapStore.load()`, which asks
 `DifferentRequestsClient.config()` before it asks for anything else. `PlanState(surface: .roadmap,
 response:)` reads `AppConfig.roadmapEnabled`. On `false` the store stops there — `GetRoadmap` is
-never called — and the screen draws **"This app has no roadmap"** / "Its plans aren't shared here." There is no **Try again** on it, because there is nothing to
+never called — and the screen draws **"This app has no roadmap"** / "This app doesn't share its plans." There is no **Try again** on it, because there is nothing to
 try: the read behind it has one possible answer and it is one nobody may be shown.
 
 On `true` the store reads the roadmap and the screen behaves exactly as it did before this change.
@@ -97,9 +97,8 @@ On `true` the store reads the roadmap and the screen behaves exactly as it did b
 
 **Trigger it.** The same, against `AppConfig.changelogEnabled`.
 
-**What happens.** The same shape, with its own words: **"This app has no What's New"** / "This app
-doesn't share news about its updates." `ListChangelog` is never called,
-so neither is its paging.
+**What happens.** The same shape, with its own words: **"This app doesn't post updates"** / "If that
+changes, its updates will show up here." `ListChangelog` is never called, so neither is its paging.
 
 ### The composer under a request (`RequestDetailView`)
 
@@ -145,13 +144,13 @@ it rather than approximating it. A call that throws is not remembered, so the ne
 
 | What happens | What they see |
 | --- | --- |
-| The app's plan does not include the roadmap | **"This app has no roadmap"** / "Its plans aren't shared here." No **Try again**, and no request is sent |
-| The app's plan does not include the changelog | **"This app has no What's New"** / "This app doesn't share news about its updates." No **Try again**, and no request is sent |
+| The app's plan does not include the roadmap | **"This app has no roadmap"** / "This app doesn't share its plans." No **Try again**, and no request is sent |
+| The app's plan does not include the changelog | **"This app doesn't post updates"** / "If that changes, its updates will show up here." No **Try again**, and no request is sent |
 | The app does not take comments | **"Comments are off"** / "This app doesn't have comments. Vote to show you want this." — in the strip the field would have occupied. The thread above it is still readable, and voting still works |
-| The config read fails on the roadmap or the changelog | **"Couldn't load"** / "Couldn't load right now. Try again in a moment." with **Try again**, which asks for the config again. The surface itself is not read, because whether it exists is not known |
+| The config read fails on the roadmap or the changelog | **"Roadmap couldn't load"** or **"What's New couldn't load"** / "Something went wrong on the server. Try again in a moment." with **Try again**, which asks for the config again. The surface itself is not read, because whether it exists is not known |
 | The config read fails on a request's composer | **"Comments didn't load."** with **Try again**, in the composer's strip. The request and the thread above it are unaffected — they were read by a different rpc that answered |
-| The config read answers with no `AppConfig` in it | The same "Couldn't load" screen, from `DifferentRequestsError.incompleteResponse(.getConfig)`. Not treated as an answer: every flag on an absent message reads as `false`, and a server that said nothing would otherwise be read as an app nobody paid for |
-| The server returns `planRequired` anyway — a plan that lapsed between the config read and the surface read | **"Couldn't load"** with **Try again**, from `ReadState(readFailure:)`. The gate is a way to not ask; it is not a promise that an answer cannot change underneath it |
+| The config read answers with no `AppConfig` in it | The same "Roadmap couldn't load" or "What's New couldn't load" screen, from `DifferentRequestsError.incompleteResponse(.getConfig)`. Not treated as an answer: every flag on an absent message reads as `false`, and a server that said nothing would otherwise be read as an app nobody paid for |
+| The server returns `planRequired` anyway — a plan that lapsed between the config read and the surface read | **"Roadmap couldn't load"** or **"What's New couldn't load"** with **Try again**, from `ReadState(readFailure:)`. The gate is a way to not ask; it is not a promise that an answer cannot change underneath it |
 | The `DRApiError.message` on a plan refusal says something specific | Nobody sees it. The contract states that message is written for whoever is debugging and may name internals, and `planRequired` in particular is never surfaced to an end user |
 | A reader is shown any of the absent screens | Nothing about a plan, a tier, a price or an upgrade. They did not choose it and cannot change it |
 | The config read fails and the screen is opened again | It asks again. `PlanState.needsReading` is true after a failure, so one outage does not close a surface for the rest of the launch |
@@ -223,7 +222,7 @@ A PRO SURFACE — the defect, and where it now stops
   RoadmapView.content
     switch store.plan {
       case .unread, .reading ──► ProgressView()
-      case .failed           ──► LoadFailure.swift   "Couldn't load" + Try again
+      case .failed           ──► LoadFailure.swift   "Roadmap couldn't load" + Try again
       case .excluded         ──► AbsentSurface.swift  surface: .roadmap
       case .included         ──► columns
     }                             no default:, so a sixth case would not compile
@@ -231,8 +230,8 @@ A PRO SURFACE — the defect, and where it now stops
   RoadmapView.columns ◄─────────────────┘
     switch store.read {
       case .unread, .reading ──► ProgressView()
-      case .failed           ──► LoadFailure "Couldn't load" + Try again
-      case .empty            ──► "No roadmap yet" / "Nothing has been planned publicly."
+      case .failed           ──► LoadFailure "Roadmap couldn't load" + Try again
+      case .empty            ──► "Nothing planned yet" / "When the team plans something, it shows up here."
       case .loaded(h), .refreshing(h) ──► list(h)
     }
 
@@ -284,7 +283,7 @@ RoadmapView — an app whose plan does not include one
 │                   🗺                          │
 │           This app has no roadmap            │ ← PlanSurface.roadmap.absentTitle
 │                                              │
-│        Its plans aren't shared here.         │ ← .absentDescription
+│      This app doesn't share its plans.       │ ← .absentDescription
 │                                              │
 │                                              │ ← no Try again, no spinner, nothing
 │                                              │   to tap. Nothing is being waited for
@@ -292,20 +291,21 @@ RoadmapView — an app whose plan does not include one
 
   plan .unread / .reading  → centred spinner. Identical to a roadmap being read,
                              deliberately: at that moment they are the same fact
-  plan .failed             → "Couldn't load" / "Couldn't load right now. Try again in a moment." + [Try again]
+  plan .failed             → "Roadmap couldn't load" / "Something went wrong on the server. Try again in a moment." + [Try again]
                              ⟵ [Try again] re-asks the CONFIG, then the roadmap
   plan .included           → the four ReadState outcomes, unchanged:
-                             spinner · "Couldn't load" + [Try again] ·
-                             "No roadmap yet" / "Nothing has been planned publicly." ·
+                             spinner · "Roadmap couldn't load" + [Try again] ·
+                             "Nothing planned yet" / "When the team plans something, it shows up here." ·
                              the columns
 
 ChangelogView — the same screen, its own words
 ┌──────────────────────────────────────────────┐
 │               What's New                     │
-│                   ✨                          │
-│          This app has no What's New          │
+│                   ✨                         │
+│         This app doesn't post updates        │
 │                                              │
-│  This app doesn't share news about its updates. │
+│    If that changes, its updates will show    │
+│                   up here.                   │
 └──────────────────────────────────────────────┘
 
 RequestDetailView — an app that does not take comments
@@ -325,8 +325,8 @@ RequestDetailView — an app that does not take comments
 │  Agreed.                                     │   worth reading
 │ ─────────────────────────────────────────── │
 │  💬 Comments are off                         │ ← where the field was
-│  This app doesn't have comments. Vote to show │
-│  you want this.                              │
+│  This app doesn't have comments. Vote to     │
+│  show you want this.                         │
 └──────────────────────────────────────────────┘
 
   commenting .unread / .reading → a centred spinner in the strip, same height.

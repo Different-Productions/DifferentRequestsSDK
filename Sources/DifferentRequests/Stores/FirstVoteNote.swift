@@ -1,7 +1,7 @@
 import Foundation
 
-/// "You'll be told when this changes." — said once, under the buttons of the request a person
-/// first votes for on this phone.
+/// "You'll get an update in Inbox when this request changes." — said once, under the buttons of the
+/// request a person first votes for on this phone.
 @MainActor
 @Observable
 final class FirstVoteNote {

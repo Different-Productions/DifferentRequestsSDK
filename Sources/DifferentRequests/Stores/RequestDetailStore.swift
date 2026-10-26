@@ -33,7 +33,7 @@ final class RequestDetailStore {
   /// Offered the notification card after a vote or follow here.
   let notificationOffer: NotificationOffer
 
-  /// Says "You'll be told when this changes." after the first vote on this phone.
+  /// Says "You'll get an update in Inbox when this request changes." after the first vote on this phone.
   let firstVoteNote: FirstVoteNote
 
   // MARK: - State

@@ -115,15 +115,14 @@ final class SubmitStore {
     write = .idle
   }
 
-  /// Lets the "posted" notice stand for `shownFor`, then puts it away.
-  ///
-  /// A canceled wait means the screen showing the notice went away, and the notice goes with it.
-  func putAwayPosted(after shownFor: Duration) async {
-    do {
-      try await Task.sleep(for: shownFor)
-    } catch {
-      // Canceled with its screen: nothing is left to show the notice on.
-    }
+  /// Whether anything is typed that leaving the form would lose.
+  func holdsDraft() -> Bool {
+    let typed = title + body
+    return typed.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
+  }
+
+  /// Lets go of the request just filed, once the screen that opens it has taken its id.
+  func putAwaySubmitted() {
     submitted = nil
   }
 }

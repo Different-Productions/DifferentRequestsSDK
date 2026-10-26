@@ -6,12 +6,14 @@ Two pieces from the owner's rulings of 2026-09-26, both said once to a person wh
 they care about a request:
 
 - **Piece 22, the notification card.** After a person's first vote or follow, a card asks
-  **"Get told when this changes?"** — "We'll send a notification when it's planned, shipped or
-  someone replies." — with **Not now** and **Turn on**. **Turn on** brings up Apple's own
-  notification prompt. Either answer is remembered on this phone, and the card never comes back.
+  **"Get notified when this request changes?"** — "You'll get a notification when this request is
+  planned, shipped or replied to." — with one button, **Turn on notifications**, which brings up
+  Apple's own notification prompt, and a Dismiss button in its corner. Owner ruling 2026-10-09
+  (#167): **Not now** is gone, because the card's button should lead only to the system's question.
+  Either answer is remembered on this phone, and the card never comes back.
 - **Piece 33, the one-time line.** After the first vote on this phone, the request's own screen
-  says **"You'll be told when this changes."** under the vote and follow buttons, until the person
-  leaves that screen. It is never said again on this phone.
+  says **"You'll get an update in Inbox when this request changes."** under the vote and follow
+  buttons, until the person leaves that screen. It is never said again on this phone.
 
 Trigger: vote for a request (on the board, or on its own screen), or follow one on its own screen.
 
@@ -33,11 +35,11 @@ token to `registerDevice(tokenData:environment:)` from its delegate.
 
 | When it works | What the user sees |
 |---|---|
-| First vote on a request's screen | The vote lands, "You'll be told when this changes." appears under the buttons, and the card appears in its own section below |
+| First vote on a request's screen | The vote lands, "You'll get an update in Inbox when this request changes." appears under the buttons, and the card appears in its own section below |
 | First follow on a request's screen | The card appears below the request |
 | First vote from a board row | The card appears in the list, right under that row |
-| Taps **Not now** | The card goes, and never comes back on this phone |
-| Taps **Turn on** | The card goes and Apple's "Would like to send you notifications" prompt comes up. **Allow** registers for remote notifications; the token reaches the host app's delegate |
+| Taps the card's Dismiss button | The card goes, and never comes back on this phone |
+| Taps **Turn on notifications** | The card goes and Apple's "Would like to send you notifications" prompt comes up. **Allow** registers for remote notifications; the token reaches the host app's delegate |
 | Leaves the request's screen | The one-time line is gone, and is not said again on this phone |
 | Votes again, on any request, later | No line. No card if it was answered, or if Apple already asked |
 | The app's plan sends no notifications | No card, ever. The one-time line still shows: the inbox tells them too |
@@ -73,8 +75,8 @@ state = .offered(requestID:)                                                  No
         |
         v
 NotificationOfferCard                                                         NotificationOfferCard.swift
-   Not now  -> decline(): answered = true, state = .hidden
-   Turn on  -> accept():  answered = true, state = .hidden
+   Dismiss (DismissButton.swift) -> decline(): answered = true, state = .hidden
+   Turn on notifications  -> accept():  answered = true, state = .hidden
                  requestAuthorization([.alert, .badge, .sound])
                    granted -> UIApplication / NSApplication.registerForRemoteNotifications()
                    threw   -> state = .failed(NotificationOfferFailure)       NotificationOfferFailure.swift
@@ -91,9 +93,9 @@ Both stores are built once by `DifferentRequestsHub.swift`, with `UserDefaults.s
 
 - 2026-09-26, iPhone simulator "DR Calls Walk", iOS 27, local server, freshly installed so Apple had
   not asked yet. On a Pro app, opened "Walk: a plan filed without touching the box" and voted: the
-  count went to 1, **Following** turned on, "You'll be told when this changes." appeared under the
-  buttons, and the card appeared below. **Turn on** brought up Apple's "Would Like to Send You
-  Notifications"; **Allow** — the app's log then said `Registered device dev_170d…`. Left and
+  count went to 1, **Following** turned on, "You'll get an update in Inbox when this request
+  changes." appeared under the buttons, and the card appeared below. **Turn on notifications**
+  brought up Apple's "Would Like to Send You Notifications"; **Allow** — the app's log then said `Registered device dev_170d…`. Left and
   reopened the request: no line, no card.
 - Same simulator, reinstalled, a newly provisioned empty Pro app ("Empty Walk"): filed a request,
   took the vote back and cast it again from the board row — the card appeared right under that row.
@@ -105,4 +107,8 @@ Both stores are built once by `DifferentRequestsHub.swift`, with `UserDefaults.s
   the walk", took the vote back and voted again from the row, and the card appeared under the row.
   Reinstalled with the Example set to `.askedByApp`: the vote went 1 → 0 → 1 from the row, and no
   card appeared and no Apple prompt came up.
+- 2026-10-09, iPhone 17 Pro simulator "DR Redesign Walk", iOS 26.0, local server, a Pro app ("Calls
+  Walk"): a vote on a request's own screen drew the card with one button and a Dismiss button, and
+  the one-time line under Vote and Follow. **Turn on notifications** put the card away and brought
+  up Apple's prompt. The card's Dismiss button was not tapped.
 - The owner's real walk: not yet.

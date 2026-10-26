@@ -1,75 +1,73 @@
 import SwiftUI
 
-/// "Get told when this changes?" with Not now and Turn on, or, when Apple's prompt could not be
-/// asked, a sentence saying so.
+/// "Get notified when this request changes?": what would arrive, one button that opens Apple's
+/// prompt, and a Dismiss button in the corner. When the prompt could not be asked, a sentence saying
+/// so.
+///
+/// One button, because a second choice beside the one that leads to the system's own question is a
+/// question asked twice.
 struct NotificationOfferCard: View {
 
-  private static let spacing: CGFloat = 12
-  private static let headingSpacing: CGFloat = 10
-
-  /// The card's state and the two answers.
+  /// The card's state and its two answers.
   let offer: NotificationOffer
 
   var body: some View {
-    VStack(alignment: .leading, spacing: Self.spacing) {
-      HStack(spacing: Self.headingSpacing) {
-        Image(systemName: "bell")
-          .foregroundStyle(.tint)
+    VStack(alignment: .leading, spacing: Spacing.small.rawValue) {
+      HStack(alignment: .top, spacing: Spacing.xSmall.rawValue) {
+        Image(systemName: "bell.fill")
+          .foregroundStyle(ColorRole.tint)
+          .accessibilityHidden(true)
+
         Text(
-          "Get told when this changes?",
+          "Get notified when this request changes?",
           bundle: .module,
           comment: "Heading of the card offering notifications after a first vote or follow"
         )
-        .font(.headline)
+        .foregroundStyle(ColorRole.label)
+        .fixedSize(horizontal: false, vertical: true)
+        .frame(maxWidth: .infinity, alignment: .leading)
+
+        DismissButton {
+          offer.decline()
+        }
+        .padding(.top, -Spacing.small.rawValue)
+        .padding(.trailing, -Spacing.small.rawValue)
       }
+      .textRole(.rowTitle)
 
       switch offer.state {
       case .hidden, .offered:
         Text(
-          "We'll send a notification when it's planned, shipped or someone replies.",
+          "You'll get a notification when this request is planned, shipped or replied to.",
           bundle: .module,
           comment: "Body of the card offering notifications"
         )
-        .font(.subheadline)
-        .foregroundStyle(.secondary)
+        .textRole(.supporting)
+        .foregroundStyle(ColorRole.label)
 
-        HStack(spacing: Self.headingSpacing) {
-          Button {
-            offer.decline()
-          } label: {
-            Text("Not now", bundle: .module, comment: "Button declining notifications")
-              .frame(maxWidth: .infinity)
-          }
-          .buttonStyle(.bordered)
-
-          AsyncButton {
-            await offer.accept()
-          } label: {
-            Text("Turn on", bundle: .module, comment: "Button accepting notifications")
-              .fontWeight(.semibold)
-              .foregroundStyle(.background)
-              .frame(maxWidth: .infinity)
-          }
-          .buttonStyle(.borderedProminent)
+        AsyncButton {
+          await offer.accept()
+        } label: {
+          Text("Turn on notifications", bundle: .module, comment: "Button accepting notifications")
         }
-        .controlSize(.large)
+        .buttonStyle(PillButtonStyle(isFilled: true))
       case .failed:
         Text(
           "Notifications couldn't be turned on. You can turn them on in Settings.",
           bundle: .module,
           comment: "Shown when the system prompt could not be asked"
         )
-        .font(.subheadline)
-        .foregroundStyle(.secondary)
+        .textRole(.supporting)
+        .foregroundStyle(ColorRole.label)
 
         Button {
           offer.decline()
         } label: {
           Text("OK", bundle: .module, comment: "Button that closes the notification card")
         }
-        .buttonStyle(.bordered)
+        .buttonStyle(PillButtonStyle(isFilled: false))
       }
     }
-    .padding(.vertical, Self.headingSpacing)
+    .padding(.vertical, Spacing.xxSmall.rawValue)
   }
 }

@@ -72,16 +72,20 @@ enum BoardNarrowing: CaseIterable {
     case .nothing:
       return EmptyBoard.standard.title
     case .query:
-      return String(localized: "Nothing matches", bundle: .module, comment: "Heading over the request board when a search finds nothing")
+      return String(
+        localized: "No requests match your search",
+        bundle: .module,
+        comment: "Heading over the request board when a search finds nothing"
+      )
     case .statuses:
       return String(
-        localized: "Nothing in this filter",
+        localized: "No requests in this filter",
         bundle: .module,
         comment: "Heading over the request board when the status filter leaves nothing"
       )
     case .queryAndStatuses:
       return String(
-        localized: "No matches in this filter",
+        localized: "No requests match in this filter",
         bundle: .module,
         comment: "Heading over the request board when a search inside a status filter finds nothing"
       )
@@ -134,7 +138,7 @@ enum BoardNarrowing: CaseIterable {
       )
     case .statuses, .queryAndStatuses:
       return String(
-        localized: "You're only seeing some requests. Tap All first, so you don't ask for something that's already here.",
+        localized: "A filter is hiding some requests. Choose All to check that yours isn't already here.",
         bundle: .module,
         comment: "Warning above the new request form while a status filter is on; All is the filter chip's name"
       )

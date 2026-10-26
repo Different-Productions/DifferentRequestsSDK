@@ -3,7 +3,7 @@
 ## What it is and how to trigger it
 
 A board nobody has posted to yet is the first thing most of an app's users see of this SDK, and it
-said the same three things in every app, in our voice: "What should we build?". An app on Pro sets
+said the same three things in every app, in our voice: "No requests yet". An app on Pro sets
 its own symbol, title, message and button words for that one screen. **Pro**, ruled 2026-09-25
 (#58), and part of the same Pro surface as the app's own accent and font, `PLAN_SURFACE_APPEARANCE`
 ("the board wears your app"): it is the board looking like the app's product instead of ours.
@@ -28,7 +28,7 @@ An app that sets none passes `EmptyBoard.standard`, named rather than defaulted,
 
 A person triggers it by opening the board of an app with no requests, with nothing narrowing it.
 
-Only that one screen. "Nothing matches" and the filter messages stay the SDK's, because they
+Only that one screen. "No requests match your search" and the filter messages stay the SDK's, because they
 describe what the person did, and an app rewording them would be an app writing a bug. The button
 keeps its icon and still opens **New request**; only its words change. The "+" in the nav bar still
 says New request.
@@ -41,14 +41,14 @@ Mockup agreed 2026-09-25: https://claude.ai/artifact/1SHTWeLUD5ApsBM388aZ1L (bot
 |---|---|
 | A Pro app with its own words, board empty | The app's symbol, title and message, and a button with its words that opens New request |
 | A Pro app that left one field empty (`""`) | That one field in the SDK's words, the rest in the app's |
-| A Free app with its own words | The SDK's words: "What should we build?" / "Nobody has asked for anything yet. Tell us what you want and everyone can vote on it." / **New request** |
+| A Free app with its own words | The SDK's words: "No requests yet" / "Ask for what you want in this app, and everyone can vote on it." / **New request** |
 | Before the app's config has answered | The app's words, the same side the appearance errs on, so a Pro app never flashes ours |
 | A search or a status filter that finds nothing | The SDK's own words for those, on every plan |
 | Nobody signed in | The symbol, title and message; no button (asking belongs to a person) |
 
 | When it fails | Exact error text the user sees |
 |---|---|
-| Reading the board fails | "Couldn't load" and Try again, as before; the empty screen is not drawn |
+| Reading the board fails | "Requests couldn't load" and Try again, as before; the empty screen is not drawn |
 
 ## Flow chart
 
@@ -74,7 +74,7 @@ DifferentRequestsView.empty                           Views/DifferentRequestsVie
   - Given Pro by hand from the platform console, launched: the board read "What would make this app
     better?" / "Ask for it here, and anyone else who wants it can add a vote." with **Ask for it**
     and the sparkles symbol, the example's own words; the nav bar's "+" still read New request.
-  - Pro taken back, relaunched: "What should we build?" / "Nobody has asked for anything yet. Tell us
-    what you want and everyone can vote on it." with **New request**, the SDK's words.
+  - Pro taken back, relaunched: "No requests yet" / "Ask for what you want in this app, and
+    everyone can vote on it." with **New request**, the SDK's words.
   - On Free, a status filter that found nothing kept the SDK's filter words.
 - The owner's real walk: not yet.

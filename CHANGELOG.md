@@ -3,6 +3,46 @@
 Every released version, newest first. Versions are tags on the public repository,
 `Different-Productions/DifferentRequestsSDK`.
 
+## 0.15.0 — 2026-10-26
+
+The screens are redrawn from Apple's Human Interface Guidelines, on one set of named sizes, text
+styles and colors.
+
+**Four source changes to make.**
+
+1. Stop wrapping `DifferentRequestsView` in a `NavigationStack`. It is now a tab bar, and each tab
+   brings its own stack. Present it in a sheet as before.
+2. `SubmitRequestView` is a pushed screen and no longer brings a `NavigationStack`. If you present
+   it yourself, push it: `.navigationDestination(isPresented:) { SubmitRequestView(hub:) }`. It
+   draws its own Cancel and Send.
+3. `RoadmapView(hub:)` and `ChangelogView(hub:)` replace passing `nil` for `isShowingRequests`.
+   Passing a binding still gives an empty screen its **See requests** button.
+4. Await `requests.configure()` at launch, before your first window. It reads your plan's
+   screens, the badge and the dashboard's tint. No screen draws until it has answered, so a screen
+   opened first shows a spinner, never a color or a tab that then changes.
+
+- `DifferentRequestsView` holds Requests and Inbox as tabs, and Roadmap and What's New where your
+  plan includes them, with the system search button beside them. The More menu is gone.
+- Filter and sort are one bar button with a system menu. The chip bar is gone.
+- Voting on a row is a tile that fills with your accent once voted, and flips the moment it is
+  tapped. On a request's own screen, Vote and Follow are two buttons of one size.
+- Status is a symbol and a word in the label color, never a colored pill.
+- Screens you present alone draw the system close button where they drew Done.
+- The notification card has one button, which opens Apple's prompt, and a Dismiss button.
+- After Send, the new request's own screen opens. The "Your request is posted" strip is gone.
+- "Powered by Different Requests" is one row after the last request, on Requests only. Its page is
+  pushed, and its link opens the browser.
+- A label drawn on your accent is black or white, whichever measures 4.5 to 1 against it.
+- A Pro app's tint can be chosen in the dashboard's Appearance tab, one color for light mode and
+  one for dark mode. It wins over `Appearance(accent:)` and reaches the app the next time it calls
+  `configure()`, with no app update. Needs contract 0.42.0.
+- In the Inbox, an unread update has a dot and a heavier headline, and the dot is no longer a
+  button. An update is read by opening it, by its swipe action, or by Mark all as read. The Inbox
+  tab shows the unread count.
+- The Roadmap heads each status with its name and a spelled-out count, and shows votes as words.
+- What's New draws each update as one card, with a row per request it answers.
+- An empty board's own symbol is `bubble.left.fill`. `EmptyBoard(symbol:…)` still sets yours.
+
 ## 0.14.0 — 2026-09-30
 
 **Two source changes to make.**

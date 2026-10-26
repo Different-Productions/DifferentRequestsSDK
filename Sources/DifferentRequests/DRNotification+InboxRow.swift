@@ -28,7 +28,11 @@ extension DRNotification {
     case .commentAdded:
       return String(localized: "New comment", bundle: .module, comment: "Inbox headline: someone commented on a followed request")
     case .requestDuplicated:
-      return String(localized: "Already asked for", bundle: .module, comment: "Inbox headline: the request was merged into another")
+      return String(
+        localized: "Merged into an earlier request",
+        bundle: .module,
+        comment: "Inbox headline: the request was merged into another"
+      )
     case .none:
       return String(localized: "Something changed", bundle: .module, comment: "Inbox headline for news this version can't name")
     }

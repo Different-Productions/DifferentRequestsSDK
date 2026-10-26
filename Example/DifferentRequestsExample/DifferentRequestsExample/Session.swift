@@ -13,8 +13,8 @@ import AppKit
 /// allowed, registers for remote notifications. The raw APNs token arrives on the app delegate and
 /// comes back here through ``registerDevice(tokenData:)``.
 ///
-/// The SDK asks for permission itself, with its "Get told when this changes?" card after a
-/// person's first vote or follow, so this never prompts.
+/// The SDK asks for permission itself, with its "Get notified when this request changes?" card
+/// after a person's first vote or follow, so this never prompts.
 @Observable
 @MainActor
 final class Session {
@@ -98,7 +98,11 @@ final class Session {
   }
 
   /// Reads the app's configuration, then the badge and the board's first page once it is known.
+  ///
+  /// `hub.configure()` comes first so every SDK screen draws its tabs, badge and color on its first
+  /// frame. The client answers the `config()` after it from that same read.
   private func loadConfig() async {
+    await hub.configure()
     do {
       let configured = try await client.config()
       phase = .ready(configured.config)

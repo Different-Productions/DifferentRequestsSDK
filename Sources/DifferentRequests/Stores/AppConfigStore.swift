@@ -3,9 +3,9 @@ import Foundation
 
 /// What this app includes, read once and held for the whole session.
 ///
-/// One store rather than a read per screen. The badge, and the menu that decides which surfaces are
-/// reachable, are two readers of one answer — and a second copy of it is a second thing to keep in
-/// step. The client answers a repeated `config` call from its first read, so nothing here costs a
+/// One store rather than a read per screen. The Powered by row, the look every screen is drawn in
+/// and each plan-gated screen are readers of one answer, and a second copy of it is a second thing
+/// to keep in step. The client answers a repeated `config` call from its first read, so nothing here costs a
 /// round trip of its own.
 @Observable
 @MainActor
@@ -25,6 +25,10 @@ final class AppConfigStore {
   /// until the server says otherwise — which is the honest rendering of not knowing, and the same
   /// rule the badge follows.
   var config = DRAppConfig()
+
+  /// The tint chosen in the dashboard, or nothing: none was chosen, the plan leaves the app's own
+  /// look out, or the configuration has not answered. Written by ``load()`` with ``config``.
+  var dashboardTint: DashboardTint?
 
   // MARK: - Init
 
@@ -46,6 +50,7 @@ final class AppConfigStore {
       do {
         let answer = try await client.config()
         config = answer.config
+        dashboardTint = DashboardTint(config: answer.config)
         badge = BadgeState(response: answer)
       } catch {
         badge = .failed(error)

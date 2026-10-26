@@ -22,12 +22,12 @@ enum ReadTrouble {
     }
   }
 
-  /// What the screen says under "Couldn't load".
+  /// What the screen says under its heading.
   var message: String {
     switch self {
     case .offline:
       return String(
-        localized: "Your phone isn't connected. Check your connection and try again.",
+        localized: "You're offline. Check your connection and try again.",
         bundle: .module,
         comment: "Why a screen couldn't load: no connection"
       )
@@ -46,7 +46,7 @@ enum ReadTrouble {
       )
     case .other:
       return String(
-        localized: "Couldn't load right now. Try again in a moment.",
+        localized: "Something went wrong on the server. Try again in a moment.",
         bundle: .module,
         comment: "Why a screen couldn't load: any other failure"
       )
