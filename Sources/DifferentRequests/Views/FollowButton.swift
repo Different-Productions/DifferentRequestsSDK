@@ -28,7 +28,7 @@ struct FollowButton: View {
         }
       }
     }
-    .buttonStyle(PillButtonStyle(isFilled: false))
-    .disabled(store.write.isWriting)
+    .buttonStyle(PillButtonStyle(fill: .gray))
+    .disabled(store.write.isWriting())
   }
 }

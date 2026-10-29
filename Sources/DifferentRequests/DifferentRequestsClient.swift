@@ -19,22 +19,20 @@ import SwiftProtobuf
 /// before it reaches the network.
 public actor DifferentRequestsClient {
 
-  /// Both directions carry protobuf. The same content type BacklogServer and the CMS speak.
-  private static let protobufContentType = DRMediaType.protobuf.rawValue
-
   // Internal rather than private so `DifferentRequestsClient+Describe` can read them. Still not
   // public: `describeIntegration()` is the only way out, and it elides the key.
   let appKey: String
-  let baseURL: URL
+  let baseURL: SecureBaseURL
 
   /// This client's own session, apart from the host app's, with timeouts short enough that a board
   /// tab does not hang on a stalled connection.
-  private lazy var session: URLSession = {
-    let sessionConfiguration = URLSessionConfiguration.ephemeral
-    sessionConfiguration.timeoutIntervalForRequest = 15
-    sessionConfiguration.timeoutIntervalForResource = 20
-    return URLSession(configuration: sessionConfiguration)
-  }()
+  private let session: URLSession
+
+  /// How long one request may wait between bytes.
+  private static let requestTimeoutSeconds: TimeInterval = 15
+
+  /// How long one request may take from start to finish.
+  private static let resourceTimeoutSeconds: TimeInterval = 20
 
   private var sessionToken: String?
 
@@ -51,31 +49,27 @@ public actor DifferentRequestsClient {
 
   /// What happened on the last call, so ``describeIntegration()`` can say whether anything has left
   /// the device at all.
-  public private(set) var lastCall: LastCall = .none
+  public private(set) var lastCall = LastCall()
 
   // MARK: - Creation
 
-  /// A client for `appKey`, pointed at `baseURL`. Assigns what it is given and nothing more.
+  /// A client for `appKey`, pointed at `baseURL`. Assigns what it is given and builds the one
+  /// `URLSession` it owns.
   ///
   /// Takes a ``SecureBaseURL`` rather than a `URL`, so a plaintext address is refused where it is
   /// written rather than on the first call that carries a key over it.
   ///
   /// - Parameters:
   ///   - appKey: Your app key, from the DifferentRequests console.
-  ///   - baseURL: Where the API is: ``SecureBaseURL/production``, or a staging endpoint.
+  ///   - baseURL: Where the API is: `SecureBaseURL(service: .production)`, or a staging endpoint.
   public init(appKey: String, baseURL: SecureBaseURL) {
     self.appKey = appKey
-    self.baseURL = baseURL.url
+    self.baseURL = baseURL
+    let sessionConfiguration = URLSessionConfiguration.ephemeral
+    sessionConfiguration.timeoutIntervalForRequest = Self.requestTimeoutSeconds
+    sessionConfiguration.timeoutIntervalForResource = Self.resourceTimeoutSeconds
+    self.session = URLSession(configuration: sessionConfiguration)
   }
-
-  /// Baked into every app built against this SDK version, so it cannot change without a coordinated
-  /// release.
-  public static let productionBaseURL: URL = {
-    guard let url = URL(string: "https://api.differentrequests.com") else {
-      preconditionFailure("DifferentRequests: the built-in base URL is not a URL — SDK bug.")
-    }
-    return url
-  }()
 
   // MARK: - Configuration and identity
 
@@ -212,7 +206,7 @@ public actor DifferentRequestsClient {
   public func comments(requestID: String, cursor: String?) async throws -> DRListCommentsResponse {
     try await get(
       .listComments(requestId: requestID),
-      query: Self.cursorQuery(cursor, named: DRListCommentsRequest.Field.cursor)
+      query: cursorQuery(cursor, named: DRListCommentsRequest.Field.cursor)
     )
   }
 
@@ -227,7 +221,7 @@ public actor DifferentRequestsClient {
   public func notifications(cursor: String?) async throws -> DRListNotificationsResponse {
     try await get(
       .listNotifications,
-      query: Self.cursorQuery(cursor, named: DRListNotificationsRequest.Field.cursor)
+      query: cursorQuery(cursor, named: DRListNotificationsRequest.Field.cursor)
     )
   }
 
@@ -261,10 +255,7 @@ public actor DifferentRequestsClient {
     tokenData: Data,
     environment: DRPushEnvironment
   ) async throws -> DRRegisterDeviceResponse {
-    var payload = DRRegisterDeviceRequest()
-    payload.token = Self.hexString(from: tokenData)
-    payload.environment = environment
-    return try await send(.registerDevice, body: payload)
+    try await send(.registerDevice, body: DRRegisterDeviceRequest(tokenData: tokenData, environment: environment))
   }
 
   /// Drop a device, by the id registration handed back.
@@ -283,7 +274,7 @@ public actor DifferentRequestsClient {
   public func changelog(cursor: String?) async throws -> DRListChangelogResponse {
     try await get(
       .listChangelog,
-      query: Self.cursorQuery(cursor, named: DRListChangelogRequest.Field.cursor)
+      query: cursorQuery(cursor, named: DRListChangelogRequest.Field.cursor)
     )
   }
 
@@ -316,27 +307,31 @@ public actor DifferentRequestsClient {
   ) async throws -> Answer {
     let rpc = endpoint.rpc
     if rpc.audience == .endUser, sessionToken == nil {
-      throw DifferentRequestsError.notAuthenticated(rpc)
+      throw DifferentRequestsError(notAuthenticated: rpc)
     }
 
+    let base = try baseURL.dialable()
     guard var components = URLComponents(
-      url: baseURL.appendingPathComponent(endpoint.path),
+      url: base.appendingPathComponent(endpoint.path),
       resolvingAgainstBaseURL: false
     ) else {
-      throw DifferentRequestsError.invalidBaseURL(baseURL)
+      throw DifferentRequestsError(invalidBaseURL: baseURL.url)
     }
     if query.isEmpty == false {
       components.queryItems = query
     }
     guard let url = components.url else {
-      throw DifferentRequestsError.invalidBaseURL(baseURL)
+      throw DifferentRequestsError(invalidBaseURL: baseURL.url)
     }
 
     var request = URLRequest(url: url)
-    request.httpMethod = try Self.httpMethod(for: rpc)
-    request.setValue(Self.protobufContentType, forHTTPHeaderField: DRHTTPHeaderName.accept.rawValue)
+    request.httpMethod = try rpc.spelledMethod()
+    request.setValue(DRMediaType.protobuf.rawValue, forHTTPHeaderField: DRHTTPHeaderName.accept.rawValue)
     request.setValue(appKey, forHTTPHeaderField: DRHTTPHeaderName.appKey.rawValue)
-    request.setValue(SDKClient.header, forHTTPHeaderField: DRHTTPHeaderName.client.rawValue)
+    request.setValue(
+      SDKClient(process: .processInfo).header(),
+      forHTTPHeaderField: DRHTTPHeaderName.client.rawValue
+    )
     if let sessionToken {
       request.setValue(
         "\(DRAuthorizationScheme.bearer.rawValue) \(sessionToken)",
@@ -346,7 +341,7 @@ public actor DifferentRequestsClient {
     if let body {
       request.httpBody = body
       request.setValue(
-        Self.protobufContentType,
+        DRMediaType.protobuf.rawValue,
         forHTTPHeaderField: DRHTTPHeaderName.contentType.rawValue
       )
     }
@@ -356,64 +351,46 @@ public actor DifferentRequestsClient {
     do {
       (data, response) = try await session.data(for: request)
     } catch {
-      record(rpc, "network — \(error.localizedDescription)")
-      throw DifferentRequestsError.networkError(underlying: error)
+      let failure = DifferentRequestsError(networkFailure: error)
+      lastCall = LastCall(rpc: rpc, status: 0, failure: failure)
+      throw failure
     }
 
     guard let http = response as? HTTPURLResponse else {
-      record(rpc, "not an HTTP response")
-      throw DifferentRequestsError.notAnHTTPResponse
+      let failure = DifferentRequestsError(
+        reason: .notAnHTTPResponse,
+        message: "The transport returned a non-HTTP response."
+      )
+      lastCall = LastCall(rpc: rpc, status: 0, failure: failure)
+      throw failure
     }
+    let status = Int32(http.statusCode)
 
     // The status says only whether the body is the answer or a failure. Which failure is in the
     // body, because a status code cannot distinguish "upgrade to Pro" from "not your request".
     guard (200..<300).contains(http.statusCode) else {
       let refusal = DifferentRequestsError(failureBody: data)
-      record(rpc, "\(http.statusCode) — \(refusal.localizedDescription)")
+      lastCall = LastCall(rpc: rpc, status: status, failure: refusal)
       throw refusal
     }
 
     do {
       let answer = try Answer(serializedBytes: [UInt8](data))
-      record(rpc, "\(http.statusCode)")
+      lastCall = LastCall(rpc: rpc, status: status)
       return answer
     } catch {
-      record(rpc, "\(http.statusCode), but the body did not decode")
-      throw DifferentRequestsError.decodingFailed(rpc, underlying: error)
+      let failure = DifferentRequestsError(decodingFailed: rpc, underlying: error)
+      lastCall = LastCall(rpc: rpc, status: status, failure: failure)
+      throw failure
     }
   }
 
-  /// Remembers what just happened, for ``describeIntegration()``.
-  ///
-  /// Every exit from the send path passes through here, including the ones that throw — a call that
-  /// failed is the one worth being able to describe.
-  private func record(_ rpc: DRRequestsServiceRPC, _ outcome: String) {
-    lastCall = .made(rpc: rpc.rawValue, outcome: outcome, at: Date())
-  }
-
-  /// The verb this rpc is sent with, as the contract spells it.
-  ///
-  /// A verb with no spelling is refused rather than sent as something else. endpoint-gen will not
-  /// emit an rpc whose route is incomplete, so this cannot happen against a contract this SDK was
-  /// built with — and if it ever does, a call that goes nowhere is a better answer than a write
-  /// delivered as a read of whatever its path points at.
-  private static func httpMethod(for rpc: DRRequestsServiceRPC) throws -> String {
-    guard let spelled = rpc.method.token else {
-      throw DifferentRequestsError.unspellableMethod(rpc)
+  /// The query item carrying `cursor` under `name`, or none for the first page.
+  private func cursorQuery(_ cursor: String?, named name: String) -> [URLQueryItem] {
+    var items: [URLQueryItem] = []
+    if let cursor, cursor.isEmpty == false {
+      items.append(URLQueryItem(name: name, value: cursor))
     }
-    return spelled
-  }
-
-  private static func cursorQuery(_ cursor: String?, named name: String) -> [URLQueryItem] {
-    guard let cursor, cursor.isEmpty == false else {
-      return []
-    }
-    return [URLQueryItem(name: name, value: cursor)]
-  }
-
-  /// APNs tokens are conventionally written as lowercase hex, so callers hand over the raw `Data` and
-  /// never do this themselves.
-  private static func hexString(from data: Data) -> String {
-    data.map { byte in String(format: "%02x", byte) }.joined()
+    return items
   }
 }

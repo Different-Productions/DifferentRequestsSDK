@@ -1,0 +1,163 @@
+syntax = "proto3";
+
+package differentrequests.sdk.v1;
+
+import "differentrequests_options.proto";
+import "differentrequests_sdk.proto";
+import "google/protobuf/timestamp.proto";
+
+// No prefix, for the reason differentrequests_sdk_state.proto gives: every contract type is
+// generated `DR`-prefixed, so an unprefixed name here cannot collide with one.
+option swift_prefix = "";
+
+// What a host app hands the SDK and what the SDK throws back: the SDK's public types that are not
+// on the wire.
+//
+// Generated public, unlike the state the screens hold, because a host app names every one of them.
+// A host app's spelling of these is the generated one, and Swift adds only behavior, in
+// `Type+Purpose.swift` extensions.
+
+// Who asks the person for notification permission: the SDK, or the host app.
+enum NotificationPermission {
+  // Nothing was chosen. The SDK never offers its card and never brings up Apple's prompt.
+  NOTIFICATION_PERMISSION_UNSPECIFIED = 0;
+
+  // After a person's first vote or follow, the SDK offers its "Get notified when this request
+  // changes?" card, and Turn on notifications brings up Apple's prompt.
+  NOTIFICATION_PERMISSION_ASKED_BY_SDK = 1;
+
+  // The host app asks for permission itself, when it chooses. The SDK never offers its card and
+  // never brings up Apple's prompt.
+  NOTIFICATION_PERMISSION_ASKED_BY_APP = 2;
+}
+
+// What a board with nothing on it says, in the host app's own words. A field left empty is
+// filled from the SDK's own words.
+message EmptyBoard {
+  // An SF Symbol name, drawn above the title.
+  string symbol = 1;
+
+  // The heading.
+  string title = 2;
+
+  // The sentence under the heading.
+  string message = 3;
+
+  // The words on the button. It still opens the composer.
+  string button = 4;
+}
+
+// Why a call through the SDK did not answer with the message its rpc returns.
+enum DifferentRequestsFault {
+  DIFFERENT_REQUESTS_FAULT_UNSPECIFIED = 0;
+
+  // The rpc requires an end-user session and none has been created. Raised before the call is
+  // sent, from the audience the contract declares for it.
+  DIFFERENT_REQUESTS_FAULT_NOT_AUTHENTICATED = 1;
+
+  // The server answered with an error, held whole in `api_error`.
+  DIFFERENT_REQUESTS_FAULT_API = 2;
+
+  // A failure response whose body was not a readable `ApiError`, so there is nothing to branch on.
+  DIFFERENT_REQUESTS_FAULT_UNREADABLE_ERROR = 3;
+
+  // The response body was not the message the rpc returns.
+  DIFFERENT_REQUESTS_FAULT_DECODING_FAILED = 4;
+
+  // The response was the message the rpc returns and left out the part it is made of: a
+  // `GetConfigResponse` carrying no `AppConfig`. Every flag on an absent message reads as false,
+  // so a server that said nothing is never read as an app that bought nothing.
+  DIFFERENT_REQUESTS_FAULT_INCOMPLETE_RESPONSE = 5;
+
+  // No connection, a timeout, or TLS.
+  DIFFERENT_REQUESTS_FAULT_NETWORK_ERROR = 6;
+
+  // The call was called off before it answered: nobody is waiting for the answer any more.
+  DIFFERENT_REQUESTS_FAULT_CANCELED = 7;
+
+  // The response was not HTTP at all.
+  DIFFERENT_REQUESTS_FAULT_NOT_AN_HTTP_RESPONSE = 8;
+
+  // The base URL cannot have an rpc path resolved against it, or is not `https`.
+  DIFFERENT_REQUESTS_FAULT_INVALID_BASE_URL = 9;
+
+  // The rpc declares a verb the contract does not spell, so nothing was sent.
+  DIFFERENT_REQUESTS_FAULT_UNSPELLABLE_METHOD = 10;
+}
+
+// What every call through the SDK throws.
+message DifferentRequestsError {
+  DifferentRequestsFault reason = 1;
+
+  // For a developer reading a log, never for the person using the app. Names the rpc, the URL or
+  // the byte count the failure is about.
+  string message = 2;
+
+  // What the server said, exactly as it sent it. Set only when `reason` is
+  // `DIFFERENT_REQUESTS_FAULT_API`.
+  differentrequests.v1.ApiError api_error = 3;
+}
+
+// A service Different Requests runs, whose address is built into the SDK.
+enum DifferentRequestsService {
+  DIFFERENT_REQUESTS_SERVICE_UNSPECIFIED = 0;
+
+  // The live service, where a released SDK points unless a developer says otherwise.
+  DIFFERENT_REQUESTS_SERVICE_PRODUCTION = 1;
+}
+
+// A base URL this SDK is willing to dial: only ever `https`.
+//
+// Every call carries `X-App-Key`, and every call for a person carries their session token. Over
+// plain `http` both cross the wire in the clear, and nothing about the request looks wrong.
+//
+// Built through `SecureBaseURL(_:)`, which refuses anything but `https` where the URL is supplied.
+// The client reads it back through the same check each time it dials.
+message SecureBaseURL {
+  // The address, as written: `https://api.differentrequests.com`.
+  string url = 1;
+}
+
+// A request's demand and the caller's own vote in it, as the vote tile draws them.
+message VoteTile {
+  // How much demand the request has, as the server counts it.
+  int32 vote_count = 1;
+
+  // Whether the caller's own vote is among them.
+  bool voted = 2;
+
+  // Whether a write is already running on the surface the tile sits on. The tile takes no tap while
+  // one is.
+  bool writing = 3;
+}
+
+// Whether the host app's requests list is shown, which **See requests** on an empty Roadmap or
+// What's New asks for.
+message RequestsPresentation {
+  // Set by See requests: the host opens its requests list.
+  bool showing = 1;
+}
+
+// What happened the last time a client reached the server, so `describeIntegration()` can say
+// whether anything has left the device at all.
+//
+// Recorded as an access log records a request: the verb and the path template, the status, the
+// failure and the time. Unset `at` is a client that has never called, which separates "not wired
+// up" from "wired up and refused".
+message LastCall {
+  // The rpc's verb.
+  differentrequests.v1.HttpMethod method = 1;
+
+  // The rpc's path template, the same for every id: `/v1/requests/{requestId}`.
+  string route = 2;
+
+  // The HTTP status the server answered with. Zero when no HTTP answer came back.
+  int32 status = 3;
+
+  // Why the call did not answer with the message its rpc returns. Unset when it did. Holds the
+  // server's `ApiError` when its reason is `DIFFERENT_REQUESTS_FAULT_API`.
+  DifferentRequestsError failure = 4;
+
+  // When the answer, or the failure, arrived.
+  google.protobuf.Timestamp at = 5;
+}

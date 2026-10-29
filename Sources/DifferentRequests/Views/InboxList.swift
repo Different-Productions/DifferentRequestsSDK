@@ -9,7 +9,7 @@ struct InboxList: View {
 
   var body: some View {
     List {
-      if let failure = hub.inbox.write.failure {
+      if let failure = hub.inbox.write.failure() {
         Section {
           WriteFailureNotice(failure: failure) {
             hub.inbox.acknowledgeWriteFailure()
@@ -18,25 +18,20 @@ struct InboxList: View {
       }
 
       Section {
-        ForEach(hub.inbox.read.held, id: \.id) { notification in
+        ForEach(hub.inbox.inbox.notifications, id: \.id) { notification in
           InboxRow(hub: hub, notification: notification)
-            .listRowInsets(
-              EdgeInsets(
-                top: Spacing.small.rawValue,
-                leading: Spacing.medium.rawValue,
-                bottom: Spacing.small.rawValue,
-                trailing: Spacing.medium.rawValue
-              )
-            )
+            .listRowPadding()
         }
 
-        if hub.inbox.page.isDone == false {
+        if hub.inbox.page.isDone() == false {
           NextPageRow(
-            state: hub.inbox.page,
-            failureMessage: String(
-              localized: "Couldn't load more updates.",
-              bundle: .module,
-              comment: "Row at the end of the Inbox list when the next page failed to load"
+            content: NextPageRowContent(
+              page: hub.inbox.page,
+              failureMessage: String(
+                localized: "Couldn't load more updates.",
+                bundle: .module,
+                comment: "Row at the end of the Inbox list when the next page failed to load"
+              )
             )
           ) {
             await hub.inbox.loadMore()

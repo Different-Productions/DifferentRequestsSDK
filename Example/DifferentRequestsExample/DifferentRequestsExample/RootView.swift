@@ -16,7 +16,7 @@ struct RootView: View {
   }
 
   var body: some View {
-    phaseContent
+    phaseContent()
       .task {
         await session.start()
       }
@@ -25,36 +25,38 @@ struct RootView: View {
   // MARK: - Phases
 
   @ViewBuilder
-  private var phaseContent: some View {
-    switch session.phase {
+  private func phaseContent() -> some View {
+    switch session.state.phase.phase {
     case .unconfigured:
       ContentUnavailableView {
         Label("No API key", systemImage: "key.slash")
       } description: {
-        Text(
-          """
-          Set \(DemoConfig.appKeyEnvironmentVariable) in the scheme's \
-          Run, Arguments, Environment Variables, then run again.
-          """
-        )
+        if let variable = DemoVariable.appKey.token {
+          Text(
+            """
+            Set \(variable) in the scheme's \
+            Run, Arguments, Environment Variables, then run again.
+            """
+          )
+        }
       }
 
-    case .reading:
+    case .reading, .none:
       ProgressView("Starting…")
 
     case .ready, .configUnreadable:
-      home
+      home()
     }
   }
 
   // MARK: - The host app
 
   /// A settings list with one row per surface, which is the whole integration.
-  private var home: some View {
+  private func home() -> some View {
     NavigationStack {
       List {
         Section {
-          ForEach(session.screens) { screen in
+          ForEach(session.state.screens, id: \.self) { screen in
             row(for: screen)
           }
         } header: {
@@ -65,8 +67,8 @@ struct RootView: View {
       }
       .navigationTitle("Example")
     }
-    .sheet(item: showing) { screen in
-      presented(screen)
+    .sheet(isPresented: presenting()) {
+      presented(session.state.showing)
     }
   }
 
@@ -79,18 +81,20 @@ struct RootView: View {
       session.show(screen)
     } label: {
       HStack(alignment: .firstTextBaseline, spacing: 12) {
-        Image(systemName: screen.symbol)
-          .foregroundStyle(.tint)
-          .frame(width: 22)
+        if let symbol = screen.token {
+          Image(systemName: symbol)
+            .foregroundStyle(.tint)
+            .frame(width: 22)
+        }
         VStack(alignment: .leading, spacing: 3) {
-          Text(screen.title)
-          Text(screen.explanation)
+          Text(LocalizedStringKey(screen.label))
+          Text(LocalizedStringKey(screen.pitch))
             .font(.caption)
             .foregroundStyle(.secondary)
         }
         Spacer()
-        if screen == .inbox, session.unreadCount > 0 {
-          Text("\(session.unreadCount)")
+        if session.badgeCount(for: screen) > 0 {
+          Text("\(Int(session.badgeCount(for: screen)))")
             .font(.caption)
             .foregroundStyle(.white)
             .padding(.horizontal, 7)
@@ -119,56 +123,50 @@ struct RootView: View {
       }
     case .roadmap:
       NavigationStack {
-        RoadmapView(hub: session.hub, isShowingRequests: isShowingRequests)
+        RoadmapView(hub: session.hub, requestsPresentation: requestsPresentation())
       }
     case .changelog:
       NavigationStack {
-        ChangelogView(hub: session.hub, isShowingRequests: isShowingRequests)
+        ChangelogView(hub: session.hub, requestsPresentation: requestsPresentation())
       }
     case .diagnostics:
       NavigationStack {
         DiagnosticsView(session: session)
-          .toolbar { doneItem }
+          .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+              DoneButton()
+            }
+          }
       }
-    }
-  }
-
-  private var doneItem: some ToolbarContent {
-    ToolbarItem(placement: .cancellationAction) {
-      DoneButton()
+    case .unspecified, .UNRECOGNIZED:
+      EmptyView()
     }
   }
 
   /// What an empty Roadmap or What's New sets to open this app's requests list in place of it.
-  private var isShowingRequests: Binding<Bool> {
-    Binding(
-      get: { session.showing == .requests },
-      set: { isShowing in
-        if isShowing {
-          session.show(.requests)
-        }
+  private func requestsPresentation() -> Binding<RequestsPresentation> {
+    Binding {
+      var presentation = RequestsPresentation()
+      presentation.showing = session.isShowing(.requests)
+      return presentation
+    } set: { presentation in
+      if presentation.showing {
+        session.show(.requests)
       }
-    )
+    }
   }
 
-  /// What the sheet is bound to.
+  /// What the sheet is bound to: up while the session shows a screen.
   ///
-  /// A binding rather than a flag per screen: what is open is one fact, and two booleans can both
-  /// be true.
-  ///
-  /// Both directions are recorded. A setter that answered only nil would leave SwiftUI holding one
-  /// screen and the store holding another, and the sheet would then re-present whichever it
-  /// remembered rather than the row that was tapped.
-  private var showing: Binding<ExampleScreen?> {
-    Binding(
-      get: { session.showing },
-      set: { screen in
-        if let screen {
-          session.show(screen)
-        } else {
-          Task { await session.dismissedWhatWasShowing() }
-        }
+  /// Both directions are recorded. A setter that answered only the dismissal would leave SwiftUI
+  /// holding one screen and the session holding another.
+  private func presenting() -> Binding<Bool> {
+    Binding {
+      session.isShowingAny()
+    } set: { shown in
+      if shown == false {
+        session.screenDismissed()
       }
-    )
+    }
   }
 }

@@ -10,10 +10,10 @@ import SwiftUI
   final class SheetRootProbeView: NSView {
 
     /// Where the answer is written. Replaced by SwiftUI when the screen is rebuilt.
-    var isSheetRoot: Binding<Bool>
+    var placement: Binding<SheetPlacement>
 
-    init(isSheetRoot: Binding<Bool>) {
-      self.isSheetRoot = isSheetRoot
+    init(placement: Binding<SheetPlacement>) {
+      self.placement = placement
       super.init(frame: .zero)
     }
 
@@ -23,7 +23,7 @@ import SwiftUI
 
     override func viewDidMoveToWindow() {
       super.viewDidMoveToWindow()
-      isSheetRoot.wrappedValue = window?.sheetParent != nil
+      placement.wrappedValue.sheetRoot = window?.sheetParent != nil
     }
   }
 #endif

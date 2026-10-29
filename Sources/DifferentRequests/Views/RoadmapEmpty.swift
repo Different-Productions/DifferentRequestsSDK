@@ -4,7 +4,7 @@ import SwiftUI
 struct RoadmapEmpty: View {
 
   /// What opens the host's requests list, or nil for no See requests.
-  let isShowingRequests: Binding<Bool>?
+  let requestsPresentation: Binding<RequestsPresentation>?
 
   var body: some View {
     ContentUnavailableView {
@@ -16,8 +16,8 @@ struct RoadmapEmpty: View {
     } description: {
       Text("When the team plans something, it shows up here.", bundle: .module, comment: "Message when the roadmap has nothing on it")
     } actions: {
-      if let isShowingRequests {
-        SeeRequestsButton(isShowingRequests: isShowingRequests)
+      if let requestsPresentation {
+        SeeRequestsButton(requestsPresentation: requestsPresentation)
       }
     }
   }

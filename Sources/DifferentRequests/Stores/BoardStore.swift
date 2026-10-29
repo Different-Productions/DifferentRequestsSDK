@@ -1,5 +1,6 @@
 import DifferentRequestsProtos
 import Foundation
+import SwiftProtobuf
 
 /// Backs the board: the ranked page of requests behind whichever tab or sheet a host app
 /// presents it in.
@@ -14,11 +15,10 @@ import Foundation
 /// and the same page shape, which is what lets one renderer show all of them. What they share is a
 /// cursor: a cursor addresses the results of the question it was handed back for, so changing any of
 /// them throws away the pages held under the old one and starts again at page one. That is why they
-/// are compared as a single ``BoardQuestion`` rather than one property at a time.
+/// are compared as one `DRListRequestsRequest` rather than one field at a time.
 ///
 /// Changing one of the three takes effect on the next `load()`. The three methods under *Narrowing*
-/// set and re-read in one call, which is what the filter bar taps; a host app setting a property
-/// directly is asking for the change to apply to the next read it starts.
+/// set and re-read in one call, which is what the filter bar taps.
 ///
 /// Three states, one per thing that can be happening: the board is being read, a further page is
 /// being read, a vote is being written. They are separate values because they are true at the
@@ -42,43 +42,51 @@ final class BoardStore {
   /// Offered the notification card after a vote cast from a row.
   let notificationOffer: NotificationOffer
 
-  /// How long a search settles before it is sent, so a typed word is one read and not five.
-  let searchSettleDelay: Duration = .milliseconds(300)
-
-  // MARK: - What is being asked
-
-  /// Which statuses the board covers. Empty means everything still on it.
-  var statuses: [DRRequestStatus]
-
-  /// Whether the board is ranked by demand or by recency.
-  var sort: DRRequestSort
-
-  /// Free text over title and body, empty for the whole board.
-  var query: String
-
   // MARK: - State
 
-  /// The board itself: where its read got to, and the requests it found.
-  var read: ReadState<[DRFeatureRequest]> = .unread
+  /// What the board is asked, what came back, and where the next page starts.
+  var board: BoardState
+
+  /// Where the board's read has got to.
+  var status = ReadStatus()
 
   /// Whether there is another page, and what became of the last attempt at one.
-  var page: PageState = .more
+  var page = PageState()
 
   /// What the last vote is doing, or what it did instead.
-  var write: WriteState = .idle
+  var write = WriteState()
 
-  // MARK: - Derived
+  // MARK: - Init
+
+  /// - Parameters:
+  ///   - client: The client the board reads through.
+  ///   - news: Where a vote cast here is recorded, so a request's own screen re-reads it.
+  ///   - notificationOffer: Offered the notification card after a vote cast here.
+  ///   - board: The board as built: which statuses it covers and how it ranks them.
+  init(
+    client: DifferentRequestsClient,
+    news: NewsAboutRequests,
+    notificationOffer: NotificationOffer,
+    board: BoardState
+  ) {
+    self.client = client
+    self.news = news
+    self.notificationOffer = notificationOffer
+    self.board = board
+  }
+
+  // MARK: - What is being asked
 
   /// The whole of what the board is being asked for right now, as the contract's own request.
   ///
   /// The cursor is deliberately left empty: it addresses a place inside an answer, not the question
   /// asked, so leaving it off is what makes `==` between two of these mean "the same board" without
   /// a comparison written field by field.
-  var question: DRListRequestsRequest {
+  func question() -> DRListRequestsRequest {
     var asking = DRListRequestsRequest()
-    asking.statuses = statuses
-    asking.sort = sort
-    asking.query = query
+    asking.statuses = board.statuses
+    asking.sort = board.sort
+    asking.query = board.query
     return asking
   }
 
@@ -87,8 +95,14 @@ final class BoardStore {
   /// The board's search task fires again every time its view is built, and its view is built again
   /// whenever anything above it redraws. Reading this before reloading is what stops that from
   /// discarding every page after the first, and the reader's place in them with it.
-  var isCurrent: Bool {
-    read.hasRead && asked == question
+  func isCurrent() -> Bool {
+    hasRead() && board.asked == question()
+  }
+
+  /// Whether a read of the board has finished, whatever it found. A refresh over requests already
+  /// held does not make the board unread again.
+  func hasRead() -> Bool {
+    status.hasRead(holdsContent: board.requests.isEmpty == false)
   }
 
   /// What was keeping requests off the board when its last read started, which is what an empty
@@ -96,8 +110,8 @@ final class BoardStore {
   ///
   /// Read from the question that read was started for rather than from what the controls now say,
   /// so the sentence on an empty board describes the read that produced it.
-  var narrowing: BoardNarrowing {
-    BoardNarrowing(question: asked)
+  func narrowing() -> BoardNarrowing {
+    BoardNarrowing(question: board.asked)
   }
 
   // MARK: - What can be asked for
@@ -106,64 +120,21 @@ final class BoardStore {
   ///
   /// Filtered to the values that have a spelling in a URL. A value with no spelling cannot be sent,
   /// which is what keeps `unspecified` — the zero every proto enum decodes to by default — out of a
-  /// query string rather than merely discouraged. Read from `allCases` rather than listed here, so
-  /// a ranking the contract adds reaches the bar by being declared and nothing here has to be
-  /// remembered.
-  var offeredSorts: [DRRequestSort] {
-    DRRequestSort.allCases.filter { $0.urlToken != nil }
+  /// query string. Read from `allCases` rather than listed here, so a ranking the contract adds
+  /// reaches the bar by being declared.
+  func offeredSorts() -> [DRRequestSort] {
+    DRRequestSort.allCases.filter { sort in
+      sort.urlToken != nil
+    }
   }
 
   /// Every status the board can be narrowed to, from the contract's own list of what a board shows.
   ///
   /// Not every spellable status is on a board. A duplicate has left it for the request it was
-  /// folded into, so asking a board for one asks for something that is not there — and the server
-  /// refused that filter every time it was offered. Which statuses a board shows is the contract's
-  /// to say since 0.35.0, so the bar is built from `shownOnABoard` rather than from what happens
-  /// to have a spelling.
-  var offeredStatuses: [DRRequestStatus] {
+  /// folded into, so asking a board for one asks for something that is not there. Which statuses a
+  /// board shows is the contract's to say, so the bar is built from `shownOnABoard`.
+  func offeredStatuses() -> [DRRequestStatus] {
     DRRequestStatus.shownOnABoard
-  }
-
-  // MARK: - Private state
-
-  /// The opaque continuation the previous page handed back.
-  private var cursor: String = ""
-
-  /// The question the last read was started for.
-  ///
-  /// Kept rather than assumed equal to ``question``: the controls move while a read is suspended,
-  /// and what is on screen answers whichever question was being asked when that read started.
-  private var asked: DRListRequestsRequest
-
-  // MARK: - Init
-
-  /// - Parameters:
-  ///   - client: The client the board reads through.
-  ///   - news: Where a vote cast here is recorded, so a request's own screen re-reads it.
-  ///   - notificationOffer: Offered the notification card after a vote cast here.
-  ///   - statuses: Which statuses to cover, or empty for everything still on the board.
-  ///   - sort: Whether to rank by demand or by recency.
-  ///
-  /// A board starts unsearched, and starts having asked nothing else — ``asked`` is the question
-  /// this was built to ask, so `loadMore()` before any `load()` pages the board as constructed
-  /// rather than paging nothing.
-  init(
-    client: DifferentRequestsClient,
-    news: NewsAboutRequests,
-    notificationOffer: NotificationOffer,
-    statuses: [DRRequestStatus],
-    sort: DRRequestSort
-  ) {
-    self.client = client
-    self.news = news
-    self.notificationOffer = notificationOffer
-    self.statuses = statuses
-    self.sort = sort
-    self.query = ""
-    var asking = DRListRequestsRequest()
-    asking.statuses = statuses
-    asking.sort = sort
-    self.asked = asking
   }
 
   // MARK: - Narrowing
@@ -173,7 +144,7 @@ final class BoardStore {
   /// Read again rather than re-sorted in place: the board is one page of many, and the top of a
   /// ranking is not something a page of another ranking contains.
   func show(sort: DRRequestSort) async {
-    self.sort = sort
+    board.sort = sort
     await load()
   }
 
@@ -181,25 +152,27 @@ final class BoardStore {
   /// again.
   ///
   /// The kept statuses are rebuilt in the order the contract declares them rather than in the order
-  /// they were tapped, so the same set is always spelled the same way in a URL. That rebuild also
-  /// drops anything the contract gives no spelling to, which the client would have dropped from the
-  /// query string anyway — this only makes the store agree with what was sent.
+  /// they were tapped, so the same set is always spelled the same way in a URL.
   func toggle(status: DRRequestStatus) async {
-    let kept = statuses
+    let kept = board.statuses
     if kept.contains(status) {
-      statuses = kept.filter { $0 != status }
+      board.statuses = kept.filter { covered in
+        covered != status
+      }
     } else {
-      statuses = offeredStatuses.filter { $0 == status || kept.contains($0) }
+      board.statuses = offeredStatuses().filter { offered in
+        offered == status || kept.contains(offered)
+      }
     }
     await load()
   }
 
   /// Drops every status filter and reads again, leaving whatever is in the search field alone.
   ///
-  /// Two narrowings, undone one at a time. Clearing someone's typed search from a control labelled
+  /// Two narrowings, undone one at a time. Clearing someone's typed search from a control labeled
   /// for statuses would take away words they can see in a field they did not touch.
   func showEveryStatus() async {
-    statuses = []
+    board.statuses = []
     await load()
   }
 
@@ -208,41 +181,51 @@ final class BoardStore {
   /// Reads the first page for whatever the board is now being asked, replacing everything held.
   ///
   /// Returns immediately when a read is already running — and that read finishes the job, because
-  /// it reads again for any question asked while it was suspended. Returning without that, a search
-  /// entered or a filter tapped while the first page was still in flight would be dropped and stay
-  /// dropped: this store outlives the screen that asked, so nothing rebuilds it and asks again.
+  /// it reads again for any question asked while it was suspended. This store outlives the screen
+  /// that asked, so nothing rebuilds it and asks again.
   ///
   /// What is already held stays held for the length of the read. It is replaced by the answer
   /// rather than cleared before the question, so a pull-to-refresh does not take away the list
   /// that is running it.
   func load() async {
-    if read.isReading == false {
+    if status.isReading() == false {
       repeat {
-        read = read.whileReading
-        asked = question
-        cursor = ""
-        page = .more
-        await readFirstPage(asked)
-      } while asked != question
+        status.state = .reading(Reading())
+        board.asked = question()
+        board.cursor = ""
+        page = PageState()
+        await readFirstPage(board.asked)
+      } while board.asked != question()
     }
   }
 
   /// Reads the board again when what is held does not answer the question now being asked, after
   /// letting a burst of typing settle.
   ///
-  /// Run from a task keyed on the question, which SwiftUI cancels and restarts on every keystroke.
+  /// Run from a task keyed on the query, which SwiftUI cancels and restarts on every keystroke.
   /// A canceled wait sends nothing, and a board that already answers the question is left alone, so
   /// a redraw does not throw away the pages after the first.
   func search() async {
-    if isCurrent == false {
+    if isCurrent() == false {
       do {
-        if query.isEmpty == false {
-          try await Task.sleep(for: searchSettleDelay)
+        if board.query.isEmpty == false {
+          try await Task.sleep(for: .seconds(board.searchSettleDelay.timeInterval))
         }
         await load()
       } catch {
         // The wait throws only when it is canceled, and a canceled search sends nothing.
       }
+    }
+  }
+
+  /// Reads the board again when any row it holds was heard to have changed after its copy arrived,
+  /// so a request shipped or answered while the board was held is not drawn as it was.
+  ///
+  /// Read again whole rather than patched: a change moves a request's rank, and can take it off a
+  /// board narrowed to the status it left, which only the server's answer says.
+  func readAgainIfNewer() async {
+    if news.hasNews(about: board) {
+      await load()
     }
   }
 
@@ -252,42 +235,58 @@ final class BoardStore {
   /// or when the whole board is being re-read. A page that failed is not one of those: the retry
   /// under the last row is how it is asked for again.
   ///
-  /// Asked under ``asked`` rather than under what the controls now say. The cursor came back from
-  /// that question, and handing it to a different one asks the server to continue a list it never
-  /// started.
+  /// Asked under the question the last read started for rather than under what the controls now
+  /// say. The cursor came back from that question.
   func loadMore() async {
-    if page.isReading == false, page.isDone == false, read.isReading == false {
-      page = .reading
+    if page.isReading() == false, page.isDone() == false, status.isReading() == false {
+      page.state = .reading(Reading())
+      let sentAt = Google_Protobuf_Timestamp(date: Date())
 
       do {
-        let answer = try await fetch(asked, cursor: cursor)
-        read = read.appending(answer.requests)
-        cursor = answer.nextCursor
+        let answer = try await fetch(board.asked, cursor: board.cursor)
+        board.requests.append(contentsOf: answer.requests)
+        stamp(answer.requests, copiedAt: sentAt)
+        status.state = .loaded(ReadAnswered())
+        board.cursor = answer.nextCursor
         page = PageState(nextCursor: answer.nextCursor)
       } catch {
         // The cursor is left where it was, so the retry asks for this page rather than skipping it.
-        page = .failed(error)
+        page.state = .failed(ReadTrouble(error: error))
       }
     }
   }
 
   /// Reads page one of `question` and replaces the board with it.
   private func readFirstPage(_ question: DRListRequestsRequest) async {
+    let sentAt = Google_Protobuf_Timestamp(date: Date())
     do {
       let answer = try await fetch(question, cursor: "")
-      read = ReadState(page: answer.requests)
-      cursor = answer.nextCursor
+      board.requests = answer.requests
+      board.copiedAt = [:]
+      stamp(answer.requests, copiedAt: sentAt)
+      status.state = .loaded(ReadAnswered())
+      board.cursor = answer.nextCursor
       page = PageState(nextCursor: answer.nextCursor)
     } catch {
-      read = ReadState(readFailure: error)
-      page = .done
+      board.requests = []
+      board.copiedAt = [:]
+      status = ReadStatus(readFailure: error)
+      page.state = .done(NoMorePages())
+    }
+  }
+
+  /// Records that these rows' copies are the server's as of `copiedAt`, the moment the read that
+  /// returned them was sent: news that lands while it is in flight is newer than what it returns.
+  private func stamp(_ rows: [DRFeatureRequest], copiedAt: Google_Protobuf_Timestamp) {
+    for row in rows {
+      board.copiedAt[row.id] = copiedAt
     }
   }
 
   /// One page of `question` at `cursor`, or its first when that is empty.
   ///
   /// The cursor is set on a copy of the question rather than passed beside it, so what goes over
-  /// the wire is one message the contract declares and not four arguments assembled here.
+  /// the wire is one message the contract declares.
   private func fetch(
     _ question: DRListRequestsRequest,
     cursor: String
@@ -306,18 +305,20 @@ final class BoardStore {
   /// `load()` can replace the whole board while the call is suspended.
   ///
   /// The row flips before the call, so the tile answers the tap at once. What the write returned
-  /// then replaces the row whole, because a count incremented locally is wrong the moment anyone
-  /// else votes, and a refused write puts back the row as it was held.
+  /// then replaces the row whole, and a refused write puts back the row as it was held.
   func toggleVote(requestID: String) async {
-    if write.isWriting == false, let current = read.held.first(where: { $0.id == requestID }) {
+    let matchingRequest = board.requests.first { request in
+      request.id == requestID
+    }
+    if write.isWriting() == false, let current = matchingRequest {
       let attempt: WriteAttempt
       if current.viewer.voted {
         attempt = .clearVote
       } else {
         attempt = .vote
       }
-      write = .writing(attempt)
-      read = read.replacing(withVoteFlipped(current), identifiedBy: { $0.id })
+      write.state = .writing(attempt)
+      land(withVoteFlipped(current))
 
       do {
         let written: DRFeatureRequest
@@ -326,17 +327,27 @@ final class BoardStore {
         } else {
           written = try await client.vote(requestID: requestID).request
         }
-        read = read.replacing(written, identifiedBy: { $0.id })
-        news.heard(aboutRequest: requestID, at: Date())
-        write = .idle
+        land(written)
+        // The row just landed is the change being announced, so its copy is as new as the news.
+        let landed = Date()
+        news.heard(aboutRequest: requestID, at: landed)
+        stamp([written], copiedAt: Google_Protobuf_Timestamp(date: landed))
+        write = WriteState()
         if written.viewer.voted {
           await notificationOffer.votedOrFollowed(requestID: requestID)
         }
       } catch {
-        read = read.replacing(current, identifiedBy: { $0.id })
-        write = .failed(WriteFailure(attempt: attempt, error: error))
+        land(current)
+        write.state = .failed(WriteFailure(attempt: attempt, error: error))
       }
     }
+  }
+
+  /// Puts `row` in place of the request held under its id, without clearing the mark that says a
+  /// read is in flight.
+  private func land(_ row: DRFeatureRequest) {
+    board.requests = board.requests.replacingRow(row, identifiedBy: \.id)
+    status = status.afterWrite()
   }
 
   /// The row as it reads the moment its tile is tapped, held until the write answers with the
@@ -360,6 +371,6 @@ final class BoardStore {
   /// Acknowledgement, not repair: the vote still did not land, and the control that casts it is
   /// on screen either way.
   func acknowledgeWriteFailure() {
-    write = .idle
+    write = WriteState()
   }
 }

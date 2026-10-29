@@ -12,35 +12,55 @@ struct RequestsScreen: View {
   /// What the screen reads from, and what its pushes are built against.
   let hub: DifferentRequestsHub
 
-  /// Whether the new request form is pushed.
-  @State private var isComposing = false
-
-  /// The request just filed, while its own screen is pushed.
-  @State private var openedRequestID: String?
+  /// Whether the new request form is pushed, and the request just filed while its own screen is.
+  @State private var requestsScreen = RequestsScreenState()
 
   var body: some View {
-    RequestsContent(hub: hub, isComposing: $isComposing)
+    RequestsContent(hub: hub, requestsScreen: $requestsScreen)
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .groupedBackground()
       .navigationTitle(Text("Requests", bundle: .module, comment: "Title of the request board"))
+      #if os(macOS)
+      .topRow(RequestsBar(hub: hub, requestsScreen: $requestsScreen))
+      #else
       .toolbar {
-        RequestsToolbar(hub: hub, isComposing: $isComposing)
+        RequestsToolbar(hub: hub, requestsScreen: $requestsScreen)
       }
+      #endif
       .sheetCloseButton()
-      .task(id: hub.board.query) {
+      .task(id: hub.board.board.query) {
         await hub.board.search()
       }
-      .navigationDestination(isPresented: $isComposing) {
+      .task(id: hub.news.news) {
+        await hub.board.readAgainIfNewer()
+      }
+      .navigationDestination(isPresented: $requestsScreen.composing) {
         SubmitRequestView(hub: hub)
       }
-      .navigationDestination(item: $openedRequestID) { requestID in
+      .navigationDestination(item: openedRequestID()) { requestID in
         RequestDetailView(hub: hub, requestID: requestID)
       }
-      .onChange(of: isComposing) {
-        if isComposing == false, let filed = hub.submission.submitted {
-          openedRequestID = filed.id
+      .onChange(of: requestsScreen.composing) {
+        if requestsScreen.composing == false, hub.submission.draft.hasSubmitted {
+          requestsScreen.openedRequestID = hub.submission.draft.submitted.id
           hub.submission.putAwaySubmitted()
         }
       }
+  }
+
+  /// The pushed request's id, or none while no request is pushed: empty in the screen's state.
+  private func openedRequestID() -> Binding<String?> {
+    Binding {
+      if requestsScreen.openedRequestID.isEmpty {
+        return nil
+      }
+      return requestsScreen.openedRequestID
+    } set: { requestID in
+      if let requestID {
+        requestsScreen.openedRequestID = requestID
+      } else {
+        requestsScreen.openedRequestID = ""
+      }
+    }
   }
 }

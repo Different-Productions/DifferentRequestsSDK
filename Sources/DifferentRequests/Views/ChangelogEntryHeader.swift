@@ -8,7 +8,7 @@ struct ChangelogEntryHeader: View {
   let entry: DRChangelogEntry
 
   var body: some View {
-    VStack(alignment: .leading, spacing: Spacing.xSmall.rawValue) {
+    VStack(alignment: .leading, spacing: Spacing.xSmall.points()) {
       if entry.title.isEmpty {
         Text("Version \(entry.version)", bundle: .module, comment: "An update's version; the argument is the version number")
           .textRole(.rowTitle)
@@ -19,13 +19,13 @@ struct ChangelogEntryHeader: View {
           .foregroundStyle(ColorRole.label)
       }
 
-      HStack(alignment: .firstTextBaseline, spacing: Spacing.xSmall.rawValue) {
+      HStack(alignment: .firstTextBaseline, spacing: Spacing.xSmall.points()) {
         if entry.title.isEmpty == false, entry.version.isEmpty == false {
           Text("Version \(entry.version)", bundle: .module, comment: "An update's version; the argument is the version number")
         }
-        Spacer(minLength: Spacing.xSmall.rawValue)
+        Spacer(minLength: Spacing.xSmall.points())
         if entry.hasPublishedAt {
-          Text(entry.publishedAt.date.ago)
+          Text(entry.publishedAt.ago())
         }
       }
       .textRole(.meta)

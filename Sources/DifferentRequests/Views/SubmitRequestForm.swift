@@ -11,7 +11,7 @@ struct SubmitRequestForm: View {
     @Bindable var submission = hub.submission
 
     List {
-      if let warning = hub.board.narrowing.composerWarning {
+      if let warning = hub.board.narrowing().composerWarning() {
         Section {
           Label(warning, systemImage: "line.3.horizontal.decrease.circle")
             .textRole(.meta)
@@ -20,22 +20,22 @@ struct SubmitRequestForm: View {
       }
 
       Section {
-        HStack(spacing: Spacing.xSmall.rawValue) {
+        HStack(spacing: Spacing.xSmall.points()) {
           TextField(
-            text: $submission.title,
+            text: $submission.draft.title,
             prompt: Text("What you want, in a few words", bundle: .module, comment: "Placeholder in a new request's title field")
           ) {
             Text("Title", bundle: .module, comment: "VoiceOver name of a new request's title field")
           }
           .textRole(.reading)
 
-          if submission.title.isEmpty == false {
+          if submission.draft.title.isEmpty == false {
             Button {
-              submission.title = ""
+              submission.draft.title = ""
             } label: {
               Image(systemName: "xmark.circle.fill")
                 .foregroundStyle(ColorRole.secondaryLabel)
-                .frame(width: TargetSize.minimum.rawValue, height: TargetSize.minimum.rawValue)
+                .frame(width: TargetSize.minimum.points(), height: TargetSize.minimum.points())
                 .contentShape(Rectangle())
             }
             .buttonStyle(.borderless)
@@ -44,7 +44,7 @@ struct SubmitRequestForm: View {
           }
         }
         .listRowInsets(
-          EdgeInsets(top: 0, leading: Spacing.medium.rawValue, bottom: 0, trailing: Spacing.xxSmall.rawValue)
+          EdgeInsets(top: 0, leading: Spacing.medium.points(), bottom: 0, trailing: Spacing.xxSmall.points())
         )
       } header: {
         Text("Title", bundle: .module, comment: "Header over a new request's title field")
@@ -52,17 +52,17 @@ struct SubmitRequestForm: View {
           .foregroundStyle(ColorRole.label)
           .textCase(nil)
       } footer: {
-        VStack(alignment: .leading, spacing: Spacing.xxSmall.rawValue) {
+        VStack(alignment: .leading, spacing: Spacing.xxSmall.points()) {
           Text("One sentence. This is what everyone else votes on.", bundle: .module, comment: "Note under a new request's title field")
             .textRole(.meta)
             .foregroundStyle(ColorRole.secondaryLabel)
-          CharactersLeft(left: submission.titleCharactersLeft)
+          CharactersLeft(content: submission.titleCharactersLeft())
         }
       }
 
       Section {
         TextField(
-          text: $submission.body,
+          text: $submission.draft.body,
           prompt: Text("Why you'd use it (optional)", bundle: .module, comment: "Placeholder in a new request's detail field"),
           axis: .vertical
         ) {
@@ -76,9 +76,9 @@ struct SubmitRequestForm: View {
           .foregroundStyle(ColorRole.label)
           .textCase(nil)
       } footer: {
-        VStack(alignment: .leading, spacing: Spacing.xxSmall.rawValue) {
-          CharactersLeft(left: submission.bodyCharactersLeft)
-          if let failure = submission.write.failure {
+        VStack(alignment: .leading, spacing: Spacing.xxSmall.points()) {
+          CharactersLeft(content: submission.bodyCharactersLeft())
+          if let failure = submission.write.failure() {
             WriteFailureNotice(failure: failure) {
               submission.acknowledgeWriteFailure()
             }

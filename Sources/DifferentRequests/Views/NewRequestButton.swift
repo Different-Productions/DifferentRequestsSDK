@@ -10,17 +10,17 @@ struct NewRequestButton: View {
   let hub: DifferentRequestsHub
 
   /// What the button says, and is called by VoiceOver.
-  let title: String
+  let label: NewRequestButtonContent
 
   /// Whether the form is up.
-  @Binding var isComposing: Bool
+  @Binding var requestsScreen: RequestsScreenState
 
   var body: some View {
     Button {
       hub.beginSubmission()
-      isComposing = true
+      requestsScreen.composing = true
     } label: {
-      Label(title, systemImage: "plus")
+      Label(label.title, systemImage: "plus")
     }
   }
 }

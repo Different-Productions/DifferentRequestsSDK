@@ -35,13 +35,13 @@ Three things carry it:
 
 | Value | Where | What it answers |
 | --- | --- | --- |
-| `PlanSurface` | `State/PlanSurface.swift` | Which surface the contract names, and what is said in its place |
-| `PlanState` | `State/PlanState.swift` | How far the asking got: `unread`, `reading`, `failed`, `excluded`, `included` |
+| `DRPlanSurface` | the contract; `State/DRPlanSurface+Absence.swift` | Which surface it is, and the `Absence` said in its place |
+| `PlanState` | `proto/differentrequests_sdk_state.proto`, `State/PlanState+Config.swift` | How far the asking got: unset (nothing asked), `reading`, `failed`, `excluded`, `included` |
 | `configuration` | `DifferentRequestsClient.swift` | The answer, kept, so that three screens asking cost one round trip |
 
-`PlanState` is held beside `ReadState` rather than folded into it. They are two questions asked in
+`PlanState` is held beside `ReadStatus` rather than folded into it. They are two questions asked in
 order — whether there is anything here, and then what it says — and only the second has content to
-hold. Folding them would also mean a sixth `ReadState` case that every surface in the package would
+hold. Folding them would also mean a fifth `ReadStatus` state that every surface in the package would
 have to enumerate, including the four that are not gated at all.
 
 The cache is a plain remembered answer on the actor, and only a successful read lands in it. A read
@@ -149,12 +149,12 @@ it rather than approximating it. A call that throws is not remembered, so the ne
 | The app does not take comments | **"Comments are off"** / "This app doesn't have comments. Vote to show you want this." — in the strip the field would have occupied. The thread above it is still readable, and voting still works |
 | The config read fails on the roadmap or the changelog | **"Roadmap couldn't load"** or **"What's New couldn't load"** / "Something went wrong on the server. Try again in a moment." with **Try again**, which asks for the config again. The surface itself is not read, because whether it exists is not known |
 | The config read fails on a request's composer | **"Comments didn't load."** with **Try again**, in the composer's strip. The request and the thread above it are unaffected — they were read by a different rpc that answered |
-| The config read answers with no `AppConfig` in it | The same "Roadmap couldn't load" or "What's New couldn't load" screen, from `DifferentRequestsError.incompleteResponse(.getConfig)`. Not treated as an answer: every flag on an absent message reads as `false`, and a server that said nothing would otherwise be read as an app nobody paid for |
-| The server returns `planRequired` anyway — a plan that lapsed between the config read and the surface read | **"Roadmap couldn't load"** or **"What's New couldn't load"** with **Try again**, from `ReadState(readFailure:)`. The gate is a way to not ask; it is not a promise that an answer cannot change underneath it |
+| The config read answers with no `AppConfig` in it | The same "Roadmap couldn't load" or "What's New couldn't load" screen, from `DifferentRequestsError(incompleteResponse: .getConfig)`. Not treated as an answer: every flag on an absent message reads as `false`, and a server that said nothing would otherwise be read as an app nobody paid for |
+| The server returns `planRequired` anyway — a plan that lapsed between the config read and the surface read | **"Roadmap couldn't load"** or **"What's New couldn't load"** with **Try again**, from `ReadStatus(readFailure:)`. The gate is a way to not ask; it is not a promise that an answer cannot change underneath it |
 | The `DRApiError.message` on a plan refusal says something specific | Nobody sees it. The contract states that message is written for whoever is debugging and may name internals, and `planRequired` in particular is never surfaced to an end user |
 | A reader is shown any of the absent screens | Nothing about a plan, a tier, a price or an upgrade. They did not choose it and cannot change it |
-| The config read fails and the screen is opened again | It asks again. `PlanState.needsReading` is true after a failure, so one outage does not close a surface for the rest of the launch |
-| A surface that is settled — included or excluded — is opened again | It does not ask again. `needsReading` is false, so an excluded screen costs nothing on every appearance |
+| The config read fails and the screen is opened again | It asks again. `PlanState.needsReading()` is true after a failure, so one outage does not close a surface for the rest of the launch |
+| A surface that is settled — included or excluded — is opened again | It does not ask again. `needsReading()` is false, so an excluded screen costs nothing on every appearance |
 
 ## The code path
 
@@ -162,17 +162,14 @@ it rather than approximating it. A call that throws is not remembered, so the ne
                   ┌────────────────────────────────────────────────────────────┐
                   │  State/  — the two values this feature is made of           │
                   ├────────────────────────────────────────────────────────────┤
- PlanSurface.swift│  roadmap · changelog · comments        (CaseIterable)       │
-                  │    .theSurfaceTheContractNames ──► DRPlanSurface            │
-                  │       ↑ the contract's own DRAppConfig.includes(_:) reads   │
-                  │         the flag. Both sides read the same one.             │
-                  │    .absentTitle · .absentDescription · .absentSymbol        │
+ DRPlanSurface    │  the contract's own enum; DRAppConfig.includes(_:) reads    │
+ +Absence.swift   │    the flag. .absence() ──► Absence(title, message, symbol)│
                   │       ↑ copy about what IS there. Never about a plan.       │
- PlanState.swift  │  unread · reading · failed(Error) · excluded · included     │
-                  │    init(surface:response:)  hasConfig == false ──► .failed  │
-                  │    .needsReading ← unread or failed, never after an answer  │
-                  │    .isIncluded   ← what a store checks before reading       │
-                  │    .failure      ← for whoever is debugging                 │
+                  │       nil for a surface with no screen of its own           │
+ PlanState        │  proto: unset · reading · failed(ReadTrouble) · excluded ·  │
+ +Config.swift    │    included. init(surface:response:) no config ──► failed   │
+                  │    .needsReading() ← unset or failed, never after an answer │
+                  │    .isIncluded()   ← what a store checks before reading     │
                   └────────────────────────────────────────────────────────────┘
 
 ONE READ, SHARED — the cache that makes asking cheap enough to do everywhere
@@ -197,9 +194,9 @@ A PRO SURFACE — the defect, and where it now stops
         │
         ▼
   RoadmapStore.load()
-    ├── read.isReading ──► return
+    ├── status.isReading() ──► return
     ├── readPlan()
-    │     ├── plan.needsReading == false ──► return   (settled once, asked once)
+    │     ├── plan.needsReading() == false ──► return   (settled once, asked once)
     │     ├── plan = .reading
     │     ├── client.config()
     │     │     ├── success ──► plan = PlanState(surface: .roadmap, response:)
@@ -208,15 +205,15 @@ A PRO SURFACE — the defect, and where it now stops
     │     │     │                        else               ──► .excluded
     │     │     └── failure ──► plan = .failed(error)
     │     ▼
-    ├── plan.isIncluded == false ──►  ✗ STOP. client.roadmap() is NOT called.
+    ├── plan.isIncluded() == false ──►  ✗ STOP. client.roadmap() is NOT called.
     │                                   ⟵ this is the whole fix. The call that
     │                                      returned planRequired is not made.
     └── readColumns()
-          ├── read = read.whileReading
+          ├── status.state = .reading(Reading())
           ├── client.roadmap()  ── GET /roadmap
-          ├── success ──► read = ReadState(page: answer.columns)
-          └── failure ──► read = ReadState(readFailure: error)
-                                  isNotFound? ──► .empty   else ──► .failed
+          ├── success ──► columns = answer.columns; status.state = .loaded(ReadAnswered())
+          └── failure ──► columns = []; status = ReadStatus(readFailure: error)
+                                  isNotFound()? ──► .loaded   else ──► .failed
         │
         ▼
   RoadmapView.content
@@ -227,12 +224,12 @@ A PRO SURFACE — the defect, and where it now stops
       case .included         ──► columns
     }                             no default:, so a sixth case would not compile
                                         │
-  RoadmapView.columns ◄─────────────────┘
-    switch store.read {
-      case .unread, .reading ──► ProgressView()
-      case .failed           ──► LoadFailure "Roadmap couldn't load" + Try again
-      case .empty            ──► "Nothing planned yet" / "When the team plans something, it shows up here."
-      case .loaded(h), .refreshing(h) ──► list(h)
+  RoadmapContent ◄──────────────────────┘
+    columns non-empty ──► list(columns)
+    else switch store.status.state {
+      case .none, .reading ──► ProgressView()
+      case .failed         ──► LoadFailure "Roadmap couldn't load" + Try again
+      case .loaded         ──► "Nothing planned yet" / "When the team plans something, it shows up here."
     }
 
   ChangelogStore / ChangelogView are the same path, on .changelog and
@@ -242,12 +239,12 @@ A PRO SURFACE — the defect, and where it now stops
 THE COMPOSER — the contract inconsistency, handled in the same shape
 
   RequestDetailStore.load()
-    ├── client.request(id:) ──► read = .loaded(request)
-    │     └── failure ──► read = ReadState(readFailure:); thread = .unread; RETURN
+    ├── client.request(id:) ──► answer = the response; status = .loaded
+    │     └── failure ──► status = ReadStatus(readFailure:); threadStatus = ReadStatus(); RETURN
     │                     ⟵ commenting is left .unread: nothing to comment on
     ├── client.comments(requestID:cursor:) ──► thread, page
     └── loadCommenting()                        ⟵ last, and usually free: the client
-          ├── commenting.needsReading == false ──► return       answers from the read
+          ├── commenting.needsReading() == false ──► return       answers from the read
           ├── commenting = .reading                             a Pro screen made
           ├── client.config()
           │     └── commenting = PlanState(surface: .comments, response:)
@@ -281,19 +278,19 @@ RoadmapView — an app whose plan does not include one
 │                                              │   the host put this here, and a blank
 │                                              │   bar would read as a broken push
 │                   🗺                          │
-│           This app has no roadmap            │ ← PlanSurface.roadmap.absentTitle
+│           This app has no roadmap            │ ← DRPlanSurface.roadmap.absence().title
 │                                              │
-│      This app doesn't share its plans.       │ ← .absentDescription
+│      This app doesn't share its plans.       │ ← .message
 │                                              │
 │                                              │ ← no Try again, no spinner, nothing
 │                                              │   to tap. Nothing is being waited for
 └──────────────────────────────────────────────┘
 
-  plan .unread / .reading  → centred spinner. Identical to a roadmap being read,
+  plan .unread / .reading  → centered spinner. Identical to a roadmap being read,
                              deliberately: at that moment they are the same fact
   plan .failed             → "Roadmap couldn't load" / "Something went wrong on the server. Try again in a moment." + [Try again]
                              ⟵ [Try again] re-asks the CONFIG, then the roadmap
-  plan .included           → the four ReadState outcomes, unchanged:
+  plan .included           → the four ReadStatus outcomes:
                              spinner · "Roadmap couldn't load" + [Try again] ·
                              "Nothing planned yet" / "When the team plans something, it shows up here." ·
                              the columns

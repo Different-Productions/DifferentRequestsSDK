@@ -19,16 +19,17 @@ final class AppConfigStore {
   // MARK: - State
 
   /// Whether this app pays, and how far the asking got.
-  var badge: BadgeState = .unread
+  var badge = BadgeState()
 
   /// What the app includes. An unread configuration is an empty one, so every surface is absent
   /// until the server says otherwise — which is the honest rendering of not knowing, and the same
   /// rule the badge follows.
   var config = DRAppConfig()
 
-  /// The tint chosen in the dashboard, or nothing: none was chosen, the plan leaves the app's own
-  /// look out, or the configuration has not answered. Written by ``load()`` with ``config``.
-  var dashboardTint: DashboardTint?
+  /// The sections the Mac sheet offers, in order: Requests, then Roadmap and What's New where the
+  /// plan includes them, then Inbox. Written by ``load()`` with ``config``, and empty before then:
+  /// no sheet is drawn until the configuration has answered.
+  var sheetTabs = OfferedTabs()
 
   // MARK: - Init
 
@@ -44,16 +45,24 @@ final class AppConfigStore {
   /// Asks again only after a read that failed. An app does not change plan mid-launch, and the
   /// contract states the configuration is fetched once per launch.
   func load() async {
-    if badge.needsReading {
-      badge = .reading
+    if badge.needsReading() {
+      badge.state = .reading(Reading())
 
       do {
         let answer = try await client.config()
         config = answer.config
-        dashboardTint = DashboardTint(config: answer.config)
+        var tabs: [ScreenTab] = [.requests]
+        if answer.config.roadmapEnabled {
+          tabs.append(.roadmap)
+        }
+        if answer.config.changelogEnabled {
+          tabs.append(.changelog)
+        }
+        tabs.append(.inbox)
+        sheetTabs.offered = tabs
         badge = BadgeState(response: answer)
       } catch {
-        badge = .failed(error)
+        badge.state = .failed(ReadTrouble(error: error))
       }
     }
   }

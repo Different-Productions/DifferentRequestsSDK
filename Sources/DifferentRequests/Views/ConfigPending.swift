@@ -7,17 +7,19 @@ struct ConfigPending: View {
   let hub: DifferentRequestsHub
 
   var body: some View {
-    switch hub.appConfig.badge {
-    case .unread, .reading:
+    switch hub.appConfig.badge.state {
+    case .none, .reading:
       ProgressView()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .task {
           await hub.appConfig.load()
         }
-    case .failed(let error):
+    case .failed(let failure):
       LoadFailure(
-        title: String(localized: "Requests couldn't load", bundle: .module, comment: "Heading when the Requests screen failed to load"),
-        error: error
+        content: LoadFailureContent(
+          title: String(localized: "Requests couldn't load", bundle: .module, comment: "Heading when the Requests screen failed to load"),
+          trouble: failure
+        )
       ) {
         await hub.appConfig.load()
       }

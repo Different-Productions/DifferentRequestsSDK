@@ -17,10 +17,9 @@ import SwiftUI
 /// @main
 /// struct MyApp: App {
 ///   private let requests = DifferentRequestsHub(
-///     client: DifferentRequestsClient(appKey: "…", baseURL: .production),
-///     appearance: .standard,
-///     emptyBoard: .standard,
-///     notificationPermission: .askedBySDK
+///     client: DifferentRequestsClient(appKey: "…", baseURL: SecureBaseURL(service: .production)),
+///     emptyBoard: EmptyBoard(),
+///     notificationPermission: .askedBySdk
 ///   )
 ///
 ///   var body: some Scene {
@@ -43,20 +42,13 @@ public final class DifferentRequestsHub {
 
   /// The client every screen calls through.
   ///
-  /// Public because a host app has its own reasons to call the same API — an inbox badge drawn
-  /// outside the inbox is one read, and lifting SDK state out of the SDK to get it would be a
-  /// second copy of a number the server already answers.
+  /// Public because a host app has its own reasons to call the same API: signing a person in,
+  /// registering a device. An inbox badge is not one of them — it is ``unreadCount()``, the number
+  /// the SDK's own Inbox tab draws, so the two never disagree.
   public let client: DifferentRequestsClient
 
-  /// The host app's own accent and font, as it asked for them.
-  ///
-  /// Handed over at `init` because it is the host app's look rather than something to fetch. What a
-  /// screen is actually drawn in is ``appearanceDrawn``, because the app's plan decides whether this
-  /// is used.
-  public let appearance: Appearance
-
   /// What a board with nothing on it says, as the host app asked for it. What is drawn is
-  /// ``emptyBoardDrawn``, because the app's plan decides whether this is used.
+  /// ``emptyBoardDrawn()``, because the app's plan decides whether this is used.
   public let emptyBoard: EmptyBoard
 
   /// Who asks the person for notification permission, as the host app set it.
@@ -108,21 +100,17 @@ public final class DifferentRequestsHub {
   /// which lives as long as that screen does.
   /// - Parameters:
   ///   - client: The client every screen reads and writes through.
-  ///   - appearance: What the screens are drawn in. ``Appearance/standard`` is the SDK's own look,
-  ///     named rather than defaulted so an app that has not thought about it says so.
-  ///   - emptyBoard: What a board with nothing on it says. ``EmptyBoard/standard`` is the SDK's own
-  ///     words, named for the same reason.
-  ///   - notificationPermission: Who asks for notification permission. ``NotificationPermission/askedBySDK``
+  ///   - emptyBoard: What a board with nothing on it says. `EmptyBoard()` is the SDK's own words,
+  ///     written out at the call site so an app that has not thought about it says so.
+  ///   - notificationPermission: Who asks for notification permission. ``NotificationPermission/askedBySdk``
   ///     lets the SDK offer its card and Apple's prompt; ``NotificationPermission/askedByApp`` leaves
   ///     asking to the host app, and the SDK never prompts.
   public init(
     client: DifferentRequestsClient,
-    appearance: Appearance,
     emptyBoard: EmptyBoard,
     notificationPermission: NotificationPermission
   ) {
     self.client = client
-    self.appearance = appearance
     self.emptyBoard = emptyBoard
     self.notificationPermission = notificationPermission
     self.news = NewsAboutRequests()
@@ -137,8 +125,7 @@ public final class DifferentRequestsHub {
       client: client,
       news: news,
       notificationOffer: notificationOffer,
-      statuses: [],
-      sort: .top
+      board: BoardState(sort: .top)
     )
     self.roadmap = RoadmapStore(client: client)
     self.changelog = ChangelogStore(client: client)
@@ -180,45 +167,38 @@ public final class DifferentRequestsHub {
 
   // MARK: - The look
 
-  /// What every screen is drawn in: the host app's look where this app's plan includes it, and the
-  /// SDK's own where it does not.
-  ///
-  /// Read only once the configuration has answered: `WornLook` draws no screen before then.
-  var appearanceDrawn: Appearance {
-    if usesHostAppearance {
-      return appearance
-    }
-    return .standard
+  /// The color every screen is tinted with in the mode being drawn: the tint chosen in the
+  /// dashboard, or the system tint where none was chosen or the plan leaves the app's own look out.
+  func tintDrawn(in colorScheme: ColorScheme) -> DrawnTint {
+    appConfig.config.dashboardTint(in: colorScheme)
   }
 
-  /// The color every screen is tinted with in the mode being drawn.
-  ///
-  /// A tint chosen in the dashboard wins over the accent the host app passed in code. With neither,
-  /// it is the system tint. The dashboard's tint is held only for an app whose plan includes its own
-  /// look, so a Free app is never drawn in one.
-  func tintDrawn(in colorScheme: ColorScheme) -> Color {
-    if let dashboardTint = appConfig.dashboardTint {
-      return dashboardTint.color(in: colorScheme)
+  /// The family every screen is set in: the one chosen in the dashboard where this app's plan
+  /// includes its own look, and the system's default family before the configuration has answered
+  /// or where the plan leaves it out.
+  func fontDrawn() -> Font.Design {
+    if usesHostAppearance() {
+      return appConfig.config.fontFamily.fontDesign()
     }
-    return appearanceDrawn.accent
+    return Font.Design.default
   }
 
   /// What a board with nothing on it says: the host app's words where its plan includes its own
-  /// look, and the SDK's where it does not. Read only once the configuration has answered, like
-  /// ``appearanceDrawn``.
-  var emptyBoardDrawn: EmptyBoard {
-    if usesHostAppearance {
-      return emptyBoard.filledIn
+  /// look, and the SDK's where it does not. Read only once the configuration has answered: `WornLook`
+  /// draws no screen before then.
+  func emptyBoardDrawn() -> EmptyBoard {
+    if usesHostAppearance() {
+      return emptyBoard.filledIn()
     }
-    return .standard
+    return EmptyBoard().filledIn()
   }
 
   /// Whether the host app's own look is drawn: the configuration answered and the plan includes it.
-  private var usesHostAppearance: Bool {
-    switch appConfig.badge {
+  private func usesHostAppearance() -> Bool {
+    switch appConfig.badge.state {
     case .bought, .carried:
       return appConfig.config.appearanceEnabled
-    case .unread, .reading, .failed:
+    case .none, .reading, .failed:
       return false
     }
   }
@@ -236,7 +216,7 @@ public final class DifferentRequestsHub {
   /// in flight is not started twice, so a button that warms on every appearance costs one round
   /// trip rather than one per appearance.
   public func readTheBoardBeforeItIsShown() async {
-    if board.read.hasRead == false {
+    if board.hasRead() == false {
       await board.load()
     }
   }
@@ -252,7 +232,7 @@ public final class DifferentRequestsHub {
   /// Public so a host app can offer its own way in — a menu item, a settings row — and get a
   /// composer in the same state the board's own button gives.
   public func beginSubmission() {
-    submission.begin(title: board.query)
+    submission.begin(title: board.board.query)
   }
 
   /// Files what is in the composer, then re-reads the board it now belongs on.
@@ -263,15 +243,39 @@ public final class DifferentRequestsHub {
   /// now one request out of date.
   func fileRequest() async {
     await submission.submit()
-    if submission.submitted != nil {
+    if submission.draft.hasSubmitted {
       await board.load()
+    }
+  }
+
+  // MARK: - The inbox
+
+  /// How many updates the signed-in person has not opened, as the server last counted them.
+  ///
+  /// The one count every Inbox badge draws: the SDK's own Inbox tab, and a host app's row or icon.
+  /// Observable — read it in a view's body and the view redraws when it changes. It changes when
+  /// the inbox is read, when an update is opened or marked read, and when
+  /// ``heardThatARequestChanged(requestID:)`` is told a push landed.
+  public func unreadCount() -> Int32 {
+    inbox.inbox.unreadCount
+  }
+
+  /// Reads the inbox's first page and its unread count, where somebody is signed in.
+  ///
+  /// Await it once the host app has signed somebody in, so a badge drawn before the Inbox is ever
+  /// opened has a count. One asked for while a read is in flight is not started beside it: the
+  /// read in flight reads again when it lands.
+  public func loadInbox() async {
+    await whoIsHere.read()
+    if whoIsHere.somebodyIsHere() {
+      await inbox.load()
     }
   }
 
   // MARK: - News from outside
 
-  /// Tell the SDK that a push about a request landed, so the screen for it reads again rather than
-  /// drawing the copy it had before the change.
+  /// Tell the SDK that a push about a request landed, so every screen holding that request reads it
+  /// again, and the inbox and its unread count read the update the push announced.
   ///
   /// Call it from wherever your app receives a notification. The payload carries `requestID`, which
   /// is the id to hand over; a push exists only because that request changed, so the copy anybody
@@ -284,7 +288,7 @@ public final class DifferentRequestsHub {
   /// ) async {
   ///   let payload = response.notification.request.content.userInfo
   ///   if let requestID = payload["requestID"] as? String {
-  ///     requests.heardThatARequestChanged(requestID: requestID)
+  ///     await requests.heardThatARequestChanged(requestID: requestID)
   ///   }
   /// }
   /// ```
@@ -292,7 +296,8 @@ public final class DifferentRequestsHub {
   /// The inbox does the same for itself: every notification it reads says its request changed when
   /// that notification was written, so a reader who opens the inbox instead of the push is served
   /// the same way without your app doing anything.
-  public func heardThatARequestChanged(requestID: String) {
+  public func heardThatARequestChanged(requestID: String) async {
     news.heard(aboutRequest: requestID, at: Date())
+    await loadInbox()
   }
 }

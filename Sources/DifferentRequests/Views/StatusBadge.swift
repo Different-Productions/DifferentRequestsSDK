@@ -34,19 +34,19 @@ public struct StatusBadge: View {
   public var body: some View {
     switch shownStatus() {
     case .open:
-      StatusMark(word: DRRequestStatus.open.localizedLabel, symbol: "circle")
+      StatusMark(content: StatusMarkContent(word: DRRequestStatus.open.localizedLabel(), symbol: "circle"))
     case .planned:
-      StatusMark(word: DRRequestStatus.planned.localizedLabel, symbol: "calendar")
+      StatusMark(content: StatusMarkContent(word: DRRequestStatus.planned.localizedLabel(), symbol: "calendar"))
     case .inProgress:
-      StatusMark(word: DRRequestStatus.inProgress.localizedLabel, symbol: "circle.lefthalf.filled")
+      StatusMark(content: StatusMarkContent(word: DRRequestStatus.inProgress.localizedLabel(), symbol: "circle.lefthalf.filled"))
     case .shipped:
-      StatusMark(word: DRRequestStatus.shipped.localizedLabel, symbol: "checkmark.circle.fill")
+      StatusMark(content: StatusMarkContent(word: DRRequestStatus.shipped.localizedLabel(), symbol: "checkmark.circle.fill"))
     case .declined:
-      StatusMark(word: DRRequestStatus.declined.localizedLabel, symbol: "xmark.circle")
+      StatusMark(content: StatusMarkContent(word: DRRequestStatus.declined.localizedLabel(), symbol: "xmark.circle"))
     case .duplicate:
-      StatusMark(word: DRRequestStatus.duplicate.localizedLabel, symbol: "arrow.triangle.merge")
+      StatusMark(content: StatusMarkContent(word: DRRequestStatus.duplicate.localizedLabel(), symbol: "arrow.triangle.merge"))
     case .unspecified, .UNRECOGNIZED:
-      StatusMark(word: DRRequestStatus.unspecified.localizedLabel, symbol: "questionmark.circle")
+      StatusMark(content: StatusMarkContent(word: DRRequestStatus.unspecified.localizedLabel(), symbol: "questionmark.circle"))
     }
   }
 

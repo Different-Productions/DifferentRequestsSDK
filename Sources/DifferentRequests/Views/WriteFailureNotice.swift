@@ -4,7 +4,7 @@ import SwiftUI
 /// a Dismiss button, in a row beside the control that failed. VoiceOver reads it when it appears.
 ///
 /// The failure itself is never rendered: an `ApiError`'s message is written for whoever is
-/// debugging, so the sentence comes from ``WriteFailure/message``.
+/// debugging, so the sentence comes from ``WriteFailure/message()``.
 struct WriteFailureNotice: View {
 
   /// Which write failed, and what to say about it.
@@ -14,13 +14,13 @@ struct WriteFailureNotice: View {
   let acknowledge: () -> Void
 
   var body: some View {
-    HStack(alignment: .center, spacing: Spacing.xSmall.rawValue) {
+    HStack(alignment: .center, spacing: Spacing.xSmall.points()) {
       Image(systemName: "exclamationmark.triangle.fill")
         .textRole(.supporting)
         .foregroundStyle(ColorRole.failure)
         .accessibilityHidden(true)
 
-      Text(failure.message)
+      Text(failure.message())
         .textRole(.supporting)
         .foregroundStyle(ColorRole.label)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -30,7 +30,7 @@ struct WriteFailureNotice: View {
       }
     }
     .onAppear {
-      AccessibilityNotification.Announcement(failure.message).post()
+      AccessibilityNotification.Announcement(failure.message()).post()
     }
   }
 }

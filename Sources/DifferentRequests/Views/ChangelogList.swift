@@ -9,7 +9,7 @@ struct ChangelogList: View {
 
   var body: some View {
     List {
-      ForEach(hub.changelog.read.held, id: \.id) { entry in
+      ForEach(hub.changelog.changelog.entries, id: \.id) { entry in
         Section {
           ChangelogEntryHeader(entry: entry)
 
@@ -28,14 +28,16 @@ struct ChangelogList: View {
         }
       }
 
-      if hub.changelog.page.isDone == false {
+      if hub.changelog.page.isDone() == false {
         Section {
           NextPageRow(
-            state: hub.changelog.page,
-            failureMessage: String(
-              localized: "Couldn't load more of What's New.",
-              bundle: .module,
-              comment: "Row at the end of the What's New list when the next page failed to load"
+            content: NextPageRowContent(
+              page: hub.changelog.page,
+              failureMessage: String(
+                localized: "Couldn't load more of What's New.",
+                bundle: .module,
+                comment: "Row at the end of the What's New list when the next page failed to load"
+              )
             )
           ) {
             await hub.changelog.loadMore()

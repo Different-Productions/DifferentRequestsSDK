@@ -16,12 +16,12 @@ struct RequestActions: View {
   @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
   var body: some View {
-    VStack(alignment: .leading, spacing: Spacing.small.rawValue) {
-      if hub.whoIsHere.somebodyIsHere, dynamicTypeSize.isAccessibilitySize {
+    VStack(alignment: .leading, spacing: Spacing.small.points()) {
+      if hub.whoIsHere.somebodyIsHere(), dynamicTypeSize.isAccessibilitySize {
         VoteButton(store: store, request: request)
         FollowButton(store: store, request: request)
-      } else if hub.whoIsHere.somebodyIsHere {
-        HStack(spacing: Spacing.small.rawValue) {
+      } else if hub.whoIsHere.somebodyIsHere() {
+        HStack(spacing: Spacing.small.points()) {
           VoteButton(store: store, request: request)
           FollowButton(store: store, request: request)
         }
@@ -31,7 +31,7 @@ struct RequestActions: View {
           .foregroundStyle(ColorRole.secondaryLabel)
       }
 
-      if hub.firstVoteNote.requestID == request.id {
+      if hub.firstVoteNote.isSaid(on: request.id) {
         Text(
           "You'll get an update in Inbox when this request changes.",
           bundle: .module,
@@ -41,7 +41,7 @@ struct RequestActions: View {
         .foregroundStyle(ColorRole.secondaryLabel)
       }
 
-      if let failure = store.write.failure {
+      if let failure = store.write.failure() {
         WriteFailureNotice(failure: failure) {
           store.acknowledgeWriteFailure()
         }

@@ -11,7 +11,7 @@ struct CommentByline: View {
 
   var body: some View {
     if dynamicTypeSize.isAccessibilitySize {
-      VStack(alignment: .leading, spacing: Spacing.xxSmall.rawValue) {
+      VStack(alignment: .leading, spacing: Spacing.xxSmall.points()) {
         CommentAuthor(comment: comment)
           .textRole(.supporting)
           .fontWeight(.semibold)
@@ -20,13 +20,13 @@ struct CommentByline: View {
         CommentAge(comment: comment)
       }
     } else {
-      HStack(alignment: .firstTextBaseline, spacing: Spacing.xSmall.rawValue) {
+      HStack(alignment: .firstTextBaseline, spacing: Spacing.xSmall.points()) {
         CommentAuthor(comment: comment)
           .textRole(.supporting)
           .fontWeight(.semibold)
           .foregroundStyle(ColorRole.label)
         CommentTeamMark(comment: comment)
-        Spacer(minLength: Spacing.xSmall.rawValue)
+        Spacer(minLength: Spacing.xSmall.points())
         CommentAge(comment: comment)
       }
     }

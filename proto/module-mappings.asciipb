@@ -1,0 +1,10 @@
+# Read by protoc-gen-swift through scripts/generate.sh.
+#
+# The contract's messages are generated into DifferentRequestsProtos, never into this target. An
+# SDK message holding one imports that module.
+mapping {
+  module_name: "DifferentRequestsProtos"
+  proto_file_path: "differentrequests_sdk.proto"
+  proto_file_path: "differentrequests_domain.proto"
+  proto_file_path: "differentrequests_options.proto"
+}

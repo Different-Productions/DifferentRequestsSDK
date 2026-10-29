@@ -13,7 +13,7 @@ struct RequestStateNote: View {
   var body: some View {
     switch request.state {
     case .declined(let decline):
-      VStack(alignment: .leading, spacing: Spacing.xxSmall.rawValue) {
+      VStack(alignment: .leading, spacing: Spacing.xxSmall.points()) {
         if decline.reason.label.isEmpty == false {
           Text(decline.reason.label)
             .fontWeight(.semibold)

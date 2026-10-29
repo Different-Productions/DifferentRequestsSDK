@@ -3,6 +3,191 @@
 Every released version, newest first. Versions are tags on the public repository,
 `Different-Productions/DifferentRequestsSDK`.
 
+## 0.16.0 — 2026-10-29
+
+`DifferentRequestsError`, `EmptyBoard`, `NotificationPermission`, `SecureBaseURL` and `LastCall`
+are generated from one `.proto`, like every type on the wire, so the SDK, the server and the
+dashboard hold one shape for each. The board's color and font come from the dashboard alone.
+
+**Eleven source changes to make.**
+
+1. `NotificationPermission.askedBySDK` is now `.askedBySdk`. `.askedByApp` is unchanged.
+
+   ```swift
+   // Before
+   notificationPermission: .askedBySDK
+   // After
+   notificationPermission: .askedBySdk
+   ```
+
+2. `EmptyBoard.standard` is gone. Pass `EmptyBoard()` for the SDK's own words: a field left empty
+   is already filled from them. `EmptyBoard(symbol:title:message:button:)` is unchanged.
+
+   ```swift
+   // Before
+   emptyBoard: .standard
+   // After
+   emptyBoard: EmptyBoard()
+   ```
+
+3. `DifferentRequestsError` is a message, not an enum. Switch on its `reason`, a
+   `DifferentRequestsFault` whose cases have the old cases' names. The server's answer is on
+   `apiError`. What the other cases carried — the rpc, the URL, the byte count, the underlying
+   error — is in `message`, word for word what `localizedDescription` said before.
+
+   ```swift
+   // Before
+   catch let error as DifferentRequestsError {
+     switch error {
+     case .api(let refusal):
+       logger.error("Refused: \(refusal.message)")
+     case .networkError:
+       logger.error("Could not be reached")
+     default:
+       logger.error("\(error.localizedDescription)")
+     }
+   }
+   // After
+   catch let error as DifferentRequestsError {
+     switch error.reason {
+     case .api:
+       logger.error("Refused: \(error.apiError.message)")
+     case .networkError:
+       logger.error("Could not be reached")
+     case .unspecified, .notAuthenticated, .unreadableError, .decodingFailed, .incompleteResponse,
+       .canceled, .notAnHTTPResponse, .invalidBaseURL, .unspellableMethod, .UNRECOGNIZED:
+       logger.error("\(error.message)")
+     }
+   }
+   ```
+
+4. `isNotFound` and `retryAfterSeconds` are methods, and `isARefusalOfWhatWasWritten` is
+   `isRefusal()`.
+
+   ```swift
+   // Before
+   if error.isNotFound { … }
+   if error.isARefusalOfWhatWasWritten { … }
+   if let wait = error.retryAfterSeconds { … }
+   // After
+   if error.isNotFound() { … }
+   if error.isRefusal() { … }
+   if let wait = error.retryAfterSeconds() { … }
+   ```
+
+5. `Appearance` is gone, and `DifferentRequestsHub` no longer takes an `appearance:` argument.
+   Delete it, and set the color and the font on the dashboard's Appearance page. They reach every
+   user the next time Requests opens, with no app update. Until the config loads, and on a plan
+   without Appearance, the SDK draws the system color and the system's default font.
+
+   ```swift
+   // Before
+   DifferentRequestsHub(
+     client: client,
+     appearance: Appearance(accent: .purple, font: .rounded),
+     emptyBoard: EmptyBoard(),
+     notificationPermission: .askedBySdk
+   )
+   // After
+   DifferentRequestsHub(
+     client: client,
+     emptyBoard: EmptyBoard(),
+     notificationPermission: .askedBySdk
+   )
+   ```
+
+6. `SecureBaseURL.production` is `SecureBaseURL(service: .production)`, and
+   `DifferentRequestsClient.productionBaseURL` is gone. `SecureBaseURL(_:)` and
+   `SecureBaseURL(literal:)` are unchanged.
+
+   ```swift
+   // Before
+   DifferentRequestsClient(appKey: "your-app-key", baseURL: .production)
+   // After
+   DifferentRequestsClient(appKey: "your-app-key", baseURL: SecureBaseURL(service: .production))
+   ```
+
+7. `SecureBaseURL.url` is the address as a `String`, not a `URL`.
+
+   ```swift
+   // Before
+   let host = baseURL.url.host()
+   // After
+   let host = URL(string: baseURL.url)?.host()
+   ```
+
+8. `LastCall` is a message, not an enum. A client that has never called has no `at`. Otherwise
+   `method` and `route` name the rpc by its verb and path template, `status` is the HTTP status
+   (zero when no HTTP answer came back), `failure` is the `DifferentRequestsError` the call threw,
+   and `at` is when it ended. `describeIntegration()` still prints all of it on one line.
+
+   ```swift
+   // Before
+   switch await client.lastCall {
+   case .none:
+     logger.info("Never called")
+   case .made(let rpc, let outcome, let at):
+     logger.info("\(rpc) \(outcome) at \(at)")
+   }
+   // After
+   let call = await client.lastCall
+   if call.hasAt == false {
+     logger.info("Never called")
+   } else if call.hasFailure {
+     logger.info("\(call.route) \(call.status) \(call.failure.message) at \(call.at.date)")
+   } else {
+     logger.info("\(call.route) \(call.status) at \(call.at.date)")
+   }
+   ```
+
+9. `VoteControl` takes a `VoteTile` in place of `voteCount:`, `voted:` and `isWriting:`. Build
+   one from the request with `VoteTile(request:writing:)`, or set its `voteCount`, `voted` and
+   `writing` yourself. What the control's `voteCount`, `voted` and `isWriting` said is on its
+   `tile`.
+
+   ```swift
+   // Before
+   VoteControl(voteCount: Int(request.voteCount), voted: request.viewer.voted, isWriting: writing) {
+     await vote()
+   }
+   // After
+   VoteControl(tile: VoteTile(request: request, writing: writing)) {
+     await vote()
+   }
+   ```
+
+10. `RoadmapView` and `ChangelogView` take `requestsPresentation:`, a binding to a
+    `RequestsPresentation`, in place of `isShowingRequests:`, a binding to a `Bool`. See requests
+    sets its `showing`. `init(hub:)` is unchanged.
+
+    ```swift
+    // Before
+    @State private var isShowingRequests = false
+    RoadmapView(hub: requests, isShowingRequests: $isShowingRequests)
+    // After
+    @State private var requestsPresentation = RequestsPresentation()
+    RoadmapView(hub: requests, requestsPresentation: $requestsPresentation)
+    ```
+
+11. `heardThatARequestChanged(requestID:)` is `async`: it also reads the inbox and its unread
+    count. Await it from your notification delegate.
+
+    ```swift
+    // Before
+    requests.heardThatARequestChanged(requestID: requestID)
+    // After
+    await requests.heardThatARequestChanged(requestID: requestID)
+    ```
+
+- A request's own screen, already open, reads again the moment a push about it lands, and
+  Requests reads again when a request on it changed after its rows were read.
+- `unreadCount()` on the hub is the count the Inbox tab draws. Draw your own inbox badge from it
+  instead of calling the client's `unreadCount()`, so the two never disagree. `loadInbox()` reads
+  it, for a badge drawn before the Inbox is opened.
+- A call that was called off before it answered throws `.canceled`. It used to throw
+  `.networkError`, with Apple's cancellation inside it.
+- `errorDescription` and `localizedDescription` say exactly what they said before.
+
 ## 0.15.1 — 2026-10-26
 
 No source changes to make.

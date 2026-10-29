@@ -32,22 +32,18 @@ final class InboxStore {
 
   // MARK: - State
 
-  /// The inbox itself: where its read got to, and the notifications it found.
-  var read: ReadState<[DRNotification]> = .unread
+  /// The notifications the inbox's reads found, newest first, how many the server counts unread,
+  /// and where the next page starts.
+  var inbox = InboxState()
+
+  /// Where the inbox's read has got to.
+  var status = ReadStatus()
 
   /// Whether there is another page, and what became of the last attempt at one.
-  var page: PageState = .more
+  var page = PageState()
 
   /// What the last read stamp is doing, or what it did instead.
-  var write: WriteState = .idle
-
-  /// How many are unread, as the server counts them.
-  var unreadCount: Int = 0
-
-  // MARK: - Private state
-
-  /// The opaque continuation the previous page handed back.
-  private var cursor: String = ""
+  var write = WriteState()
 
   // MARK: - Init
 
@@ -70,31 +66,44 @@ final class InboxStore {
 
   /// Reads the first page and the unread count, replacing everything held.
   ///
-  /// Returns immediately when a read is already running. What is held stays on screen for the
-  /// length of the read: a pull-to-refresh runs on the list's own task, and a list cleared at the
-  /// start of a read would take that task with it.
+  /// A read asked for while one is running is not started twice: the running read reads again when
+  /// it lands, because it may have been sent before the update that prompted the ask. What is held
+  /// stays on screen for the length of the read: a pull-to-refresh runs on the list's own task, and
+  /// a list cleared at the start of a read would take that task with it.
   ///
   /// Both calls are one read. A page that arrives beside a count that did not is an inbox
   /// rendering a badge nobody vouches for, and the toolbar's Read All appears and disappears on
   /// that badge — so either both answered or the read failed.
   func load() async {
-    if read.isReading == false {
-      read = read.whileReading
-      cursor = ""
-      page = .more
+    if status.isReading() {
+      inbox.askedAgain = true
+    } else {
+      repeat {
+        inbox.askedAgain = false
+        await readFirstPage()
+      } while inbox.askedAgain
+    }
+  }
 
-      do {
-        let answer = try await client.notifications(cursor: nil)
-        let counted = try await client.unreadCount()
-        unreadCount = Int(counted.unreadCount)
-        read = ReadState(page: answer.notifications)
-        cursor = answer.nextCursor
-        page = PageState(nextCursor: answer.nextCursor)
-        record(answer.notifications)
-      } catch {
-        read = ReadState(readFailure: error)
-        page = .done
-      }
+  /// Reads page one and the unread count, and replaces the inbox with them.
+  private func readFirstPage() async {
+    status.state = .reading(Reading())
+    inbox.cursor = ""
+    page = PageState()
+
+    do {
+      let answer = try await client.notifications(cursor: inbox.cursor)
+      let counted = try await client.unreadCount()
+      inbox.unreadCount = counted.unreadCount
+      inbox.notifications = answer.notifications
+      status.state = .loaded(ReadAnswered())
+      inbox.cursor = answer.nextCursor
+      page = PageState(nextCursor: answer.nextCursor)
+      record(answer.notifications)
+    } catch {
+      inbox.notifications = []
+      status = ReadStatus(readFailure: error)
+      page.state = .done(NoMorePages())
     }
   }
 
@@ -103,18 +112,19 @@ final class InboxStore {
   /// Returns immediately when the server reported no further page, when one is already in flight,
   /// or when the whole inbox is being re-read.
   func loadMore() async {
-    if page.isReading == false, page.isDone == false, read.isReading == false {
-      page = .reading
+    if page.isReading() == false, page.isDone() == false, status.isReading() == false {
+      page.state = .reading(Reading())
 
       do {
-        let answer = try await client.notifications(cursor: cursor)
-        read = read.appending(answer.notifications)
-        cursor = answer.nextCursor
+        let answer = try await client.notifications(cursor: inbox.cursor)
+        inbox.notifications.append(contentsOf: answer.notifications)
+        status.state = .loaded(ReadAnswered())
+        inbox.cursor = answer.nextCursor
         page = PageState(nextCursor: answer.nextCursor)
         record(answer.notifications)
       } catch {
         // The cursor is left where it was, so the retry asks for this page rather than skipping it.
-        page = .failed(error)
+        page.state = .failed(ReadTrouble(error: error))
       }
     }
   }
@@ -128,19 +138,23 @@ final class InboxStore {
   /// suspension would then address a different row or none at all. A row that is gone is not an
   /// error — it was read, which is what was asked for.
   func markRead(notificationID: String) async {
-    if write.isWriting == false, let current = read.held.first(where: { $0.id == notificationID }) {
+    let matchingNotification = inbox.notifications.first { notification in
+      notification.id == notificationID
+    }
+    if write.isWriting() == false, let current = matchingNotification {
       let wasUnread = current.hasReadAt == false
-      write = .writing(.markRead)
+      write.state = .writing(.markRead)
 
       do {
         let written = try await client.markRead(notificationID: notificationID).notification
-        read = read.replacing(written, identifiedBy: { $0.id })
+        inbox.notifications = inbox.notifications.replacingRow(written, identifiedBy: \.id)
+        status = status.afterWrite()
         if wasUnread, written.hasReadAt {
-          unreadCount = max(unreadCount - 1, 0)
+          inbox.unreadCount = max(inbox.unreadCount - 1, 0)
         }
-        write = .idle
+        write = WriteState()
       } catch {
-        write = .failed(WriteFailure(attempt: .markRead, error: error))
+        write.state = .failed(WriteFailure(attempt: .markRead, error: error))
       }
     }
   }
@@ -151,17 +165,17 @@ final class InboxStore {
   /// the rows themselves, and each of those rows now carries a read stamp the inbox renders — as
   /// does the badge. Nothing marked means nothing changed, so there is nothing to re-read.
   func markAllRead() async {
-    if write.isWriting == false {
-      write = .writing(.markEverythingRead)
+    if write.isWriting() == false {
+      write.state = .writing(.markEverythingRead)
 
       do {
         let marked = try await client.markAllRead().markedCount
-        write = .idle
+        write = WriteState()
         if marked > 0 {
           await load()
         }
       } catch {
-        write = .failed(WriteFailure(attempt: .markEverythingRead, error: error))
+        write.state = .failed(WriteFailure(attempt: .markEverythingRead, error: error))
       }
     }
   }
@@ -171,6 +185,6 @@ final class InboxStore {
   /// Acknowledgement, not repair: nothing was marked, and the dot that marks it is on screen
   /// either way.
   func acknowledgeWriteFailure() {
-    write = .idle
+    write = WriteState()
   }
 }

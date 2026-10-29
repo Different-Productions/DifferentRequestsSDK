@@ -21,10 +21,11 @@ extension DifferentRequestsClient {
   ///
   /// which is the single most useful line on the list.
   public func describeIntegration() -> String {
+    let build = SDKClient(process: .processInfo)
     var lines = [
-      "DifferentRequests \(SDKClient.version) (\(SDKClient.header))",
-      "  base URL     \(baseURL.absoluteString)",
-      "  app key      \(elidedKey)"
+      "DifferentRequests \(build.version) (\(build.header()))",
+      "  base URL     \(baseURL.url)",
+      "  app key      \(elidedKey())"
     ]
 
     if let app = configuration?.config.app {
@@ -48,13 +49,13 @@ extension DifferentRequestsClient {
       lines.append("  signed in    nobody — call createSession, or asking and voting are hidden")
     }
 
-    lines.append("  last call    \(lastCallLine)")
+    lines.append("  last call    \(lastCallLine())")
     return lines.joined(separator: "\n")
   }
 
   /// The tail of the key and nothing else. Enough to match against the one in a binary, useless to
   /// anybody who reads it over a shoulder or in a pasted support email.
-  private var elidedKey: String {
+  private func elidedKey() -> String {
     let tail = appKey.suffix(4)
     return tail.isEmpty ? "(empty)" : "…\(tail)"
   }
@@ -71,12 +72,23 @@ extension DifferentRequestsClient {
     return surfaces.joined(separator: ", ")
   }
 
-  private var lastCallLine: String {
-    switch lastCall {
-    case .none:
+  /// The last call as one line: its verb and route, then its status, then why it failed if it did.
+  private func lastCallLine() -> String {
+    guard lastCall.hasAt else {
       return "none yet — this app has never reached the server"
-    case .made(let rpc, let outcome, let at):
-      return "\(rpc) → \(outcome)  (\(at.formatted(.iso8601)))"
     }
+    let answered = "\(routeKey()) answered \(lastCall.status)  (\(lastCall.at.date.formatted(.iso8601)))"
+    guard lastCall.hasFailure else {
+      return answered
+    }
+    return "\(answered): \(lastCall.failure.message)"
+  }
+
+  /// The last call's verb and path template, `GET /v1/requests/{requestId}`.
+  private func routeKey() -> String {
+    guard let verb = lastCall.method.token else {
+      return lastCall.route
+    }
+    return "\(verb) \(lastCall.route)"
   }
 }

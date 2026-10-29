@@ -1,3 +1,4 @@
+import DifferentRequestsProtos
 import SwiftUI
 
 /// What sits where the comment field would be in an app that takes no comments: the same words the
@@ -5,15 +6,17 @@ import SwiftUI
 struct CommentsOff: View {
 
   var body: some View {
-    VStack(alignment: .leading, spacing: Spacing.xxSmall.rawValue) {
-      Label(PlanSurface.comments.absentTitle, systemImage: PlanSurface.comments.absentSymbol)
-        .textRole(.supporting)
-        .foregroundStyle(ColorRole.label)
+    if let absence = DRPlanSurface.comments.absence() {
+      VStack(alignment: .leading, spacing: Spacing.xxSmall.points()) {
+        Label(absence.title, systemImage: absence.symbol)
+          .textRole(.supporting)
+          .foregroundStyle(ColorRole.label)
 
-      Text(PlanSurface.comments.absentDescription)
-        .textRole(.meta)
-        .foregroundStyle(ColorRole.secondaryLabel)
+        Text(absence.message)
+          .textRole(.meta)
+          .foregroundStyle(ColorRole.secondaryLabel)
+      }
+      .frame(maxWidth: .infinity, alignment: .leading)
     }
-    .frame(maxWidth: .infinity, alignment: .leading)
   }
 }

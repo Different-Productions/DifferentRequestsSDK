@@ -15,18 +15,18 @@ struct InboxRow: View {
 
   var body: some View {
     NavigationLink {
-      RequestDetailView(hub: hub, requestID: notification.destinationID)
+      RequestDetailView(hub: hub, requestID: notification.destinationID())
         .task {
           if notification.hasReadAt == false {
             await hub.inbox.markRead(notificationID: notification.id)
           }
         }
     } label: {
-      HStack(alignment: .firstTextBaseline, spacing: Spacing.xSmall.rawValue) {
-        UnreadDot(isUnread: notification.hasReadAt == false)
+      HStack(alignment: .firstTextBaseline, spacing: Spacing.xSmall.points()) {
+        UnreadDot(notification: notification)
 
-        VStack(alignment: .leading, spacing: Spacing.xxSmall.rawValue) {
-          Text(notification.headline)
+        VStack(alignment: .leading, spacing: Spacing.xxSmall.points()) {
+          Text(notification.headline())
             .textRole(notification.hasReadAt ? .reading : .rowTitle)
             .foregroundStyle(ColorRole.label)
 

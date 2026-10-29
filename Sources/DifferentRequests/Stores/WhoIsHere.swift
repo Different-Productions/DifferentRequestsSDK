@@ -22,7 +22,7 @@ final class WhoIsHere {
 
   /// Who the host app signed in, or nobody. Absent until the first read, which is also nobody as
   /// far as any screen is concerned — there is no third state worth drawing.
-  private(set) var person: DREndUser?
+  private(set) var signedIn = WhoIsHereState()
 
   /// - Parameter client: The client holding the session, if there is one.
   init(client: DifferentRequestsClient) {
@@ -30,8 +30,8 @@ final class WhoIsHere {
   }
 
   /// Whether a control that acts for a person is worth offering.
-  var somebodyIsHere: Bool {
-    person != nil
+  func somebodyIsHere() -> Bool {
+    signedIn.hasPerson
   }
 
   /// Reads who the client is holding.
@@ -39,6 +39,10 @@ final class WhoIsHere {
   /// Called by a screen when it appears, because a host app may sign somebody in after the first
   /// screen is already drawn — at launch, or when its own sign-in finishes.
   func read() async {
-    person = await client.currentUser
+    if let person = await client.currentUser {
+      signedIn.person = person
+    } else {
+      signedIn.clearPerson()
+    }
   }
 }

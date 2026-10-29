@@ -14,7 +14,7 @@ struct ChangelogAnswerRow: View {
     NavigationLink {
       RequestDetailView(hub: hub, requestID: answer.requestID)
     } label: {
-      HStack(alignment: .firstTextBaseline, spacing: Spacing.small.rawValue) {
+      HStack(alignment: .firstTextBaseline, spacing: Spacing.small.points()) {
         Image(systemName: "checkmark.circle.fill")
           .accessibilityHidden(true)
         Text(answer.title)

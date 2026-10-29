@@ -80,18 +80,18 @@ DifferentRequestsView ............................... Views/DifferentRequestsVie
   ├─ .task { await hub.appConfig.load() }
   │    │
   │    └─ AppConfigStore.load() ...................... Stores/AppConfigStore.swift
-  │         ├─ badge.needsReading == false → return   ← answered already, or reading
+  │         ├─ badge.needsReading() == false → return   ← answered already, or reading
   │         ├─ badge = .reading
   │         ├─ try await client.config()
   │         │    └─ throws → badge = .failed(error)   ← draws nothing, retryable
   │         ├─ config = answer.config                 ← also decides which surfaces are reachable
-  │         └─ badge = BadgeState(response:) ......... State/BadgeState.swift
+  │         └─ badge = BadgeState(response:) ......... State/BadgeState+Config.swift
   │              └─ config.badgeRemoved ? .bought : .carried
   │
   └─ RequestsScreen → RequestsContent → RequestsList .. Views/RequestsList.swift
        │
-       └─ appConfig.badge.isCarried == false → no section at all
-          appConfig.badge.isCarried == true  → Section { PoweredByRow } .. Views/PoweredByRow.swift
+       └─ appConfig.badge.isCarried() == false → no section at all
+          appConfig.badge.isCarried() == true → Section { PoweredByRow } .. Views/PoweredByRow.swift
             ├─ label: the words, footnote; the list draws the chevron
             └─ tap → push
                  └─ PoweredByPage(appConfig:) ................... Views/PoweredByPage.swift

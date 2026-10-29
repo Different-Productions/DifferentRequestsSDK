@@ -17,15 +17,25 @@ import UserNotifications
 final class RemoteNotificationDelegate: NSObject, UNUserNotificationCenterDelegate {
 
   /// Everything this app reads and writes through. Built here and nowhere else.
-  let session = Session(
-    hub: DifferentRequestsHub(
-      client: DifferentRequestsClient(appKey: DemoConfig.appKey, baseURL: DemoConfig.baseURL),
-      appearance: DemoConfig.appearance,
-      emptyBoard: DemoConfig.emptyBoard,
-      notificationPermission: .askedBySDK
-    ),
-    backend: DemoBackend(signingSecret: DemoConfig.signingSecret)
-  )
+  let session: Session
+
+  /// Reads the environment once, then builds the client, the hub and the session from what it said.
+  ///
+  /// The signing secret goes straight to the backend that holds it and into nothing else.
+  override init() {
+    let environment = ProcessInfo.processInfo.environment
+    let settings = DemoSettings(environment: environment)
+    session = Session(
+      hub: DifferentRequestsHub(
+        client: DifferentRequestsClient(appKey: settings.appKey, baseURL: settings.baseURL),
+        emptyBoard: settings.emptyBoard,
+        notificationPermission: .askedBySdk
+      ),
+      backend: DemoBackend(signingSecret: DemoVariable.signingSecret.setting(in: environment)),
+      settings: settings
+    )
+    super.init()
+  }
 
   /// Where the server puts the request id. Its own key beside `aps`, because `aps` belongs to Apple
   /// and everything else in the payload belongs to the app.
@@ -55,7 +65,7 @@ final class RemoteNotificationDelegate: NSObject, UNUserNotificationCenterDelega
     _ center: UNUserNotificationCenter,
     willPresent notification: UNNotification
   ) async -> UNNotificationPresentationOptions {
-    await session.refreshUnreadCount()
+    await heardAbout(notification)
     return [.banner, .list, .sound]
   }
 
@@ -67,10 +77,15 @@ final class RemoteNotificationDelegate: NSObject, UNUserNotificationCenterDelega
     _ center: UNUserNotificationCenter,
     didReceive response: UNNotificationResponse
   ) async {
-    let payload = response.notification.request.content.userInfo
-    if let requestID = payload[Self.requestIDKey] as? String {
-      NSLog("Opened from a notification about %@", requestID)
-    }
     session.show(.inbox)
+    await heardAbout(response.notification)
+  }
+
+  /// Tells the SDK the request a push is about changed, so a screen already showing it reads again
+  /// and the inbox and its badge read the update.
+  private func heardAbout(_ notification: UNNotification) async {
+    if let requestID = notification.request.content.userInfo[Self.requestIDKey] as? String {
+      await session.hub.heardThatARequestChanged(requestID: requestID)
+    }
   }
 }

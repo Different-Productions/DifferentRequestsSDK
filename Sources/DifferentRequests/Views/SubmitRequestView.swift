@@ -16,7 +16,8 @@ import SwiftUI
 /// ```
 ///
 /// It draws its own Cancel and Send and hides the back button, because leaving with something typed
-/// asks first. What is typed belongs to the hub, so a redraw cannot take it. Once the request is
+/// asks first. On macOS they sit in a row at the top of the form. What is typed belongs to the hub,
+/// so a redraw cannot take it. Once the request is
 /// filed the form dismisses itself, and ``DifferentRequestsHub`` has re-read the board.
 public struct SubmitRequestView: View {
 
@@ -24,7 +25,7 @@ public struct SubmitRequestView: View {
   private let hub: DifferentRequestsHub
 
   /// Whether the question about discarding what was typed is up.
-  @State private var isConfirmingDiscard = false
+  @State private var submitScreen = SubmitScreenState()
 
   @Environment(\.dismiss) private var dismiss
 
@@ -43,47 +44,31 @@ public struct SubmitRequestView: View {
       .toolbarVisibility(.hidden, for: .tabBar)
       #endif
       .worn(by: hub)
+      #if os(macOS)
+      .topRow(
+        HStack(spacing: Spacing.small.points()) {
+          CancelSubmissionButton(hub: hub, submitScreen: $submitScreen)
+          Text("New Request", bundle: .module, comment: "Mac title of the form for a new feature request")
+            .textRole(.rowTitle)
+            .frame(maxWidth: .infinity)
+          SendSubmissionButton(hub: hub, submitScreen: $submitScreen)
+        }
+        .padding(Spacing.small.points())
+      )
+      .sheetBarHidden()
+      #else
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
-          Button {
-            if hub.submission.holdsDraft() {
-              isConfirmingDiscard = true
-            } else {
-              dismiss()
-            }
-          } label: {
-            Text("Cancel", bundle: .module, comment: "Button that closes the new request form without sending")
-          }
-          .tint(Color.primary)
+          CancelSubmissionButton(hub: hub, submitScreen: $submitScreen)
         }
         ToolbarItem(placement: .confirmationAction) {
-          if hub.submission.write.isWriting {
-            ProgressView()
-          } else if hub.submission.canSubmit == false {
-            // Filled only once it can be tapped: the filled style draws no unavailable look.
-            Button {
-              isConfirmingDiscard = false
-            } label: {
-              Text("Send", bundle: .module, comment: "Button that sends a new request or a comment")
-            }
-            .disabled(true)
-          } else {
-            AsyncButton {
-              await hub.fileRequest()
-              // A refused write leaves the form up with what was typed still in it.
-              if hub.submission.submitted != nil {
-                dismiss()
-              }
-            } label: {
-              Text("Send", bundle: .module, comment: "Button that sends a new request or a comment")
-            }
-            .buttonStyle(.glassProminent)
-          }
+          SendSubmissionButton(hub: hub, submitScreen: $submitScreen)
         }
       }
+      #endif
       .confirmationDialog(
         Text("Discard this request?", bundle: .module, comment: "Question when leaving the new request form with something typed"),
-        isPresented: $isConfirmingDiscard,
+        isPresented: $submitScreen.confirmingDiscard,
         titleVisibility: .visible
       ) {
         Button(role: .destructive) {
@@ -92,7 +77,7 @@ public struct SubmitRequestView: View {
           Text("Discard request", bundle: .module, comment: "Button that leaves the new request form and loses what was typed")
         }
         Button(role: .cancel) {
-          isConfirmingDiscard = false
+          submitScreen.confirmingDiscard = false
         } label: {
           Text("Keep writing", bundle: .module, comment: "Button that stays on the new request form")
         }

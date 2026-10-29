@@ -6,14 +6,14 @@ import SwiftUI
   struct SheetRootProbe: UIViewControllerRepresentable {
 
     /// Where the answer is written each time the screen appears.
-    @Binding var isSheetRoot: Bool
+    @Binding var placement: SheetPlacement
 
     func makeUIViewController(context: Context) -> SheetRootProbeController {
-      SheetRootProbeController(isSheetRoot: $isSheetRoot)
+      SheetRootProbeController(placement: $placement)
     }
 
     func updateUIViewController(_ controller: SheetRootProbeController, context: Context) {
-      controller.isSheetRoot = $isSheetRoot
+      controller.placement = $placement
     }
   }
 #elseif canImport(AppKit)
@@ -21,14 +21,14 @@ import SwiftUI
   struct SheetRootProbe: NSViewRepresentable {
 
     /// Where the answer is written each time the view joins a window.
-    @Binding var isSheetRoot: Bool
+    @Binding var placement: SheetPlacement
 
     func makeNSView(context: Context) -> SheetRootProbeView {
-      SheetRootProbeView(isSheetRoot: $isSheetRoot)
+      SheetRootProbeView(placement: $placement)
     }
 
     func updateNSView(_ view: SheetRootProbeView, context: Context) {
-      view.isSheetRoot = $isSheetRoot
+      view.placement = $placement
     }
   }
 #endif

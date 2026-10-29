@@ -3,17 +3,14 @@ import SwiftUI
 /// A status as a symbol and a word, both in the label color, so no status is told by hue.
 struct StatusMark: View {
 
-  /// The status in the phone's language.
-  let word: String
-
-  /// The SF Symbol that gives the status its shape.
-  let symbol: String
+  /// The status in the phone's language, and the SF Symbol that gives it its shape.
+  let content: StatusMarkContent
 
   var body: some View {
-    HStack(spacing: Spacing.xxSmall.rawValue) {
-      Image(systemName: symbol)
+    HStack(spacing: Spacing.xxSmall.points()) {
+      Image(systemName: content.symbol)
         .accessibilityHidden(true)
-      Text(word)
+      Text(content.word)
     }
     .textRole(.meta)
     .foregroundStyle(ColorRole.label)

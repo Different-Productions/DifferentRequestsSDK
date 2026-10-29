@@ -7,7 +7,7 @@ extension DRNotification {
   /// Only duplicate news names somewhere else, and it names it on its own arm, so a tap is never
   /// routed by a target that arrived on news that was not about a duplicate. The request it
   /// duplicates now holds the demand, so that is the one worth opening.
-  var destinationID: String {
+  func destinationID() -> String {
     switch news {
     case .requestDuplicated(let folded):
       return folded.duplicateOfRequestID
@@ -21,10 +21,10 @@ extension DRNotification {
   ///
   /// News this SDK version doesn't know still says something happened rather than drawing an empty
   /// row: the request title underneath is what the reader recognizes anyway.
-  var headline: String {
+  func headline() -> String {
     switch news {
     case .statusChanged(let moved):
-      return moved.newStatus.movedHeadline
+      return moved.newStatus.movedHeadline()
     case .commentAdded:
       return String(localized: "New comment", bundle: .module, comment: "Inbox headline: someone commented on a followed request")
     case .requestDuplicated:

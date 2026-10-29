@@ -17,7 +17,7 @@ struct RequestRow: View {
 
   var body: some View {
     if dynamicTypeSize.isAccessibilitySize {
-      VStack(alignment: .leading, spacing: Spacing.small.rawValue) {
+      VStack(alignment: .leading, spacing: Spacing.small.points()) {
         RequestVote(hub: hub, request: request)
 
         NavigationLink {
@@ -27,7 +27,7 @@ struct RequestRow: View {
         }
       }
     } else {
-      HStack(alignment: .top, spacing: Spacing.small.rawValue) {
+      HStack(alignment: .top, spacing: Spacing.small.points()) {
         RequestVote(hub: hub, request: request)
 
         NavigationLink {

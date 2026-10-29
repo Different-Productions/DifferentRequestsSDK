@@ -85,13 +85,13 @@ RoadmapContent.swift          switch store.plan, then store.read
          +-- RoadmapHeading.swift   the status word and "%lld requests"
          +-- RoadmapRow.swift       push -> RequestDetailView.swift
 
-ChangelogView.swift           View+FirstRead.swift -> Stores/ChangelogStore.swift load()
+ChangelogView.swift           .task, hasRead() == false -> Stores/ChangelogStore.swift load()
    v
 ChangelogContent.swift        switch store.plan, then store.read
    +-- excluded -> AbsentSurface.swift
    +-- empty    -> ChangelogEmpty.swift
    +-- loaded   -> ChangelogList.swift
-         +-- ChangelogEntryHeader.swift   title, "Version %@", Date+Ago.swift, notes
+         +-- ChangelogEntryHeader.swift   title, "Version %@", Timestamp+Ago.swift, notes
          +-- ChangelogAnswerRow.swift     push -> RequestDetailView.swift
          +-- NextPageRow.swift
 ```

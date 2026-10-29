@@ -1,6 +1,8 @@
 import DifferentRequestsProtos
 import Foundation
 
+/// A write the SDK cannot name is never made, so it borrows the screen's sentence for any other
+/// failure rather than carrying words of its own.
 extension WriteAttempt {
 
   /// What the person who made this write is told when it did not land.
@@ -8,7 +10,7 @@ extension WriteAttempt {
   /// Each says what did not happen and that the thing they tapped is still there to tap again,
   /// because in every one of these cases it is: the control is on screen, the draft is still in
   /// the field, and nothing has been thrown away.
-  var failureMessage: String {
+  func failureMessage() -> String {
     switch self {
     case .vote:
       return String(
@@ -58,25 +60,13 @@ extension WriteAttempt {
         bundle: .module,
         comment: "A new request failed to send; Send is the button's name"
       )
+    case .unspecified, .UNRECOGNIZED:
+      return ReadTrouble().message()
     }
   }
 
-  /// What the person is told when the server refused what they wrote, saying why, because the
-  /// same write refused once is refused every time and "try it again" would be a loop.
-  func refusedMessage(_ refusal: WriteRefusal) -> String {
-    switch refusal {
-    case .gone:
-      return goneMessage
-    case .notAllowed:
-      return notAllowedMessage
-    case .field(let field):
-      return fieldMessage(field)
-    case .other:
-      return otherRefusalMessage
-    }
-  }
-
-  private var goneMessage: String {
+  /// What the person is told when what the write was about is no longer there.
+  func goneMessage() -> String {
     switch self {
     case .vote, .clearVote, .follow, .unfollow, .comment:
       return String(
@@ -102,10 +92,13 @@ extension WriteAttempt {
         bundle: .module,
         comment: "The server refused a new request"
       )
+    case .unspecified, .UNRECOGNIZED:
+      return ReadTrouble().message()
     }
   }
 
-  private var notAllowedMessage: String {
+  /// What the person is told when this app is not letting their account make the write.
+  func notAllowedMessage() -> String {
     switch self {
     case .vote, .clearVote:
       return String(
@@ -137,12 +130,14 @@ extension WriteAttempt {
         bundle: .module,
         comment: "The app's settings block this account from sending requests"
       )
+    case .unspecified, .UNRECOGNIZED:
+      return ReadTrouble().message()
     }
   }
 
-  /// The field is named as the schema spells it; the server blames one only when it was empty or
-  /// longer than its limit.
-  private func fieldMessage(_ field: String) -> String {
+  /// What the person is told when the server refused one field, named as the schema spells it; it
+  /// blames one only when it was empty or longer than its limit.
+  func fieldMessage(_ field: String) -> String {
     switch self {
     case .comment:
       return String(
@@ -165,13 +160,15 @@ extension WriteAttempt {
           comment: "The server refused a new request's detail; Send is the button's name"
         )
       }
-      return otherRefusalMessage
-    case .vote, .clearVote, .follow, .unfollow, .markRead, .markEverythingRead:
-      return otherRefusalMessage
+      return otherRefusalMessage()
+    case .vote, .clearVote, .follow, .unfollow, .markRead, .markEverythingRead, .unspecified, .UNRECOGNIZED:
+      return otherRefusalMessage()
     }
   }
 
-  private var otherRefusalMessage: String {
+  /// What the person is told when the server refused the write for a reason they cannot change by
+  /// editing or waiting.
+  func otherRefusalMessage() -> String {
     switch self {
     case .vote:
       return String(
@@ -221,6 +218,8 @@ extension WriteAttempt {
         bundle: .module,
         comment: "The server refused a new request"
       )
+    case .unspecified, .UNRECOGNIZED:
+      return ReadTrouble().message()
     }
   }
 }

@@ -25,30 +25,29 @@ public struct InboxView: View {
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .groupedBackground()
       .navigationTitle(Text("Inbox", bundle: .module, comment: "Tab and title of the screen listing updates on requests"))
+      #if os(macOS)
+      .topRow(
+        HStack {
+          Spacer()
+          MarkAllReadButton(hub: hub)
+        }
+        .padding(Spacing.small.points())
+      )
+      #else
+      .toolbar {
+        ToolbarItem(placement: .primaryAction) {
+          MarkAllReadButton(hub: hub)
+        }
+      }
+      #endif
       .worn(by: hub)
       .sheetCloseButton()
       .sheetMinimumSize()
-      .toolbar {
-        if hub.inbox.unreadCount > 0 {
-          ToolbarItem(placement: .primaryAction) {
-            AsyncButton {
-              await hub.inbox.markAllRead()
-            } label: {
-              Text("Mark all as read", bundle: .module, comment: "Button that marks every inbox update read")
-            }
-            .tint(Color.primary)
-            .disabled(hub.inbox.write.isWriting)
-          }
-        }
-      }
       .task {
         // Every appearance: an inbox is what changed while somebody was elsewhere, so coming back
-        // to it is when it is out of date. A read already in flight is not started twice.
+        // to it is when it is out of date. A read in flight reads again when it lands instead.
         await hub.appConfig.load()
-        await hub.whoIsHere.read()
-        if hub.whoIsHere.somebodyIsHere {
-          await hub.inbox.load()
-        }
+        await hub.loadInbox()
       }
   }
 }

@@ -29,7 +29,7 @@ struct DemoBackend {
       using: SymmetricKey(data: Data(signingSecret.utf8))
     )
     return DRIdentityProof(
-      signature: Data(signature).urlSafeBase64String,
+      signature: Data(signature).urlSafeBase64String(),
       expiresAt: Date(timeIntervalSince1970: TimeInterval(expiresAt))
     )
   }

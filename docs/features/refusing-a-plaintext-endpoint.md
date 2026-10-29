@@ -11,18 +11,20 @@ wrong. **It works, which is the problem.**
 The built-in production URL is `https`, so this only ever fires on an address a developer supplied
 themselves: a staging endpoint, a local server, or a typo.
 
-**Refused where it is written, not where it is dialed.** `SecureBaseURL` is a type rather than a
-check inside the client, so the failure lands on the line that wrote the URL and names it. A check
-on the first call would report a broken request instead of a wrong address, and by then a key has
-already been sent.
+**Refused where it is written, and again where it is dialed.** `SecureBaseURL` is a generated
+message whose initializers refuse anything but `https`, rather than a check inside the client, so
+the failure lands on the line that wrote the URL and names it. A check on the first call alone would
+report a broken request instead of a wrong address. The client still reads the address back through
+the same check each time it dials, so a value whose `url` was set by hand is refused before anything
+leaves the device.
 
 ## Surfaces
 
 | Surface | Ships this? |
 |---|---|
 | `DifferentRequestsClient` | **Yes** — `init(appKey:baseURL:)` takes `SecureBaseURL` |
-| `SecureBaseURL` | **Yes** — `init(_:) throws`, and `.production` |
-| `.production` | **Non-throwing.** Production is known `https`, so it is built through the trusted path and cannot fail |
+| `SecureBaseURL` | **Yes** — a generated message: `init(_:) throws`, `init(literal:)` and `init(service:)` |
+| `SecureBaseURL(service: .production)` | **Non-throwing.** Production is a known `https` literal, so it cannot fail |
 | The example app | Reads `DIFFERENT_REQUESTS_BASE_URL` and refuses a non-https one loudly |
 | The server | **None.** This is a client-side refusal; the server never sees the call it prevents |
 
@@ -31,7 +33,7 @@ already been sent.
 **The ordinary case needs no `try`.**
 
 ```swift
-let client = DifferentRequestsClient(appKey: "dr_…", baseURL: .production)
+let client = DifferentRequestsClient(appKey: "dr_…", baseURL: SecureBaseURL(service: .production))
 ```
 
 **A staging endpoint now says so:**
@@ -45,7 +47,7 @@ let client = DifferentRequestsClient(appKey: "dr_…", baseURL: staging)
 
 ```swift
 try SecureBaseURL(URL(string: "http://localhost:8080")!)
-// throws DifferentRequestsError.invalidBaseURL(http://localhost:8080)
+// throws DifferentRequestsError(invalidBaseURL: http://localhost:8080)
 ```
 
 The error already existed for a URL this client will not use; nothing new was invented for it.
@@ -58,7 +60,7 @@ The error already existed for a URL this client will not use; nothing new was in
 
 | Given | When | Then |
 |---|---|---|
-| `.production` named | `init(appKey:baseURL:)` | Production, and no `try` at the call site |
+| `SecureBaseURL(service: .production)` named | `init(appKey:baseURL:)` | Production, and no `try` at the call site |
 | An `https` URL | `SecureBaseURL(_:)` | Wrapped, and the client dials it |
 | `HTTPS://` in capitals | `SecureBaseURL(_:)` | Accepted — the scheme is compared lowercased |
 | The example app with no `DIFFERENT_REQUESTS_BASE_URL` | It launches | Production |
@@ -71,6 +73,7 @@ The error already existed for a URL this client will not use; nothing new was in
 | `http://…` | `SecureBaseURL(_:)` | Throws `invalidBaseURL`, naming that URL. **Nothing is sent** |
 | `ftp://…`, or any other scheme | `SecureBaseURL(_:)` | Same |
 | A URL with no scheme | `SecureBaseURL(_:)` | Same |
+| A `SecureBaseURL` whose `url` was set by hand to `http://…` | Any call | `dialable()` throws `invalidBaseURL` before the request is built. **Nothing is sent** |
 | The example app with a non-https `DIFFERENT_REQUESTS_BASE_URL` | It launches | Stops, naming the variable and the value. **It does not fall back to production** — somebody who named a staging endpoint and silently got production would be reading the wrong board and believing it was theirs |
 
 ## The path
@@ -79,19 +82,24 @@ The error already existed for a URL this client will not use; nothing new was in
   developer's code
     │  try SecureBaseURL(url)
     ▼
-  SecureBaseURL.init(_:) ............................ SecureBaseURL.swift
-    ├─ url.scheme?.lowercased() != "https" ──▶ throw DifferentRequestsError.invalidBaseURL(url)
+  SecureBaseURL.init(_:) ............................ SecureBaseURL+Https.swift
+    ├─ url.scheme?.lowercased() != "https" ──▶ throw DifferentRequestsError(invalidBaseURL:)
     │                                           nothing built, nothing sent
     └─ https ─────────────────────────────────▶ SecureBaseURL
                                                      │
     ┌────────────────────────────────────────────────┘
     ▼
   DifferentRequestsClient.init(appKey:baseURL:)
-       assigns baseURL.url and nothing else — the check already happened
+       assigns baseURL and nothing else
+    │
+    ▼
+  DifferentRequestsClient.perform(_:query:body:)
+    └─ baseURL.dialable() ........................... SecureBaseURL+Https.swift
+         ├─ not an https URL ──▶ throw DifferentRequestsError(invalidBaseURL:), nothing sent
+         └─ https ────────────▶ the URL the request is built on
 
-  .production ....................................... SecureBaseURL.swift
-       built through the private trusted path from DifferentRequestsClient.productionBaseURL,
-       which is a known https literal, so passing it needs no try
+  SecureBaseURL(service: .production) ............... SecureBaseURL+Https.swift
+       init(literal:) on a known https literal, so passing it needs no try
 ```
 
 ## The screen

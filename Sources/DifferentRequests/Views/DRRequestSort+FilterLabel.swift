@@ -8,7 +8,7 @@ extension DRRequestSort {
 
   /// Says what the ranking orders by. A ranking with no URL spelling is never offered, but the
   /// switch names it so a new one is a compile error here rather than a blank item.
-  var filterLabel: String {
+  func filterLabel() -> String {
     switch self {
     case .top:
       return String(localized: "Most votes", bundle: .module, comment: "Sort menu item that ranks requests by votes")

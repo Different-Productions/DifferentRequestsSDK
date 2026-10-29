@@ -1,5 +1,6 @@
 import DifferentRequestsProtos
 import Foundation
+import SwiftProtobuf
 
 /// Backs one request's own screen: the request, its thread, and the writes that act on both.
 ///
@@ -27,9 +28,6 @@ final class RequestDetailStore {
   /// The client every call goes through.
   let client: DifferentRequestsClient
 
-  /// Which request the screen is about.
-  let requestID: String
-
   /// Offered the notification card after a vote or follow here.
   let notificationOffer: NotificationOffer
 
@@ -38,22 +36,23 @@ final class RequestDetailStore {
 
   // MARK: - State
 
-  /// When the copy this store holds arrived, so news about the request can be compared with it.
-  ///
-  /// Absent until a read lands. A copy nobody has is not stale; it is missing, which ``read``
-  /// already says.
-  private(set) var readAt: Date?
+  /// Which request, when the copy held arrived, its thread, where the next page of it starts, and
+  /// the comment being written.
+  var detail: RequestDetailState
 
-  /// The request itself: where its read got to, and what it found.
+  /// Where the request's read has got to.
   ///
-  /// `empty` is a server that says there is no such request. Someone arrives here from a
-  /// notification kept overnight or a link pasted last month, and "it is not here any more" is a
-  /// different screen from "check your connection" — one of them has a Try again on it that will
-  /// never work.
-  var read: ReadState<DRFeatureRequest> = .unread
+  /// Answered with no request in ``answer`` is a server that says there is no such request.
+  /// Someone arrives here from a notification kept overnight or a link pasted last month, and "it
+  /// is not here any more" is a different screen from "check your connection" — one of them has a
+  /// Try again on it that will never work.
+  var status = ReadStatus()
 
-  /// The thread, oldest first — the order a discussion reads in.
-  var thread: ReadState<[DRComment]> = .unread
+  /// The request as the server last answered with it. Holds no request until a read finds one.
+  var answer = DRGetRequestResponse()
+
+  /// Where the thread's read has got to.
+  var threadStatus = ReadStatus()
 
   /// Whether this app takes comments, and how far the asking got.
   ///
@@ -61,37 +60,29 @@ final class RequestDetailStore {
   /// not to moderate a discussion. The same question all the same — a composer under a thread that
   /// does not take comments is a field whose Send has one possible answer, and whether that answer
   /// is a refusal today is the server's to change without telling anyone.
-  var commenting: PlanState = .unread
+  var commenting = PlanState()
 
   /// Whether there is another page of the thread, and what became of the last attempt at one.
-  var page: PageState = .more
+  var page = PageState()
 
   /// What the last vote, follow or comment is doing, or what it did instead.
-  var write: WriteState = .idle
-
-  /// The comment being written, held here so what a reader typed survives a redraw.
-  var draft: String = ""
-
-  // MARK: - Private state
-
-  /// The opaque continuation the previous page of the thread handed back.
-  private var cursor: String = ""
+  var write = WriteState()
 
   // MARK: - Init
 
   /// - Parameters:
   ///   - client: The client the screen reads and writes through.
-  ///   - requestID: Which request the screen is about.
+  ///   - detail: Which request the screen is about, nothing about it read yet.
   ///   - notificationOffer: Offered the notification card after a vote or follow here.
   ///   - firstVoteNote: Says the one-time line after the first vote on this phone.
   init(
     client: DifferentRequestsClient,
-    requestID: String,
+    detail: RequestDetailState,
     notificationOffer: NotificationOffer,
     firstVoteNote: FirstVoteNote
   ) {
     self.client = client
-    self.requestID = requestID
+    self.detail = detail
     self.notificationOffer = notificationOffer
     self.firstVoteNote = firstVoteNote
   }
@@ -114,37 +105,50 @@ final class RequestDetailStore {
   /// finished reading. It is usually free by then — the client answers it from the first read any
   /// gated surface made.
   func load() async {
-    if read.isReading == false, thread.isReading == false {
-      read = read.whileReading
+    if status.isReading() == false, threadStatus.isReading() == false {
+      status.state = .reading(Reading())
+      // Stamped when asked, not when answered: news that lands while the read is in flight is
+      // newer than the copy it returns.
+      let sentAt = Google_Protobuf_Timestamp(date: Date())
 
       do {
-        let answer = try await client.request(id: requestID)
-        read = .loaded(answer.request)
-        readAt = Date()
+        answer = try await client.request(id: detail.requestID)
+        status.state = .loaded(ReadAnswered())
+        detail.readAt = sentAt
         await loadThread()
         await loadCommenting()
       } catch {
-        read = ReadState(readFailure: error)
-        thread = .unread
-        page = .done
+        answer = DRGetRequestResponse()
+        status = ReadStatus(readFailure: error)
+        detail.comments = []
+        threadStatus = ReadStatus()
+        page.state = .done(NoMorePages())
       }
     }
   }
 
+  /// Whether a read of the request has finished, whatever it found. A refresh over the request
+  /// already held does not make it unread again.
+  func hasRead() -> Bool {
+    status.hasRead(holdsContent: answer.hasRequest)
+  }
+
   /// Reads the first page of the discussion under a request that was just read.
   private func loadThread() async {
-    thread = thread.whileReading
-    cursor = ""
-    page = .more
+    threadStatus.state = .reading(Reading())
+    detail.cursor = ""
+    page = PageState()
 
     do {
-      let answer = try await client.comments(requestID: requestID, cursor: nil)
-      thread = ReadState(page: answer.comments)
-      cursor = answer.nextCursor
-      page = PageState(nextCursor: answer.nextCursor)
+      let thread = try await client.comments(requestID: detail.requestID, cursor: detail.cursor)
+      detail.comments = thread.comments
+      threadStatus.state = .loaded(ReadAnswered())
+      detail.cursor = thread.nextCursor
+      page = PageState(nextCursor: thread.nextCursor)
     } catch {
-      thread = ReadState(readFailure: error)
-      page = .done
+      detail.comments = []
+      threadStatus = ReadStatus(readFailure: error)
+      page.state = .done(NoMorePages())
     }
   }
 
@@ -155,14 +159,14 @@ final class RequestDetailStore {
   /// open is owed a way to ask again that does not re-read the request and the thread they are
   /// already looking at.
   func loadCommenting() async {
-    if commenting.needsReading {
-      commenting = .reading
+    if commenting.needsReading() {
+      commenting.state = .reading(Reading())
 
       do {
         let answer = try await client.config()
         commenting = PlanState(surface: .comments, response: answer)
       } catch {
-        commenting = .failed(error)
+        commenting.state = .failed(ReadTrouble(error: error))
       }
     }
   }
@@ -172,18 +176,19 @@ final class RequestDetailStore {
   /// Returns immediately when the server reported no further page, when one is already in flight,
   /// or when the screen is being re-read.
   func loadMore() async {
-    let isIdle = read.isReading == false && thread.isReading == false
-    if page.isReading == false, page.isDone == false, isIdle {
-      page = .reading
+    let isIdle = status.isReading() == false && threadStatus.isReading() == false
+    if page.isReading() == false, page.isDone() == false, isIdle {
+      page.state = .reading(Reading())
 
       do {
-        let answer = try await client.comments(requestID: requestID, cursor: cursor)
-        thread = thread.appending(answer.comments)
-        cursor = answer.nextCursor
-        page = PageState(nextCursor: answer.nextCursor)
+        let thread = try await client.comments(requestID: detail.requestID, cursor: detail.cursor)
+        detail.comments.append(contentsOf: thread.comments)
+        threadStatus.state = .loaded(ReadAnswered())
+        detail.cursor = thread.nextCursor
+        page = PageState(nextCursor: thread.nextCursor)
       } catch {
         // The cursor is left where it was, so the retry asks for this page rather than skipping it.
-        page = .failed(error)
+        page.state = .failed(ReadTrouble(error: error))
       }
     }
   }
@@ -196,74 +201,82 @@ final class RequestDetailStore {
   /// the answer to a vote is the request the write returned, not a second guess at what it should
   /// now say.
   func toggleVote() async {
-    if write.isWriting == false, let current = read.content {
+    if write.isWriting() == false, answer.hasRequest {
+      let current = answer.request
       let attempt: WriteAttempt
       if current.viewer.voted {
         attempt = .clearVote
       } else {
         attempt = .vote
       }
-      write = .writing(attempt)
+      write.state = .writing(attempt)
 
       do {
         let written: DRFeatureRequest
         if current.viewer.voted {
-          written = try await client.clearVote(requestID: requestID).request
+          written = try await client.clearVote(requestID: detail.requestID).request
         } else {
-          written = try await client.vote(requestID: requestID).request
+          written = try await client.vote(requestID: detail.requestID).request
         }
-        read = read.holding(written)
-        write = .idle
+        land(written)
+        write = WriteState()
         if written.viewer.voted {
-          firstVoteNote.voted(requestID: requestID)
-          await notificationOffer.votedOrFollowed(requestID: requestID)
+          firstVoteNote.voted(requestID: detail.requestID)
+          await notificationOffer.votedOrFollowed(requestID: detail.requestID)
         }
       } catch {
-        write = .failed(WriteFailure(attempt: attempt, error: error))
+        write.state = .failed(WriteFailure(attempt: attempt, error: error))
       }
     }
   }
 
   /// Starts or stops following, so status changes reach this reader without adding demand.
   func toggleFollow() async {
-    if write.isWriting == false, let current = read.content {
+    if write.isWriting() == false, answer.hasRequest {
+      let current = answer.request
       let attempt: WriteAttempt
       if current.viewer.isFollowing {
         attempt = .unfollow
       } else {
         attempt = .follow
       }
-      write = .writing(attempt)
+      write.state = .writing(attempt)
 
       do {
         let written: DRFeatureRequest
         if current.viewer.isFollowing {
-          written = try await client.unfollow(requestID: requestID).request
+          written = try await client.unfollow(requestID: detail.requestID).request
         } else {
-          written = try await client.follow(requestID: requestID).request
+          written = try await client.follow(requestID: detail.requestID).request
         }
-        read = read.holding(written)
-        write = .idle
+        land(written)
+        write = WriteState()
         if written.viewer.isFollowing {
-          await notificationOffer.votedOrFollowed(requestID: requestID)
+          await notificationOffer.votedOrFollowed(requestID: detail.requestID)
         }
       } catch {
-        write = .failed(WriteFailure(attempt: attempt, error: error))
+        write.state = .failed(WriteFailure(attempt: attempt, error: error))
       }
     }
   }
 
+  /// Holds `written` as the request, without clearing the mark that says a read is in flight.
+  private func land(_ written: DRFeatureRequest) {
+    answer.request = written
+    status = status.afterWrite()
+  }
+
   /// How many characters the draft has left, from the limit the contract declares. Negative once
   /// it is over.
-  var commentCharactersLeft: Int {
-    DRCreateCommentRequest.TextLimit.body - draft.count
+  func commentCharactersLeft() -> CharactersLeftContent {
+    CharactersLeftContent(limit: DRCreateCommentRequest.TextLimit.body, typed: detail.draft)
   }
 
   /// Whether the draft is worth sending. A blank or overlong comment is refused by the server, so
   /// it is refused here instead of sent.
-  var canPostComment: Bool {
-    draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
-      && commentCharactersLeft >= 0
+  func canPostComment() -> Bool {
+    detail.draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
+      && commentCharactersLeft().left >= 0
   }
 
   /// Posts the draft and clears it.
@@ -276,19 +289,20 @@ final class RequestDetailStore {
   /// A failure leaves the draft exactly as typed. The message says to send it again, and there
   /// has to be something to send.
   func postComment() async {
-    let body = draft.trimmingCharacters(in: .whitespacesAndNewlines)
-    if write.isWriting == false, body.isEmpty == false {
-      write = .writing(.comment)
+    let body = detail.draft.trimmingCharacters(in: .whitespacesAndNewlines)
+    if write.isWriting() == false, body.isEmpty == false {
+      write.state = .writing(.comment)
 
       do {
-        let written = try await client.comment(requestID: requestID, body: body)
-        draft = ""
-        if page.isDone {
-          thread = thread.appending([written.comment])
+        let written = try await client.comment(requestID: detail.requestID, body: body)
+        detail.draft = ""
+        if page.isDone() {
+          detail.comments.append(written.comment)
+          threadStatus.state = .loaded(ReadAnswered())
         }
-        write = .idle
+        write = WriteState()
       } catch {
-        write = .failed(WriteFailure(attempt: .comment, error: error))
+        write.state = .failed(WriteFailure(attempt: .comment, error: error))
       }
     }
   }
@@ -298,6 +312,6 @@ final class RequestDetailStore {
   /// Acknowledgement, not repair: nothing landed, and every control that starts one of these is
   /// on screen either way.
   func acknowledgeWriteFailure() {
-    write = .idle
+    write = WriteState()
   }
 }

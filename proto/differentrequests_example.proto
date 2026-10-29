@@ -1,0 +1,150 @@
+syntax = "proto3";
+
+package differentrequests.example.v1;
+
+import "differentrequests_domain.proto";
+import "differentrequests_options.proto";
+import "differentrequests_sdk.proto";
+import "differentrequests_sdk_public.proto";
+
+// No prefix: the example's names are the ones it already calls these by, and none collides with a
+// `DR`-prefixed contract type or an SDK public one.
+option swift_prefix = "";
+
+// The example app's own values: which SDK screen a row opens, where launch has got to, and what the
+// environment said at launch. Generated into the example target, internal.
+
+// A surface the SDK draws, as a row this example offers.
+//
+// `(label)` is what the row says, `(pitch)` the one line under it, and `(token)` the SF Symbol
+// beside it.
+enum ExampleScreen {
+  EXAMPLE_SCREEN_UNSPECIFIED = 0 [
+    (differentrequests.v1.label) = "None",
+    (differentrequests.v1.pitch) = "No screen."
+  ];
+
+  // Everything people asked for, ranked, searchable, with the composer behind it.
+  EXAMPLE_SCREEN_REQUESTS = 1 [
+    (differentrequests.v1.label) = "Requests",
+    (differentrequests.v1.pitch) = "Ranked by votes and searchable, with a button to ask for something new.",
+    (differentrequests.v1.token) = "list.bullet"
+  ];
+
+  // What this reader has been told about the requests they follow. Where a push lands.
+  EXAMPLE_SCREEN_INBOX = 2 [
+    (differentrequests.v1.label) = "Inbox",
+    (differentrequests.v1.pitch) = "Status changes, replies and duplicates on what they follow. Tapping a notification opens it.",
+    (differentrequests.v1.token) = "bell"
+  ];
+
+  // What is planned and what is being built, in columns. Pro.
+  EXAMPLE_SCREEN_ROADMAP = 3 [
+    (differentrequests.v1.label) = "Roadmap",
+    (differentrequests.v1.pitch) = "Planned and in progress, in columns.",
+    (differentrequests.v1.token) = "map"
+  ];
+
+  // What shipped, written up. Pro.
+  EXAMPLE_SCREEN_CHANGELOG = 4 [
+    (differentrequests.v1.label) = "What's New",
+    (differentrequests.v1.pitch) = "What shipped, written up, linked to the requests it answers.",
+    (differentrequests.v1.token) = "sparkles"
+  ];
+
+  // What the SDK says about its own setup, the first thing to read when a board is empty and
+  // nobody knows why.
+  EXAMPLE_SCREEN_DIAGNOSTICS = 5 [
+    (differentrequests.v1.label) = "Diagnostics",
+    (differentrequests.v1.pitch) = "What the SDK says about its own setup. Paste it into a support email.",
+    (differentrequests.v1.token) = "stethoscope"
+  ];
+}
+
+// The environment variables the example reads at launch, set in the scheme's Run, Arguments,
+// Environment Variables.
+enum DemoVariable {
+  DEMO_VARIABLE_UNSPECIFIED = 0;
+
+  // A real app key. Never committed: this repository is public.
+  DEMO_VARIABLE_APP_KEY = 1 [(differentrequests.v1.token) = "DIFFERENT_REQUESTS_APP_KEY"];
+
+  // A staging endpoint in place of production. Refused unless it is https.
+  DEMO_VARIABLE_BASE_URL = 2 [(differentrequests.v1.token) = "DIFFERENT_REQUESTS_BASE_URL"];
+
+  // A different person to sign in as.
+  DEMO_VARIABLE_EXTERNAL_ID = 3 [(differentrequests.v1.token) = "DIFFERENT_REQUESTS_EXTERNAL_ID"];
+
+  // A different name for them.
+  DEMO_VARIABLE_DISPLAY_NAME = 4 [(differentrequests.v1.token) = "DIFFERENT_REQUESTS_DISPLAY_NAME"];
+
+  // The app's signing secret, which in a real integration never leaves the developer's backend.
+  DEMO_VARIABLE_SIGNING_SECRET = 5 [(differentrequests.v1.token) = "DIFFERENT_REQUESTS_SIGNING_SECRET"];
+}
+
+// What the environment said at launch, read once by the app delegate before any window is shown.
+message DemoSettings {
+  // The key the client presents: the environment's, or an obviously fake stand-in.
+  string app_key = 1;
+
+  // Whether a real key was supplied. An unset variable and a revoked key both answer 401, and only
+  // one of them is worth a developer's time to debug.
+  bool app_key_supplied = 2;
+
+  // Production, unless a staging endpoint was named.
+  differentrequests.sdk.v1.SecureBaseURL base_url = 3;
+
+  // The app's own stable identifier for the signed-in person: the dedupe key that carries their
+  // votes across a reinstall.
+  string external_user_id = 4;
+
+  // Shown on requests and comments they author.
+  string display_name = 5;
+
+  // The example's own words for a board with nothing on it.
+  differentrequests.sdk.v1.EmptyBoard empty_board = 6;
+
+  // Which APNs environment minted this build's device tokens. Stated, never detected.
+  differentrequests.v1.PushEnvironment push_environment = 7;
+}
+
+// No app key was supplied, so there is nothing to read.
+message LaunchUnconfigured {}
+
+// What this app offers is being read.
+message LaunchReading {}
+
+// The config could not be read. The rows every plan carries are offered.
+message LaunchConfigUnreadable {}
+
+// Where the example app is in reading what it offers.
+//
+// Unset: nothing has been asked yet.
+message LaunchPhase {
+  oneof phase {
+    LaunchUnconfigured unconfigured = 1;
+    LaunchReading reading = 2;
+
+    // What this app offers, which is what decides its rows.
+    differentrequests.v1.AppConfig ready = 3;
+
+    LaunchConfigUnreadable config_unreadable = 4;
+  }
+}
+
+// What the example's session holds: where launch got to, the rows it offers, and the screen that is
+// up. The badge is the hub's own unread count, so it is not held here.
+message SessionState {
+  LaunchPhase phase = 1;
+
+  // Every surface the server says this app carries. Written with `phase`.
+  repeated ExampleScreen screens = 2;
+
+  // The SDK screen presented, or unspecified for none. One value, so two cannot both be up.
+  ExampleScreen showing = 4;
+}
+
+// What the Diagnostics screen holds: the client's own description, read once when it appears.
+message DiagnosticsContent {
+  string described = 1;
+}

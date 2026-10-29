@@ -16,7 +16,7 @@ struct RequestLoaded: View {
   var body: some View {
     List {
       Section {
-        VStack(alignment: .leading, spacing: Spacing.small.rawValue) {
+        VStack(alignment: .leading, spacing: Spacing.small.points()) {
           RequestHeader(request: request)
           RequestStateNote(hub: hub, request: request)
         }
@@ -43,13 +43,17 @@ struct RequestLoaded: View {
     .refreshable {
       await store.load()
     }
+    #if os(macOS)
+    .bottomRow(CommentBar(hub: hub, store: store))
+    #else
     .safeAreaBar(edge: .bottom) {
       // Commenting acts for a person, so with nobody signed in there is no bar at all.
-      if hub.whoIsHere.somebodyIsHere {
+      if hub.whoIsHere.somebodyIsHere() {
         RequestComposerBar(store: store)
-          .padding(.horizontal, Spacing.medium.rawValue)
-          .padding(.vertical, Spacing.xSmall.rawValue)
+          .padding(.horizontal, Spacing.medium.points())
+          .padding(.vertical, Spacing.xSmall.points())
       }
     }
+    #endif
   }
 }

@@ -25,18 +25,13 @@ final class SubmitStore {
 
   // MARK: - State
 
-  /// What is being asked for, in one line.
-  var title: String = ""
-
-  /// The detail, which the server accepts empty.
-  var body: String = ""
+  /// The title and detail being written, and what the server filed once it answered. What was
+  /// filed arrives with the author's own vote already counted, and its presence is what tells a
+  /// presenter the sheet is done.
+  var draft = SubmitState()
 
   /// What the filing is doing, or what it did instead.
-  var write: WriteState = .idle
-
-  /// What the server filed, once it has answered. It arrives with the author's own vote already
-  /// counted, and its presence is what tells a presenter the sheet is done.
-  var submitted: DRFeatureRequest?
+  var write = WriteState()
 
   // MARK: - Init
 
@@ -57,21 +52,20 @@ final class SubmitStore {
   /// opened while it still held the last filed request would look finished before anything was
   /// typed.
   func begin(title: String) {
-    self.title = title
-    body = ""
-    submitted = nil
-    write = .idle
+    draft = SubmitState()
+    draft.title = title
+    write = WriteState()
   }
 
   /// How many characters the title has left, from the limit the contract declares. Negative once
-  /// it is over, which is what a counter draws and what ``canSubmit`` refuses on.
-  var titleCharactersLeft: Int {
-    DRCreateRequestRequest.TextLimit.title - title.count
+  /// it is over, which is what a counter draws and what ``canSubmit()`` refuses on.
+  func titleCharactersLeft() -> CharactersLeftContent {
+    CharactersLeftContent(limit: DRCreateRequestRequest.TextLimit.title, typed: draft.title)
   }
 
   /// The same, for the detail.
-  var bodyCharactersLeft: Int {
-    DRCreateRequestRequest.TextLimit.body - body.count
+  func bodyCharactersLeft() -> CharactersLeftContent {
+    CharactersLeftContent(limit: DRCreateRequestRequest.TextLimit.body, typed: draft.body)
   }
 
   /// Whether there is enough to file, and not too much.
@@ -79,10 +73,10 @@ final class SubmitStore {
   /// A blank title and text past the limit are both refused by the server, so both are refused
   /// here instead of sent. Sending them costs a round trip and comes back as a failure written for
   /// a developer, which the person who typed it cannot act on.
-  var canSubmit: Bool {
-    title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
-      && titleCharactersLeft >= 0
-      && bodyCharactersLeft >= 0
+  func canSubmit() -> Bool {
+    draft.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
+      && titleCharactersLeft().left >= 0
+      && bodyCharactersLeft().left >= 0
   }
 
   /// Files the request.
@@ -90,19 +84,19 @@ final class SubmitStore {
   /// Returns immediately when a write is already running: a second tap on a slow network would
   /// otherwise file the duplicate this whole flow exists to prevent.
   func submit() async {
-    let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
-    if write.isWriting == false, trimmedTitle.isEmpty == false {
-      write = .writing(.fileRequest)
+    let trimmedTitle = draft.title.trimmingCharacters(in: .whitespacesAndNewlines)
+    if write.isWriting() == false, trimmedTitle.isEmpty == false {
+      write.state = .writing(.fileRequest)
 
       do {
         let written = try await client.submit(
           title: trimmedTitle,
-          body: body.trimmingCharacters(in: .whitespacesAndNewlines)
+          body: draft.body.trimmingCharacters(in: .whitespacesAndNewlines)
         )
-        submitted = written.request
-        write = .idle
+        draft.submitted = written.request
+        write = WriteState()
       } catch {
-        write = .failed(WriteFailure(attempt: .fileRequest, error: error))
+        write.state = .failed(WriteFailure(attempt: .fileRequest, error: error))
       }
     }
   }
@@ -112,17 +106,17 @@ final class SubmitStore {
   /// Acknowledgement, not repair: nothing was filed, and Send is still in the bar with
   /// everything typed still under it.
   func acknowledgeWriteFailure() {
-    write = .idle
+    write = WriteState()
   }
 
   /// Whether anything is typed that leaving the form would lose.
   func holdsDraft() -> Bool {
-    let typed = title + body
+    let typed = draft.title + draft.body
     return typed.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
   }
 
   /// Lets go of the request just filed, once the screen that opens it has taken its id.
   func putAwaySubmitted() {
-    submitted = nil
+    draft.clearSubmitted()
   }
 }

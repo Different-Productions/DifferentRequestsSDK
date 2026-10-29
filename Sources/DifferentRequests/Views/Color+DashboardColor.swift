@@ -7,10 +7,10 @@ extension Color {
   /// Nothing where a component is over the largest a component holds: that is not a color the
   /// dashboard can write, so it is read as none.
   init?(dashboardColor color: DRColor) {
-    let largest = ColorComponent.largest.rawValue
-    guard color.red <= largest, color.green <= largest, color.blue <= largest else {
+    guard color.isDashboardColor() else {
       return nil
     }
+    let largest = ColorComponent.largest.level()
     self.init(
       .sRGB,
       red: Double(color.red) / Double(largest),

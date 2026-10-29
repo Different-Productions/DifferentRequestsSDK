@@ -8,10 +8,10 @@ import SwiftUI
   final class SheetRootProbeController: UIViewController {
 
     /// Where the answer is written. Replaced by SwiftUI when the screen is rebuilt.
-    var isSheetRoot: Binding<Bool>
+    var placement: Binding<SheetPlacement>
 
-    init(isSheetRoot: Binding<Bool>) {
-      self.isSheetRoot = isSheetRoot
+    init(placement: Binding<SheetPlacement>) {
+      self.placement = placement
       super.init(nibName: nil, bundle: nil)
     }
 
@@ -21,11 +21,11 @@ import SwiftUI
 
     override func viewWillAppear(_ animated: Bool) {
       super.viewWillAppear(animated)
-      isSheetRoot.wrappedValue = isRootOfPresentedStack
+      placement.wrappedValue.sheetRoot = isRootOfPresentedStack()
     }
 
     /// True when the stack holding this screen was presented and this screen is its first.
-    private var isRootOfPresentedStack: Bool {
+    private func isRootOfPresentedStack() -> Bool {
       if let navigation = navigationController,
         navigation.presentingViewController != nil,
         let root = navigation.viewControllers.first {

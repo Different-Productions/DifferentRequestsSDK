@@ -15,7 +15,7 @@ struct RoadmapRow: View {
     NavigationLink {
       RequestDetailView(hub: hub, requestID: request.id)
     } label: {
-      VStack(alignment: .leading, spacing: Spacing.xxSmall.rawValue) {
+      VStack(alignment: .leading, spacing: Spacing.xxSmall.points()) {
         Text(request.title)
           .textRole(.reading)
           .foregroundStyle(ColorRole.label)

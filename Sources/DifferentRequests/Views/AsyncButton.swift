@@ -15,8 +15,8 @@ struct AsyncButton<Label: View>: View {
   private let action: () async -> Void
   private let label: Label
 
-  /// `true` from the tap until the action finishes.
-  @State private var isRunning: Bool = false
+  /// Running from the tap until the action finishes.
+  @State private var run = AsyncButtonState()
 
   init(action: @escaping () async -> Void, @ViewBuilder label: () -> Label) {
     self.action = action
@@ -25,14 +25,14 @@ struct AsyncButton<Label: View>: View {
 
   var body: some View {
     Button {
-      isRunning = true
+      run.running = true
       Task {
         await action()
-        isRunning = false
+        run.running = false
       }
     } label: {
       label
     }
-    .disabled(isRunning)
+    .disabled(run.running)
   }
 }

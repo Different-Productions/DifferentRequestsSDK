@@ -21,63 +21,31 @@ final class Session {
 
   // MARK: - Inputs
 
-  /// What every SDK screen in this app reads from, and what holds their state between redraws.
+  /// What every SDK screen in this app reads from, and what holds their state between redraws. Its
+  /// client is the one the screens call through, so a session created here is the session they act
+  /// under.
   let hub: DifferentRequestsHub
 
   /// What signs a proof for the person being signed in, standing in for a developer's own backend.
   let backend: DemoBackend
 
+  /// What the environment said at launch: the person to sign in as and where tokens are minted.
+  let settings: DemoSettings
+
   // MARK: - State
 
-  private(set) var phase: LaunchPhase = .reading
-
-  /// How many notifications this reader has not opened.
+  /// Where launch has got to, the rows it offers, and the screen that is up.
   ///
-  /// Read through the client rather than from the SDK's own inbox store, because that store is
-  /// internal — the SDK exposes screens, not the state behind them. A host app that wants a badge
-  /// outside those screens asks the API for the count, which is one read and exactly what the count
-  /// route exists for.
-  private(set) var unreadCount = 0
-
-  /// Which SDK screen is presented, or none.
-  ///
-  /// Held here rather than as a flag per screen on the view, because what is open is one fact and
-  /// two booleans can both be true.
-  private(set) var showing: ExampleScreen?
-
-  // MARK: - Derived
-
-  /// The rows this app offers, which is every surface the server says this app carries.
-  ///
-  /// A Free app has no roadmap and no changelog, so those rows are absent rather than present and
-  /// refused when tapped — the same rule the SDK's own menu follows.
-  var screens: [ExampleScreen] {
-    switch phase {
-    case .ready(let config):
-      return ExampleScreen.allCases.filter { screen in
-        screen.isCarried(by: config)
-      }
-    case .configUnreadable:
-      // An unread config is an empty one: only what every plan carries is offered.
-      return ExampleScreen.allCases.filter { screen in
-        screen.isCarried(by: DRAppConfig())
-      }
-    case .unconfigured, .reading:
-      return []
-    }
-  }
-
-  /// The client the hub was built with — the same one the screens call through, so a session
-  /// created here is the session they act under.
-  var client: DifferentRequestsClient {
-    hub.client
-  }
+  /// The badge is not held here: it is the hub's `unreadCount()`, the same count the SDK's Inbox
+  /// tab draws. What is up is one value, so two screens cannot both be.
+  private(set) var state = SessionState()
 
   // MARK: - Init
 
-  init(hub: DifferentRequestsHub, backend: DemoBackend) {
+  init(hub: DifferentRequestsHub, backend: DemoBackend, settings: DemoSettings) {
     self.hub = hub
     self.backend = backend
+    self.settings = settings
   }
 
   // MARK: - Signing in
@@ -87,18 +55,28 @@ final class Session {
   ///
   /// Config is fetched here rather than by each screen because it decides which screens exist at
   /// all: the roadmap and the changelog are Pro surfaces, and a tab that is shown and then refused
-  /// has told the person using the app that something is broken. Asking once, before
-  /// anything is drawn, is the difference between an absent tab and a dead one.
+  /// has told the person using the app that something is broken.
   ///
   /// Push permission is asked for only when `pushEnabled`: on a plan that sends no push, asking
   /// the person is asking for something that never arrives.
   func start() async {
-    if DemoConfig.isConfigured {
-      phase = .reading
+    if settings.appKeySupplied {
+      enter(.reading(LaunchReading()))
       await signIn()
       await loadConfig()
     } else {
-      phase = .unconfigured
+      enter(.unconfigured(LaunchUnconfigured()))
+    }
+  }
+
+  /// Moves launch to `phase`, and offers the rows every surface it carries.
+  ///
+  /// A Free app has no roadmap and no changelog, so those rows are absent rather than present and
+  /// refused when tapped — the same rule the SDK's own menu follows.
+  private func enter(_ phase: LaunchPhase.OneOf_Phase) {
+    state.phase.phase = phase
+    state.screens = ExampleScreen.allCases.filter { screen in
+      screen.isCarried(in: state.phase)
     }
   }
 
@@ -109,35 +87,32 @@ final class Session {
   private func loadConfig() async {
     await hub.configure()
     do {
-      let configured = try await client.config()
-      phase = .ready(configured.config)
+      let configured = try await hub.client.config()
+      enter(.ready(configured.config))
       if configured.config.pushEnabled {
         await registerForRemoteNotifications()
       }
-      await refreshUnreadCount()
+      await hub.loadInbox()
       // The board's first page is a round trip. Started here, while the person is still looking at
       // the settings list, it is held by the time they open the board.
       await hub.readTheBoardBeforeItIsShown()
     } catch {
       NSLog("What this app offers could not be read: %@", error.localizedDescription)
-      phase = .configUnreadable
+      enter(.configUnreadable(LaunchConfigUnreadable()))
     }
   }
 
   /// Creates the session for the demo person, carrying a proof when this app has a signing secret.
   ///
   /// A refusal is written where a developer reads it and drawn nowhere. The reasons are all the
-  /// integration's — no proof, an expired one, a secret that has been replaced, a retired app key —
-  /// and none of them is something the person holding the phone can act on. The board still reads,
-  /// and asking, voting and commenting are not offered until somebody is signed in.
+  /// integration's, and none of them is something the person holding the phone can act on.
   private func signIn() async {
-    let externalID = ProcessInfo.processInfo.demoExternalUserID
     do {
-      let signedIn = try await client.createSession(
-        externalID: externalID,
+      let signedIn = try await hub.client.createSession(
+        externalID: settings.externalUserID,
         email: nil,
-        displayName: ProcessInfo.processInfo.demoDisplayName,
-        proof: backend.vouchFor(externalID: externalID)
+        displayName: settings.displayName,
+        proof: backend.vouchFor(externalID: settings.externalUserID)
       )
       NSLog("Signed in as %@", signedIn.user.id)
     } catch {
@@ -147,32 +122,40 @@ final class Session {
 
   // MARK: - What the screens say
 
-  /// Re-reads the badge.
-  ///
-  /// A failure leaves the count where it was and says nothing: a badge is the least important thing
-  /// on screen, and an alert about one would interrupt somebody to tell them about a number they had
-  /// not looked at.
-  func refreshUnreadCount() async {
-    do {
-      unreadCount = Int(try await client.unreadCount().unreadCount)
-    } catch {
-      NSLog("Unread count unavailable: %@", error.localizedDescription)
+  /// The count on `screen`'s row: the hub's unread count on the inbox, and nothing on the others.
+  func badgeCount(for screen: ExampleScreen) -> Int32 {
+    switch screen {
+    case .inbox:
+      return hub.unreadCount()
+    case .requests, .roadmap, .changelog, .diagnostics, .unspecified, .UNRECOGNIZED:
+      return 0
     }
   }
 
   // MARK: - Which screen is up
 
   func show(_ screen: ExampleScreen) {
-    showing = screen
+    state.showing = screen
+  }
+
+  /// Whether `screen` is the one up.
+  func isShowing(_ screen: ExampleScreen) -> Bool {
+    state.showing == screen
+  }
+
+  /// Whether any screen is up.
+  func isShowingAny() -> Bool {
+    switch state.showing {
+    case .requests, .inbox, .roadmap, .changelog, .diagnostics:
+      return true
+    case .unspecified, .UNRECOGNIZED:
+      return false
+    }
   }
 
   /// Called when the presented screen goes away.
-  ///
-  /// The badge is re-read here rather than on a timer: the one thing that changes it is somebody
-  /// reading their inbox, and they just closed it.
-  func dismissedWhatWasShowing() async {
-    showing = nil
-    await refreshUnreadCount()
+  func screenDismissed() {
+    state.showing = .unspecified
   }
 
   /// Registers for remote notifications when the person already allowed them, so a rotated token
@@ -194,9 +177,9 @@ final class Session {
   /// invalidate one silently, so registration is an upsert rather than a one-time write.
   func registerDevice(tokenData: Data) async {
     do {
-      let registered = try await client.registerDevice(
+      let registered = try await hub.client.registerDevice(
         tokenData: tokenData,
-        environment: DemoConfig.pushEnvironment
+        environment: settings.pushEnvironment
       )
       NSLog("Registered device %@", registered.device.id)
     } catch {

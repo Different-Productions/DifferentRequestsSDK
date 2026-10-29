@@ -10,7 +10,7 @@ extension DRApiError {
   ///
   /// The contract states the message is written for whoever is debugging and never for an end
   /// user, so this is surfaced into `errorDescription` and never into UI copy.
-  var refusalDescription: String {
+  func refusalDescription() -> String {
     if let reason {
       return "\(reason.fieldName): \(message)"
     }

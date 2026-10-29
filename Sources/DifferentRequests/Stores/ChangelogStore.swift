@@ -30,18 +30,16 @@ final class ChangelogStore {
   // MARK: - State
 
   /// Whether this app publishes release notes, and how far the asking got.
-  var plan: PlanState = .unread
+  var plan = PlanState()
 
-  /// The changelog itself: where its read got to, and the entries it found.
-  var read: ReadState<[DRChangelogEntry]> = .unread
+  /// Where the changelog's read has got to.
+  var status = ReadStatus()
+
+  /// The entries the changelog's reads found, newest first, and where the next page starts.
+  var changelog = ChangelogState()
 
   /// Whether there is another page, and what became of the last attempt at one.
-  var page: PageState = .more
-
-  // MARK: - Private state
-
-  /// The opaque continuation the previous page handed back.
-  private var cursor: String = ""
+  var page = PageState()
 
   // MARK: - Init
 
@@ -52,15 +50,21 @@ final class ChangelogStore {
 
   // MARK: - Loading
 
+  /// Whether a read of the changelog has finished, whatever it found. A refresh over entries
+  /// already held does not make it unread again.
+  func hasRead() -> Bool {
+    status.hasRead(holdsContent: changelog.entries.isEmpty == false)
+  }
+
   /// Asks what this app includes, then reads the first page if it publishes release notes.
   ///
   /// Returns immediately when a read is already running. Also the retry behind both failures the
   /// screen can show: the configuration is asked for again when the last ask did not answer, and
   /// asked for once when it did.
   func load() async {
-    if read.isReading == false {
+    if status.isReading() == false {
       await readPlan()
-      if plan.isIncluded {
+      if plan.isIncluded() {
         await readFirstPage()
       }
     }
@@ -71,14 +75,14 @@ final class ChangelogStore {
   /// The client answers a second ask from the first read, so the cost of every gated surface
   /// asking for itself is one round trip for all of them.
   private func readPlan() async {
-    if plan.needsReading {
-      plan = .reading
+    if plan.needsReading() {
+      plan.state = .reading(Reading())
 
       do {
         let answer = try await client.config()
         plan = PlanState(surface: .changelog, response: answer)
       } catch {
-        plan = .failed(error)
+        plan.state = .failed(ReadTrouble(error: error))
       }
     }
   }
@@ -88,18 +92,20 @@ final class ChangelogStore {
   /// What is held stays on screen for the length of the read: a pull-to-refresh runs on the list's
   /// own task, and a list cleared at the start of a read would take that task with it.
   private func readFirstPage() async {
-    read = read.whileReading
-    cursor = ""
-    page = .more
+    status.state = .reading(Reading())
+    changelog.cursor = ""
+    page = PageState()
 
     do {
-      let answer = try await client.changelog(cursor: nil)
-      read = ReadState(page: answer.entries)
-      cursor = answer.nextCursor
+      let answer = try await client.changelog(cursor: changelog.cursor)
+      changelog.entries = answer.entries
+      status.state = .loaded(ReadAnswered())
+      changelog.cursor = answer.nextCursor
       page = PageState(nextCursor: answer.nextCursor)
     } catch {
-      read = ReadState(readFailure: error)
-      page = .done
+      changelog.entries = []
+      status = ReadStatus(readFailure: error)
+      page.state = .done(NoMorePages())
     }
   }
 
@@ -108,17 +114,18 @@ final class ChangelogStore {
   /// Returns immediately when the server reported no further page, when one is already in flight,
   /// or when the whole changelog is being re-read.
   func loadMore() async {
-    if page.isReading == false, page.isDone == false, read.isReading == false {
-      page = .reading
+    if page.isReading() == false, page.isDone() == false, status.isReading() == false {
+      page.state = .reading(Reading())
 
       do {
-        let answer = try await client.changelog(cursor: cursor)
-        read = read.appending(answer.entries)
-        cursor = answer.nextCursor
+        let answer = try await client.changelog(cursor: changelog.cursor)
+        changelog.entries.append(contentsOf: answer.entries)
+        status.state = .loaded(ReadAnswered())
+        changelog.cursor = answer.nextCursor
         page = PageState(nextCursor: answer.nextCursor)
       } catch {
         // The cursor is left where it was, so the retry asks for this page rather than skipping it.
-        page = .failed(error)
+        page.state = .failed(ReadTrouble(error: error))
       }
     }
   }

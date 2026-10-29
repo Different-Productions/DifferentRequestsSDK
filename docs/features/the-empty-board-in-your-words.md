@@ -5,26 +5,26 @@
 A board nobody has posted to yet is the first thing most of an app's users see of this SDK, and it
 said the same three things in every app, in our voice: "No requests yet". An app on Pro sets
 its own symbol, title, message and button words for that one screen. **Pro**, ruled 2026-09-25
-(#58), and part of the same Pro surface as the app's own accent and font, `PLAN_SURFACE_APPEARANCE`
+(#58), and part of the same Pro surface as the color and font chosen in the dashboard, `PLAN_SURFACE_APPEARANCE`
 ("the board wears your app"): it is the board looking like the app's product instead of ours.
 
-Set once, where the hub is made, next to the appearance:
+Set once, where the hub is made:
 
 ```swift
 private let requests = DifferentRequestsHub(
-  client: DifferentRequestsClient(appKey: "your-app-key", baseURL: .production),
-  appearance: .standard,
+  client: DifferentRequestsClient(appKey: "your-app-key", baseURL: SecureBaseURL(service: .production)),
   emptyBoard: EmptyBoard(
     symbol: "leaf",
     title: "What would help your practice?",
     message: "Tell us what would make your sessions calmer. Others can add their vote.",
     button: "Share an idea"
-  )
+  ),
+  notificationPermission: .askedBySdk
 )
 ```
 
-An app that sets none passes `EmptyBoard.standard`, named rather than defaulted, the way
-`Appearance.standard` is.
+An app that sets none passes `emptyBoard: EmptyBoard()`, named rather than defaulted. An empty
+`EmptyBoard` is the SDK's own words: `filledIn()` fills every empty field.
 
 A person triggers it by opening the board of an app with no requests, with nothing narrowing it.
 
@@ -53,18 +53,18 @@ Mockup agreed 2026-09-25: https://claude.ai/artifact/1SHTWeLUD5ApsBM388aZ1L (bot
 ## Flow chart
 
 ```
-DifferentRequestsHub(client:appearance:emptyBoard:)   DifferentRequestsHub.swift
+DifferentRequestsHub(client:emptyBoard:notificationPermission:)   DifferentRequestsHub.swift
         │ keeps emptyBoard as the app handed it
         ▼
 DifferentRequestsView.empty                           Views/DifferentRequestsView.swift
         │ store.narrowing == .nothing ?
         ├─ yes ─► hub.emptyBoardDrawn                 DifferentRequestsHub.swift
         │           │ drawsHostLook (config answered and appearanceEnabled, or not answered yet)
-        │           ├─ true  ─► emptyBoard.filledIn   EmptyBoard.swift (empty field → .standard's)
-        │           └─ false ─► EmptyBoard.standard   EmptyBoard.swift
+        │           ├─ true  ─► emptyBoard.filledIn()   EmptyBoard+Words.swift (empty field → the SDK's)
+        │           └─ false ─► EmptyBoard().filledIn() EmptyBoard+Words.swift
         │         symbol, title, message ─► ContentUnavailableView
         │         button ─► the empty state's button, somebody signed in only
-        └─ no  ─► BoardNarrowing's own words          State/BoardNarrowing.swift
+        └─ no  ─► BoardNarrowing's own words          State/BoardNarrowing+Wording.swift
 ```
 
 ## What was walked

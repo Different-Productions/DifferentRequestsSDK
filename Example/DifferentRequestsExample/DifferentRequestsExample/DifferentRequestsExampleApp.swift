@@ -22,5 +22,9 @@ struct DifferentRequestsExampleApp: App {
     WindowGroup {
       RootView(session: composition.session)
     }
+    #if os(macOS)
+    // Taller than the SDK's 600 pt sheet and its title bar, so the sheet hangs inside the window.
+    .defaultSize(width: 900, height: 760)
+    #endif
   }
 }

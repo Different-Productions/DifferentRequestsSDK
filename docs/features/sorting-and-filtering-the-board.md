@@ -84,9 +84,9 @@ FilterMenu.swift          Menu, two sections         MenuCheckLabel.swift draws 
 Stores/BoardStore.swift
    show(sort:) / toggle(status:) / showEveryStatus()  --> load()
    load()
-     if read.isReading: the read already running finishes the job
+     if status.isReading(): the read already running finishes the job
      repeat
-       read = read.whileReading          State/ReadState.swift   the rows held stay up
+       status.state = .reading(Reading())   State/ReadStatus+Reading.swift   the rows held stay up
        asked = question; cursor = ""; page = .more
        readFirstPage(asked) --> DifferentRequestsClient.swift  requests(_:)
             sort.urlToken, statuses' urlTokens joined by commas   GET /requests
@@ -94,7 +94,7 @@ Stores/BoardStore.swift
    loadMore() --> fetch(asked, cursor:)  asked, never question: the cursor belongs to it
 
 RequestsContent.swift     switch board.read
-   .empty --> RequestsEmpty.swift --> State/BoardNarrowing.swift
+   .empty --> RequestsEmpty.swift --> State/BoardNarrowing+Wording.swift
                  a status filter on --> NarrowedEmptyActions.swift: Show all, New request
 
 Search walks the same store through another door:

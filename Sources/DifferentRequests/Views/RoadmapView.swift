@@ -4,11 +4,11 @@ import SwiftUI
 ///
 /// ```swift
 /// NavigationStack {
-///   RoadmapView(hub: requests, isShowingRequests: $isShowingRequests)
+///   RoadmapView(hub: requests, requestsPresentation: $requestsPresentation)
 /// }
 /// ```
 ///
-/// Handed a binding, an empty roadmap offers **See requests**, which sets it to `true` so the host
+/// Handed a binding, an empty roadmap offers **See requests**, which sets its `showing` so the host
 /// opens its requests list. Built with `init(hub:)`, it offers nothing. Shown as the first screen of
 /// a sheet, it draws the system close button.
 ///
@@ -20,15 +20,15 @@ public struct RoadmapView: View {
   /// What the screen reads from, and what a push from a row is built against.
   private let hub: DifferentRequestsHub
 
-  /// Set to `true` by **See requests** on an empty roadmap, or nil when the host gave no way there.
-  private let isShowingRequests: Binding<Bool>?
+  /// Set showing by **See requests** on an empty roadmap, or nil when the host gave no way there.
+  private let requestsPresentation: Binding<RequestsPresentation>?
 
   /// - Parameters:
   ///   - hub: What the host app built once and holds.
-  ///   - isShowingRequests: What opens the host's requests list, or nil for no **See requests**.
-  public init(hub: DifferentRequestsHub, isShowingRequests: Binding<Bool>?) {
+  ///   - requestsPresentation: What opens the host's requests list, or nil for no **See requests**.
+  public init(hub: DifferentRequestsHub, requestsPresentation: Binding<RequestsPresentation>?) {
     self.hub = hub
-    self.isShowingRequests = isShowingRequests
+    self.requestsPresentation = requestsPresentation
   }
 
   /// The roadmap with no **See requests**, for where the requests list is already one tap away.
@@ -36,11 +36,11 @@ public struct RoadmapView: View {
   /// - Parameter hub: What the host app built once and holds.
   public init(hub: DifferentRequestsHub) {
     self.hub = hub
-    self.isShowingRequests = nil
+    self.requestsPresentation = nil
   }
 
   public var body: some View {
-    RoadmapContent(hub: hub, isShowingRequests: isShowingRequests)
+    RoadmapContent(hub: hub, requestsPresentation: requestsPresentation)
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .groupedBackground()
       .navigationTitle(Text("Roadmap", bundle: .module, comment: "Title of the roadmap screen"))

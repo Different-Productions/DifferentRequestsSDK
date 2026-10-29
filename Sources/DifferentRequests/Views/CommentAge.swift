@@ -8,7 +8,7 @@ struct CommentAge: View {
 
   var body: some View {
     if comment.hasCreatedAt {
-      Text(comment.createdAt.date.ago)
+      Text(comment.createdAt.ago())
         .textRole(.supporting)
         .foregroundStyle(ColorRole.secondaryLabel)
     }

@@ -9,8 +9,8 @@ struct TabsWornLook: ViewModifier {
   let hub: DifferentRequestsHub
 
   func body(content: Content) -> some View {
-    switch hub.appConfig.badge {
-    case .unread, .reading, .failed:
+    switch hub.appConfig.badge.state {
+    case .none, .reading, .failed:
       NavigationStack {
         ConfigPending(hub: hub)
           .sheetCloseButton()

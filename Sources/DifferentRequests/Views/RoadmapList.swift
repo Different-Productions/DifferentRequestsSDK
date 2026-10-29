@@ -9,7 +9,7 @@ struct RoadmapList: View {
 
   var body: some View {
     List {
-      ForEach(hub.roadmap.read.held, id: \.status.rawValue) { column in
+      ForEach(hub.roadmap.roadmap.columns, id: \.status.rawValue) { column in
         Section {
           if column.requests.isEmpty {
             Text("No requests here yet.", bundle: .module, comment: "A roadmap column with no requests in it")

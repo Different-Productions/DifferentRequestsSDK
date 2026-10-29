@@ -5,7 +5,8 @@ import SwiftUI
 /// each status, with a checkmark on what is in effect.
 ///
 /// What it offers is read from the store, which reads the contract's own tables, so nothing here
-/// lists a ranking or a status.
+/// lists a ranking or a status. On iOS the words beside its symbol are what VoiceOver calls it; on
+/// macOS they are drawn.
 struct FilterMenu: View {
 
   /// What holds the board the menu narrows.
@@ -14,11 +15,11 @@ struct FilterMenu: View {
   var body: some View {
     Menu {
       Section {
-        ForEach(hub.board.offeredSorts, id: \.self) { sort in
+        ForEach(hub.board.offeredSorts(), id: \.self) { sort in
           AsyncButton {
             await hub.board.show(sort: sort)
           } label: {
-            MenuCheckLabel(title: sort.filterLabel, isChecked: hub.board.sort == sort)
+            MenuCheckLabel(content: MenuCheckContent(title: sort.filterLabel(), checked: hub.board.board.sort == sort))
           }
         }
       }
@@ -29,16 +30,20 @@ struct FilterMenu: View {
           await hub.board.showEveryStatus()
         } label: {
           MenuCheckLabel(
-            title: String(localized: "All", bundle: .module, comment: "Filter menu item that shows requests in every status"),
-            isChecked: hub.board.statuses.isEmpty
+            content: MenuCheckContent(
+              title: String(localized: "All", bundle: .module, comment: "Filter menu item that shows requests in every status"),
+              checked: hub.board.board.statuses.isEmpty
+            )
           )
         }
 
-        ForEach(hub.board.offeredStatuses, id: \.self) { status in
+        ForEach(hub.board.offeredStatuses(), id: \.self) { status in
           AsyncButton {
             await hub.board.toggle(status: status)
           } label: {
-            MenuCheckLabel(title: status.localizedLabel, isChecked: hub.board.statuses.contains(status))
+            MenuCheckLabel(
+              content: MenuCheckContent(title: status.localizedLabel(), checked: hub.board.board.statuses.contains(status))
+            )
           }
         }
       }
@@ -46,7 +51,11 @@ struct FilterMenu: View {
       .tint(Color.primary)
     } label: {
       Label {
+        #if os(macOS)
+        Text("Filter", bundle: .module, comment: "Mac button that opens the filter and sort menu")
+        #else
         Text("Filter and sort", bundle: .module, comment: "VoiceOver label for the button that opens the filter and sort menu")
+        #endif
       } icon: {
         Image(systemName: "line.3.horizontal.decrease")
       }

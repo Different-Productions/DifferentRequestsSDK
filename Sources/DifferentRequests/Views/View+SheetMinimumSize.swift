@@ -3,12 +3,9 @@ import SwiftUI
 extension View {
 
   /// A floor for a full SDK screen's size on macOS, where a sheet sizes itself to its content and
-  /// a `List` has no height of its own. Nothing on iOS, where a sheet fills its space.
+  /// a `List` has no height of its own. Nothing on iOS, where a sheet fills its space, and nothing
+  /// inside ``DifferentRequestsView``, which sizes the whole sheet.
   func sheetMinimumSize() -> some View {
-    #if os(macOS)
-    frame(minWidth: SheetMinimumSize.width.rawValue, minHeight: SheetMinimumSize.height.rawValue)
-    #else
-    self
-    #endif
+    modifier(SheetMinimumFrame())
   }
 }

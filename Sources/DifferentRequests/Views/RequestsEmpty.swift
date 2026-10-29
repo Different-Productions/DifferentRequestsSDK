@@ -11,30 +11,34 @@ struct RequestsEmpty: View {
   let hub: DifferentRequestsHub
 
   /// Whether the new request form is up.
-  @Binding var isComposing: Bool
+  @Binding var requestsScreen: RequestsScreenState
 
   var body: some View {
-    switch hub.board.narrowing {
-    case .nothing:
+    switch hub.board.narrowing() {
+    case .nothing, .unspecified, .UNRECOGNIZED:
       ContentUnavailableView {
-        Label(hub.emptyBoardDrawn.title, systemImage: hub.emptyBoardDrawn.symbol)
+        Label(hub.emptyBoardDrawn().title, systemImage: hub.emptyBoardDrawn().symbol)
       } description: {
-        Text(hub.emptyBoardDrawn.message)
+        Text(hub.emptyBoardDrawn().message)
       } actions: {
-        if hub.whoIsHere.somebodyIsHere {
-          NewRequestButton(hub: hub, title: hub.emptyBoardDrawn.button, isComposing: $isComposing)
-            .labelStyle(.titleOnly)
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
+        if hub.whoIsHere.somebodyIsHere() {
+          NewRequestButton(
+            hub: hub,
+            label: NewRequestButtonContent(title: hub.emptyBoardDrawn().button),
+            requestsScreen: $requestsScreen
+          )
+          .labelStyle(.titleOnly)
+          .buttonStyle(.borderedProminent)
+          .controlSize(.large)
         }
       }
     case .query, .statuses, .queryAndStatuses:
       ContentUnavailableView {
-        Label(hub.board.narrowing.emptyTitle, systemImage: hub.board.narrowing.emptyIcon)
+        Label(hub.board.narrowing().emptyTitle(), systemImage: hub.board.narrowing().emptyIcon())
       } description: {
-        Text(hub.board.narrowing.emptyMessage)
+        Text(hub.board.narrowing().emptyMessage())
       } actions: {
-        NarrowedEmptyActions(hub: hub, isComposing: $isComposing)
+        NarrowedEmptyActions(hub: hub, requestsScreen: $requestsScreen)
       }
     }
   }

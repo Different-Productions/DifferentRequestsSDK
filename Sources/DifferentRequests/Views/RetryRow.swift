@@ -8,7 +8,7 @@ import SwiftUI
 struct RetryRow: View {
 
   /// What could not be read, in words for a reader.
-  let message: String
+  let content: RetryRowContent
 
   /// Asks for it again.
   let retry: () async -> Void
@@ -17,15 +17,15 @@ struct RetryRow: View {
     AsyncButton {
       await retry()
     } label: {
-      VStack(alignment: .leading, spacing: Spacing.xxSmall.rawValue) {
-        Text(message)
+      VStack(alignment: .leading, spacing: Spacing.xxSmall.points()) {
+        Text(content.message)
           .foregroundStyle(ColorRole.secondaryLabel)
 
         Text("Try again", bundle: .module, comment: "Button that reads something again after it failed")
           .foregroundStyle(ColorRole.tint)
       }
       .textRole(.supporting)
-      .frame(maxWidth: .infinity, minHeight: TargetSize.minimum.rawValue, alignment: .leading)
+      .frame(maxWidth: .infinity, minHeight: TargetSize.minimum.points(), alignment: .leading)
       .contentShape(Rectangle())
     }
     .buttonStyle(.borderless)

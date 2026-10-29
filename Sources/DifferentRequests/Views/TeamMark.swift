@@ -5,7 +5,7 @@ import SwiftUI
 struct TeamMark: View {
 
   var body: some View {
-    HStack(spacing: Spacing.xxSmall.rawValue) {
+    HStack(spacing: Spacing.xxSmall.points()) {
       Image(systemName: "checkmark.seal.fill")
         .foregroundStyle(ColorRole.tint)
         .accessibilityHidden(true)

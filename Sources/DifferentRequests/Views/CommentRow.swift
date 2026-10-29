@@ -10,7 +10,7 @@ struct CommentRow: View {
   let comment: DRComment
 
   var body: some View {
-    VStack(alignment: .leading, spacing: Spacing.xxSmall.rawValue) {
+    VStack(alignment: .leading, spacing: Spacing.xxSmall.points()) {
       CommentByline(comment: comment)
 
       switch comment.content {

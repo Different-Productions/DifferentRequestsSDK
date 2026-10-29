@@ -113,7 +113,7 @@ the server                                        (DifferentRequests-Server, ser
   ├─ secret, proof adds up ───────────────────► session, email and name refreshed
   └─ secret, proof missing or wrong ──────────► RPCFailure(unauthenticated:)
                                                    │
-       DifferentRequestsError.api(DRApiError) ◄────┘
+       DifferentRequestsError(answer: DRApiError) ◄┘
          │  errorDescription = "unauthenticated: <what the server said>"
          ▼
        Session.signIn() catch                     (Session.swift)

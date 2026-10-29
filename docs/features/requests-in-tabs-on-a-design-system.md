@@ -12,15 +12,18 @@ the names live in one place each. No file touched by this slice keeps a one-off 
 
 | Token | Values | Shape in Swift |
 |---|---|---|
-| `Spacing` | 4, 8, 12, 16, 20, 24, 32 | an enum with `CGFloat` raw values |
+| `Spacing` | 4, 8, 12, 16, 20, 24, 32 | a generated proto enum, read with `.points()` |
 | `TargetSize` | 44, the smallest tap area | the same |
 | `Radius` | 12, the vote tile. Controls are capsules and a group's corner is the system's | the same |
 | `VoteTileSize` | 48 wide, 56 tall, both minimums | the same |
-| `TextRole` | screenTitle (Large Title), requestTitle (Title 2), rowTitle (Headline), reading (Body), supporting (Subheadline), meta (Footnote) | an enum, read with `.textRole(_:)` |
-| `ColorRole` | label, secondaryLabel, fill, tint, onTint, failure | an enum that is a `ShapeStyle` |
+| `TextRole` | screenTitle (Large Title), requestTitle (Title 2), rowTitle (Headline), reading (Body), supporting (Subheadline), meta (Footnote) | a generated proto enum, read with `.textRole(_:)` |
+| `ColorRole` | label, secondaryLabel, fill, tint, onTint, failure | a generated proto enum that is a `ShapeStyle` |
 
-The tint is the host app's own color: the one its developer chose in the dashboard, or else
-`Appearance.accent`, applied once by `worn(by:)` (`a-tint-set-in-the-dashboard.md`). `onTint` is
+Each is declared in `proto/differentrequests_sdk_state.proto`; its numbers and styles are an
+extension method that switches over every case.
+
+The tint is the host app's own color: the one its developer chose in the dashboard, or else the
+system tint, applied once by `worn(by:)` (`a-tint-set-in-the-dashboard.md`). `onTint` is
 the label drawn on that color: white where white measures 4.5 to 1 against the tint in the
 appearance being drawn, and black where it does not. The contrast floor wins over matching the white
 iOS draws on its own filled buttons. The screen background, the card behind rows and the lines
@@ -94,7 +97,7 @@ Trigger: present `DifferentRequestsView(hub:)` in a sheet. In the example app, t
 Host app: .sheet { DifferentRequestsView(hub:) }
         |
         v
-DifferentRequestsView.swift          TabView(selection: ScreenTab)        ScreenTab.swift
+DifferentRequestsView.swift          TabView(selection: ScreenTab)        proto/differentrequests_sdk_state.proto
    |  .searchable(text: hub.board.query)     .worn(by:)  View+WornBy.swift
    |  .task: appConfig.load, whoIsHere.read, inbox.load (the badge's count)
    |
@@ -116,8 +119,8 @@ RequestsScreen.swift
    v
 RequestsContent.swift                switch board.read
    +-- unread, reading -> ProgressView
-   +-- failed          -> LoadFailure.swift   (State/ReadTrouble.swift picks the sentence)
-   +-- empty           -> RequestsEmpty.swift (State/BoardNarrowing.swift, EmptyBoard.swift)
+   +-- failed          -> LoadFailure.swift   (State/ReadTrouble+Message.swift picks the sentence)
+   +-- empty           -> RequestsEmpty.swift (State/BoardNarrowing+Wording.swift, EmptyBoard+Words.swift)
    +-- loaded          -> RequestsList.swift
                             +-- WriteFailureNotice.swift
                             +-- RequestRow.swift
@@ -126,14 +129,14 @@ RequestsContent.swift                switch board.read
                             |     |               flips the row, then DifferentRequestsClient.vote / clearVote
                             |     +-- VoteTally.swift (nobody signed in)
                             |     +-- RequestSummary.swift -> StatusBadge.swift, StatusMark.swift,
-                            |              CommentCount.swift, Date+Ago.swift
+                            |              CommentCount.swift, Timestamp+Ago.swift
                             |     +-- push -> RequestDetailView.swift
                             +-- NextPageRow.swift -> RetryRow.swift
                             +-- PoweredByRow.swift -> push PoweredByPage.swift
 
 Tokens read by the views above:
-   Spacing.swift  TargetSize.swift  Radius.swift  VoteTileSize.swift
-   TextRole.swift  View+TextRole.swift  ColorRole.swift
+   Spacing+Points.swift  TargetSize+Points.swift  Radius+Points.swift  VoteTileSize+Points.swift
+   TextRole+Font.swift  View+TextRole.swift  ColorRole+ShapeStyle.swift
 ```
 
 ## What was walked

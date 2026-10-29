@@ -10,31 +10,31 @@ struct RequestHeader: View {
   @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
   var body: some View {
-    VStack(alignment: .leading, spacing: Spacing.small.rawValue) {
+    VStack(alignment: .leading, spacing: Spacing.small.points()) {
       Text(request.title)
         .textRole(.requestTitle)
         .foregroundStyle(ColorRole.label)
         .accessibilityAddTraits(.isHeader)
 
       if dynamicTypeSize.isAccessibilitySize {
-        VStack(alignment: .leading, spacing: Spacing.xxSmall.rawValue) {
+        VStack(alignment: .leading, spacing: Spacing.xxSmall.points()) {
           StatusBadge(state: request.state)
           RequestAuthor(request: request)
             .textRole(.meta)
             .foregroundStyle(ColorRole.secondaryLabel)
           if request.hasCreatedAt {
-            RequestAge(createdAt: request.createdAt.date)
+            RequestAge(createdAt: request.createdAt)
           }
         }
       } else {
-        HStack(alignment: .firstTextBaseline, spacing: Spacing.small.rawValue) {
+        HStack(alignment: .firstTextBaseline, spacing: Spacing.small.points()) {
           StatusBadge(state: request.state)
           RequestAuthor(request: request)
             .textRole(.meta)
             .foregroundStyle(ColorRole.secondaryLabel)
-          Spacer(minLength: Spacing.xSmall.rawValue)
+          Spacer(minLength: Spacing.xSmall.points())
           if request.hasCreatedAt {
-            RequestAge(createdAt: request.createdAt.date)
+            RequestAge(createdAt: request.createdAt)
           }
         }
       }

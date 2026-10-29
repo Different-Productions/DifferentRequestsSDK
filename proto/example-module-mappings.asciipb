@@ -1,0 +1,14 @@
+# Read by protoc-gen-swift through scripts/generate.sh, for the example app's own messages.
+#
+# The contract's messages live in DifferentRequestsProtos, and the SDK's public ones in
+# DifferentRequests. An example message holding either imports that module.
+mapping {
+  module_name: "DifferentRequestsProtos"
+  proto_file_path: "differentrequests_sdk.proto"
+  proto_file_path: "differentrequests_domain.proto"
+  proto_file_path: "differentrequests_options.proto"
+}
+mapping {
+  module_name: "DifferentRequests"
+  proto_file_path: "differentrequests_sdk_public.proto"
+}

@@ -12,8 +12,8 @@ struct NotificationOfferCard: View {
   let offer: NotificationOffer
 
   var body: some View {
-    VStack(alignment: .leading, spacing: Spacing.small.rawValue) {
-      HStack(alignment: .top, spacing: Spacing.xSmall.rawValue) {
+    VStack(alignment: .leading, spacing: Spacing.small.points()) {
+      HStack(alignment: .top, spacing: Spacing.xSmall.points()) {
         Image(systemName: "bell.fill")
           .foregroundStyle(ColorRole.tint)
           .accessibilityHidden(true)
@@ -30,13 +30,13 @@ struct NotificationOfferCard: View {
         DismissButton {
           offer.decline()
         }
-        .padding(.top, -Spacing.small.rawValue)
-        .padding(.trailing, -Spacing.small.rawValue)
+        .padding(.top, -Spacing.small.points())
+        .padding(.trailing, -Spacing.small.points())
       }
       .textRole(.rowTitle)
 
-      switch offer.state {
-      case .hidden, .offered:
+      switch offer.state.card {
+      case .none, .offered:
         Text(
           "You'll get a notification when this request is planned, shipped or replied to.",
           bundle: .module,
@@ -50,7 +50,7 @@ struct NotificationOfferCard: View {
         } label: {
           Text("Turn on notifications", bundle: .module, comment: "Button accepting notifications")
         }
-        .buttonStyle(PillButtonStyle(isFilled: true))
+        .buttonStyle(PillButtonStyle(fill: .tint))
       case .failed:
         Text(
           "Notifications couldn't be turned on. You can turn them on in Settings.",
@@ -65,9 +65,9 @@ struct NotificationOfferCard: View {
         } label: {
           Text("OK", bundle: .module, comment: "Button that closes the notification card")
         }
-        .buttonStyle(PillButtonStyle(isFilled: false))
+        .buttonStyle(PillButtonStyle(fill: .gray))
       }
     }
-    .padding(.vertical, Spacing.xxSmall.rawValue)
+    .padding(.vertical, Spacing.xxSmall.points())
   }
 }

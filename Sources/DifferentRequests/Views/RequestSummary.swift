@@ -13,7 +13,7 @@ struct RequestSummary: View {
   @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
   var body: some View {
-    VStack(alignment: .leading, spacing: Spacing.xxSmall.rawValue) {
+    VStack(alignment: .leading, spacing: Spacing.xxSmall.points()) {
       Text(request.title)
         .textRole(.rowTitle)
         .foregroundStyle(ColorRole.label)

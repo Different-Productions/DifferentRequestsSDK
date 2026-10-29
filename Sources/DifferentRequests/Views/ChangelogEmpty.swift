@@ -4,7 +4,7 @@ import SwiftUI
 struct ChangelogEmpty: View {
 
   /// What opens the host's requests list, or nil for no See requests.
-  let isShowingRequests: Binding<Bool>?
+  let requestsPresentation: Binding<RequestsPresentation>?
 
   var body: some View {
     ContentUnavailableView {
@@ -20,8 +20,8 @@ struct ChangelogEmpty: View {
         comment: "Message on an empty release notes screen"
       )
     } actions: {
-      if let isShowingRequests {
-        SeeRequestsButton(isShowingRequests: isShowingRequests)
+      if let requestsPresentation {
+        SeeRequestsButton(requestsPresentation: requestsPresentation)
       }
     }
   }

@@ -25,19 +25,15 @@ public struct RequestDetailView: View {
   /// This screen's own store, alive exactly as long as the screen is on the navigation stack.
   @State private var store: RequestDetailStore
 
-  /// Which request this screen is about, so news about it can be asked for by id.
-  private let requestID: String
-
   /// - Parameters:
   ///   - hub: What the host app built once and holds.
   ///   - requestID: Which request to show.
   public init(hub: DifferentRequestsHub, requestID: String) {
     self.hub = hub
-    self.requestID = requestID
     self._store = State(
       initialValue: RequestDetailStore(
         client: hub.client,
-        requestID: requestID,
+        detail: RequestDetailState(requestID: requestID),
         notificationOffer: hub.notificationOffer,
         firstVoteNote: hub.firstVoteNote
       )
@@ -49,6 +45,7 @@ public struct RequestDetailView: View {
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .groupedBackground()
       .navigationTitle(Text(verbatim: ""))
+      .backRow()
       .worn(by: hub)
       .sheetMinimumSize()
       // One request fills the sheet, so its comment field sits at the bottom edge.
@@ -59,13 +56,13 @@ public struct RequestDetailView: View {
       .onDisappear {
         hub.firstVoteNote.putAway()
       }
-      .task {
+      .task(id: hub.news.lastHeard(aboutRequest: store.detail.requestID)) {
         await hub.whoIsHere.read()
         // Read when there is nothing, and again when this request changed after the copy here
-        // arrived, so a screen opened from an alert draws what the alert was about.
-        if store.read.hasRead == false {
+        // arrived: on appearing, and the moment news about it lands while it is up.
+        if store.hasRead() == false {
           await store.load()
-        } else if hub.news.hasNews(aboutRequest: requestID, newerThan: store.readAt) {
+        } else if hub.news.hasNews(about: store.detail) {
           await store.load()
         }
       }

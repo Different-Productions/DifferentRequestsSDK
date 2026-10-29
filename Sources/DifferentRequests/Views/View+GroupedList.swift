@@ -7,9 +7,9 @@ extension View {
   func groupedList() -> some View {
     #if os(iOS)
     listStyle(.insetGrouped)
-      .listSectionSpacing(Spacing.small.rawValue)
+      .listSectionSpacing(Spacing.small.points())
       // Added to the system's own gap under a large title, which makes it one small space.
-      .contentMargins(.top, Spacing.xxSmall.rawValue, for: .scrollContent)
+      .contentMargins(.top, Spacing.xxSmall.points(), for: .scrollContent)
     #else
     listStyle(.inset)
     #endif

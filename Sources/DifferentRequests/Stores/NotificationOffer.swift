@@ -34,7 +34,7 @@ final class NotificationOffer {
   // MARK: - State
 
   /// Where the card is.
-  private(set) var state: NotificationOfferState = .hidden
+  private(set) var state = NotificationOfferState()
 
   // MARK: - Init
 
@@ -52,20 +52,20 @@ final class NotificationOffer {
 
   /// Whether the card is drawn under `requestID`.
   func isOffered(on requestID: String) -> Bool {
-    state.requestID == requestID
+    state.requestID() == requestID
   }
 
   /// Offers the card under `requestID` after a vote or follow landed there, when the host app left
   /// permission to the SDK, it has never been answered on this phone, the plan sends notifications,
   /// and Apple has not been asked yet.
   func votedOrFollowed(requestID: String) async {
-    if permission == .askedBySDK,
-      state.requestID == nil,
+    if permission.sdkAsks(),
+      state.requestID() == nil,
       appConfig.config.pushEnabled,
       defaults.bool(forKey: Self.answeredKey) == false {
       let settings = await UNUserNotificationCenter.current().notificationSettings()
       if settings.authorizationStatus == .notDetermined {
-        state = .offered(requestID: requestID)
+        state.card = .offered(requestID)
       }
     }
   }
@@ -75,15 +75,15 @@ final class NotificationOffer {
   /// Dismiss: the card goes, and is not offered again on this phone.
   func decline() {
     defaults.set(true, forKey: Self.answeredKey)
-    state = .hidden
+    state = NotificationOfferState()
   }
 
   /// "Turn on notifications": the card goes, Apple's prompt comes up, and a yes registers for remote
   /// notifications so the token reaches the host app's delegate.
   func accept() async {
-    if let requestID = state.requestID {
+    if let requestID = state.requestID() {
       defaults.set(true, forKey: Self.answeredKey)
-      state = .hidden
+      state = NotificationOfferState()
 
       do {
         let granted = try await UNUserNotificationCenter.current()
@@ -92,7 +92,9 @@ final class NotificationOffer {
           registerForRemoteNotifications()
         }
       } catch {
-        state = .failed(NotificationOfferFailure(requestID: requestID, error: error))
+        var failure = NotificationOfferFailure()
+        failure.requestID = requestID
+        state.card = .failed(failure)
       }
     }
   }

@@ -15,17 +15,17 @@ extension Error {
   ///
   /// Both shapes are checked. Swift's own `CancellationError` is thrown by structured concurrency,
   /// and `URLSession` throws `URLError.cancelled` instead — Apple's own spelling, kept as theirs —
-  /// and the client wraps whatever the
-  /// session threw, so the wrapper is unwrapped here rather than at each caller.
-  var isCancellation: Bool {
+  /// and the client throws a ``DifferentRequestsFault/canceled`` failure in place of either, which
+  /// is read here rather than at each caller.
+  func isCancellation() -> Bool {
     if self is CancellationError {
       return true
     }
     if let url = self as? URLError, url.code == .cancelled {
       return true
     }
-    if let known = self as? DifferentRequestsError, case .networkError(let underlying) = known {
-      return underlying.isCancellation
+    if let known = self as? DifferentRequestsError {
+      return known.isCanceled()
     }
     return false
   }

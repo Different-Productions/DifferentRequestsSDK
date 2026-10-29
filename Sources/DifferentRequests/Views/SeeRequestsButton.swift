@@ -3,12 +3,12 @@ import SwiftUI
 /// "See requests" on an empty Roadmap or What's New: asks the host to open its requests list.
 struct SeeRequestsButton: View {
 
-  /// Set to `true` to ask the host for its requests list.
-  @Binding var isShowingRequests: Bool
+  /// Set showing to ask the host for its requests list.
+  @Binding var requestsPresentation: RequestsPresentation
 
   var body: some View {
     Button {
-      isShowingRequests = true
+      requestsPresentation.showing = true
     } label: {
       Text("See requests", bundle: .module, comment: "Button on an empty Roadmap or What's New that opens the request list")
     }

@@ -16,7 +16,7 @@ So a walk can be a different person, or the same person under a new name, withou
 
 | Surface | Ships this? |
 |---|---|
-| The example app | **Yes** — `ProcessInfo+DemoPerson.swift`, read by `Session.start()` |
+| The example app | **Yes** — `DemoSettings+Environment.swift`, read by `Session.start()` |
 | The SDK library | **none** |
 | The server, console, documentation | **none** |
 
@@ -53,17 +53,16 @@ The app signs in as that identifier with that name, and everything it does after
 ## Flow chart of the real code path
 
 ```
-DifferentRequestsExampleApp · RemoteNotificationDelegate.session
+RemoteNotificationDelegate.init()                             (RemoteNotificationDelegate.swift)
+  └─ DemoSettings(environment:)                               (DemoSettings+Environment.swift)
+       ├─ external_user_id: DIFFERENT_REQUESTS_EXTERNAL_ID non-empty ──► that, otherwise "demo-user"
+       └─ display_name:     DIFFERENT_REQUESTS_DISPLAY_NAME non-empty ──► that, otherwise "Demo User"
   └─ Session.start()                                          (Session.swift)
-       ├─ DemoConfig.isConfigured == false ──► .unconfigured
+       ├─ settings.appKeySupplied == false ──► .unconfigured
        └─ Session.signIn()
             └─ client.createSession(
-                 externalID:  ProcessInfo.processInfo.demoExternalUserID  (ProcessInfo+DemoPerson.swift)
-                                ├─ DIFFERENT_REQUESTS_EXTERNAL_ID non-empty ──► that
-                                └─ otherwise ────────────────────────────────► DemoConfig.externalUserID
-                 displayName: ProcessInfo.processInfo.demoDisplayName
-                                ├─ DIFFERENT_REQUESTS_DISPLAY_NAME non-empty ──► that
-                                └─ otherwise ────────────────────────────────► DemoConfig.displayName
+                 externalID:  settings.externalUserID
+                 displayName: settings.displayName
                  proof:       DemoBackend.vouchFor(externalID:)            (DemoBackend.swift)
                )
 ```

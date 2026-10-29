@@ -33,10 +33,14 @@ final class RoadmapStore {
   // MARK: - State
 
   /// Whether this app has a roadmap, and how far the asking got.
-  var plan: PlanState = .unread
+  var plan = PlanState()
 
-  /// The roadmap itself: where its read got to, and the columns it found, in display order.
-  var read: ReadState<[DRRoadmapColumn]> = .unread
+  /// Where the roadmap's read has got to.
+  var status = ReadStatus()
+
+  /// The columns the roadmap's read found, in display order. Empty until a read answers with a
+  /// column that holds anything.
+  var roadmap = RoadmapState()
 
   // MARK: - Init
 
@@ -53,9 +57,9 @@ final class RoadmapStore {
   /// screen can show: the configuration is asked for again when the last ask did not answer, and
   /// asked for once when it did.
   func load() async {
-    if read.isReading == false {
+    if status.isReading() == false {
       await readPlan()
-      if plan.isIncluded {
+      if plan.isIncluded() {
         await readColumns()
       }
     }
@@ -66,14 +70,14 @@ final class RoadmapStore {
   /// The client answers a second ask from the first read, so the cost of every gated surface
   /// asking for itself is one round trip for all of them.
   private func readPlan() async {
-    if plan.needsReading {
-      plan = .reading
+    if plan.needsReading() {
+      plan.state = .reading(Reading())
 
       do {
         let answer = try await client.config()
         plan = PlanState(surface: .roadmap, response: answer)
       } catch {
-        plan = .failed(error)
+        plan.state = .failed(ReadTrouble(error: error))
       }
     }
   }
@@ -86,17 +90,22 @@ final class RoadmapStore {
   ///
   /// The server always answers with every column, so a roadmap is empty when every column is.
   private func readColumns() async {
-    read = read.whileReading
+    status.state = .reading(Reading())
 
     do {
       let answer = try await client.roadmap()
-      if answer.columns.allSatisfy({ $0.totalCount == 0 }) {
-        read = .empty
-      } else {
-        read = ReadState(page: answer.columns)
+      let empty = answer.columns.allSatisfy { column in
+        column.totalCount == 0
       }
+      if empty {
+        roadmap.columns = []
+      } else {
+        roadmap.columns = answer.columns
+      }
+      status.state = .loaded(ReadAnswered())
     } catch {
-      read = ReadState(readFailure: error)
+      roadmap.columns = []
+      status = ReadStatus(readFailure: error)
     }
   }
 }

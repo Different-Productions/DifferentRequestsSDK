@@ -1,0 +1,415 @@
+syntax = "proto3";
+
+package differentrequests.sdk.v1;
+
+import "differentrequests_sdk.proto";
+
+// No prefix: every contract type is generated `DR`-prefixed into DifferentRequestsProtos, so an
+// unprefixed name here cannot collide with one, and each message takes the name the SDK already
+// calls it by.
+option swift_prefix = "";
+
+// What the SDK's screens hold while they run: where a read or a write has got to, and why one did
+// not land.
+//
+// None of it goes over the wire. It lives in a schema anyway, so the SDK, the server and the
+// dashboard never hold two implementations of one object. A screen's words are Swift methods on
+// these types, because they are localized when they are drawn.
+//
+// A oneof left unset is each message's starting state, named on the message, so no message carries
+// a value meaning "nothing yet" beside the unset one.
+
+// A read or write is in flight.
+message Reading {}
+
+// The phone could not reach the server at all.
+message Offline {}
+
+// The configuration answered and this app does not have the surface.
+message SurfaceExcluded {}
+
+// The configuration answered and this app has the surface.
+message SurfaceIncluded {}
+
+// The configuration answered and this app pays, so there is no badge.
+message BadgeBought {}
+
+// The configuration answered and this app is on the free plan.
+message BadgeCarried {}
+
+// The server reported no further page by leaving the cursor empty.
+message NoMorePages {}
+
+// Why a read did not answer, in the terms the person looking at the screen can act on.
+//
+// Unset: anything else, which the person can only wait out.
+message ReadTrouble {
+  oneof reason {
+    Offline offline = 1;
+
+    // The server asked for a pause, for as long as it says.
+    differentrequests.v1.RateLimited too_many_tries = 2;
+  }
+}
+
+// The server answered a read.
+message ReadAnswered {}
+
+// Where a surface's read has got to. What it found is held beside this, on the store that owns
+// the surface, and is empty until a read answers with something.
+//
+// Unset: nothing has been asked, or the last read was called off.
+message ReadStatus {
+  oneof state {
+    // In flight. Whatever is already held stays on screen while it runs.
+    Reading reading = 1;
+
+    // The read did not answer. Nothing is held.
+    ReadTrouble failed = 2;
+
+    // The server answered. Nothing held means it found nothing, or said the thing is not there.
+    ReadAnswered loaded = 3;
+  }
+}
+
+// Whether a surface is part of what an app includes, and how far the asking got.
+//
+// Unset: nothing has been asked.
+message PlanState {
+  oneof state {
+    Reading reading = 1;
+
+    // The configuration did not answer, so whether this surface exists is not known.
+    ReadTrouble failed = 2;
+
+    SurfaceExcluded excluded = 3;
+    SurfaceIncluded included = 4;
+  }
+}
+
+// Whether this app's screens carry "Powered by Different Requests", and how far the asking got.
+//
+// Unset: nothing has been asked.
+message BadgeState {
+  oneof state {
+    Reading reading = 1;
+
+    // The configuration did not answer, so whether this app pays is not known. No badge is drawn.
+    ReadTrouble failed = 2;
+
+    BadgeBought bought = 3;
+    BadgeCarried carried = 4;
+  }
+}
+
+// Whether a paged surface has another page, and what happened to the last attempt at one.
+//
+// Unset: there may be another page, and nothing is being done about it yet.
+message PageState {
+  oneof state {
+    Reading reading = 1;
+
+    // The last attempt at the next page did not answer. The cursor still points at that page.
+    ReadTrouble failed = 2;
+
+    NoMorePages done = 3;
+  }
+}
+
+// What a write was trying to do, kept so that a failure can name it.
+enum WriteAttempt {
+  WRITE_ATTEMPT_UNSPECIFIED = 0;
+
+  // Adding the caller's vote to a request.
+  WRITE_ATTEMPT_VOTE = 1;
+
+  // Taking it back.
+  WRITE_ATTEMPT_CLEAR_VOTE = 2;
+
+  // Starting to follow a request without adding demand to it.
+  WRITE_ATTEMPT_FOLLOW = 3;
+
+  // Stopping.
+  WRITE_ATTEMPT_UNFOLLOW = 4;
+
+  // Posting a comment on a request.
+  WRITE_ATTEMPT_COMMENT = 5;
+
+  // Stamping one notification read.
+  WRITE_ATTEMPT_MARK_READ = 6;
+
+  // Stamping every notification read.
+  WRITE_ATTEMPT_MARK_EVERYTHING_READ = 7;
+
+  // Filing a new request.
+  WRITE_ATTEMPT_FILE_REQUEST = 8;
+}
+
+// A write that did not land: which one it was, and what the server answered instead.
+message WriteFailure {
+  WriteAttempt attempt = 1;
+
+  // Its reason says whether the write was refused or is worth trying again. Unset: no answer came.
+  differentrequests.v1.ApiError answer = 2;
+}
+
+// What a surface's last write is doing, or what it did instead.
+//
+// Unset: nothing is being written and nothing failed.
+message WriteState {
+  oneof state {
+    WriteAttempt writing = 1;
+    WriteFailure failed = 2;
+  }
+}
+
+// Asking Apple for permission to send notifications threw, under the request the card was on.
+message NotificationOfferFailure {
+  string request_id = 1;
+}
+
+// Where the "Get notified when this request changes?" card is.
+//
+// Unset: no card is up.
+message NotificationOfferState {
+  oneof card {
+    // The request whose vote or follow brought the card.
+    string offered = 1;
+
+    NotificationOfferFailure failed = 2;
+  }
+}
+
+// What a screen says in place of a surface this app does not have: a fact about the app, never a
+// failure, and never a word about the plan.
+message Absence {
+  string title = 1;
+  string message = 2;
+
+  // The SF Symbol beside the title, the one the surface itself uses.
+  string symbol = 3;
+}
+
+// What is keeping requests off the board, which is the whole of what an empty board means.
+enum BoardNarrowing {
+  BOARD_NARROWING_UNSPECIFIED = 0;
+
+  // The whole board, unsearched.
+  BOARD_NARROWING_NOTHING = 1;
+
+  // Narrowed by what was typed into the search field.
+  BOARD_NARROWING_QUERY = 2;
+
+  // Narrowed to a set of statuses.
+  BOARD_NARROWING_STATUSES = 3;
+
+  // Narrowed by both, the one case where a duplicate can be hidden from the person about to file it.
+  BOARD_NARROWING_QUERY_AND_STATUSES = 4;
+}
+
+// The tabs in the SDK's sheet.
+enum ScreenTab {
+  SCREEN_TAB_UNSPECIFIED = 0;
+  SCREEN_TAB_REQUESTS = 1;
+  SCREEN_TAB_ROADMAP = 2;
+  SCREEN_TAB_CHANGELOG = 3;
+  SCREEN_TAB_INBOX = 4;
+
+  // The system search button beside the tab bar.
+  SCREEN_TAB_SEARCH = 5;
+}
+
+// What this package tells the server it is, on every rpc, in the `X-DR-Client` header.
+//
+// It names the library and never the person: no identifier, nothing that survives an install,
+// nothing a second request could be joined to a first by.
+message SDKClient {
+  // The released version of this package. The release workflow refuses a tag this does not match.
+  string version = 1;
+
+  // The operating system's name: `iOS`, `macOS`, `tvOS`, `watchOS` or `visionOS`.
+  string platform = 2;
+
+  // The operating system's major and minor version, `26.1`.
+  string os_version = 3;
+}
+
+// The gaps every SDK screen is laid out from. A gap that is not one of these is the system's own.
+enum Spacing {
+  SPACING_UNSPECIFIED = 0;
+
+  // 4 pt.
+  SPACING_XX_SMALL = 1;
+
+  // 8 pt.
+  SPACING_X_SMALL = 2;
+
+  // 12 pt.
+  SPACING_SMALL = 3;
+
+  // 16 pt.
+  SPACING_MEDIUM = 4;
+
+  // 20 pt.
+  SPACING_LARGE = 5;
+
+  // 24 pt.
+  SPACING_X_LARGE = 6;
+
+  // 32 pt.
+  SPACING_XX_LARGE = 7;
+}
+
+// The corners the SDK draws. On iOS a control is a capsule and a group of rows takes the system's
+// corner, so neither has a number here.
+enum Radius {
+  RADIUS_UNSPECIFIED = 0;
+
+  // 12 pt: a shape that sits inside a row.
+  RADIUS_INNER = 1;
+
+  // 7 pt: a Mac push button's corner, for a control drawn to look like one.
+  RADIUS_MAC_CONTROL = 2;
+}
+
+// How tall a button the SDK draws itself is, at the least.
+enum ControlHeight {
+  CONTROL_HEIGHT_UNSPECIFIED = 0;
+
+  // 50 pt: the system's large control size.
+  CONTROL_HEIGHT_LARGE = 1;
+
+  // 28 pt: a Mac control's default size, from the HIG's Accessibility page.
+  CONTROL_HEIGHT_MAC_PUSH = 2;
+}
+
+// The smallest the vote tile is drawn. Each is a minimum, so the tile grows with larger text.
+enum VoteTileSize {
+  VOTE_TILE_SIZE_UNSPECIFIED = 0;
+
+  // 36 pt: the side of the Mac's square tile. A Mac control is clicked, not tapped.
+  VOTE_TILE_SIZE_SIDE = 1;
+
+  // 48 pt: the iOS tile's width.
+  VOTE_TILE_SIZE_WIDTH = 2;
+
+  // 56 pt: the iOS tile's height.
+  VOTE_TILE_SIZE_HEIGHT = 3;
+}
+
+// How small a tap area may be.
+enum TargetSize {
+  TARGET_SIZE_UNSPECIFIED = 0;
+
+  // 44 pt: the side no control's hit region goes under.
+  TARGET_SIZE_MINIMUM = 1;
+}
+
+// The smallest a full SDK screen is drawn on macOS: room for the bar's buttons on one line and a
+// screenful of rows.
+enum SheetMinimumSize {
+  SHEET_MINIMUM_SIZE_UNSPECIFIED = 0;
+
+  // 520 pt.
+  SHEET_MINIMUM_SIZE_WIDTH = 1;
+
+  // 600 pt.
+  SHEET_MINIMUM_SIZE_HEIGHT = 2;
+}
+
+// How a control the SDK draws itself looks while a finger is on it.
+enum PressedLook {
+  PRESSED_LOOK_UNSPECIFIED = 0;
+
+  // Opacity 1: a control at rest.
+  PRESSED_LOOK_AT_REST = 1;
+
+  // Opacity 0.6: a control being pressed.
+  PRESSED_LOOK_PRESSED = 2;
+}
+
+// The numbers relative luminance is computed from, over linear color components.
+enum LuminanceWeight {
+  LUMINANCE_WEIGHT_UNSPECIFIED = 0;
+
+  // 0.2126.
+  LUMINANCE_WEIGHT_RED = 1;
+
+  // 0.7152.
+  LUMINANCE_WEIGHT_GREEN = 2;
+
+  // 0.0722.
+  LUMINANCE_WEIGHT_BLUE = 3;
+
+  // 0.183: the luminance above which white on a color measures under 4.5 to 1 and black measures
+  // over it.
+  LUMINANCE_WEIGHT_BLACK_CONTRAST_THRESHOLD = 4;
+}
+
+// The range one component of a color in the contract is counted in.
+enum ColorComponent {
+  COLOR_COMPONENT_UNSPECIFIED = 0;
+
+  // 255: the largest value a component holds. A larger one is not a color.
+  COLOR_COMPONENT_LARGEST = 1;
+}
+
+// When a field's character count is worth showing.
+enum CharacterCountdown {
+  CHARACTER_COUNTDOWN_UNSPECIFIED = 0;
+
+  // 40: how few characters must be left before the count appears.
+  CHARACTER_COUNTDOWN_SHOWN_FROM = 1;
+}
+
+// What a piece of text is for, which decides the system text style it is set in. Every role is a
+// built-in text style, so all of them follow Dynamic Type.
+enum TextRole {
+  TEXT_ROLE_UNSPECIFIED = 0;
+
+  // A screen's title. Large Title, bold.
+  TEXT_ROLE_SCREEN_TITLE = 1;
+
+  // A request's title on its own screen. Title 2, bold.
+  TEXT_ROLE_REQUEST_TITLE = 2;
+
+  // A row's title, a heading, a button's label. Headline.
+  TEXT_ROLE_ROW_TITLE = 3;
+
+  // Anything read at length: comments, notes, fields. Body.
+  TEXT_ROLE_READING = 4;
+
+  // One supporting line under a title. Subheadline.
+  TEXT_ROLE_SUPPORTING = 5;
+
+  // Status, counts, age, help under a field. Footnote.
+  TEXT_ROLE_META = 6;
+}
+
+// What a color is for. Each role is a system color that adapts to light, dark and increased
+// contrast, except the tint, which is the host app's own.
+//
+// The screen background, the card behind rows and the lines between rows are drawn by the system's
+// grouped list, so they have no role here.
+enum ColorRole {
+  COLOR_ROLE_UNSPECIFIED = 0;
+
+  // Titles, status, counts, comments.
+  COLOR_ROLE_LABEL = 1;
+
+  // Supporting lines and ages.
+  COLOR_ROLE_SECONDARY_LABEL = 2;
+
+  // Behind a gray button and a vote tile that is not voted.
+  COLOR_ROLE_FILL = 3;
+
+  // The host app's color: the main action, your own vote, unread.
+  COLOR_ROLE_TINT = 4;
+
+  // A label drawn on the tint: white where white measures 4.5 to 1 against it, and black where it
+  // does not.
+  COLOR_ROLE_ON_TINT = 5;
+
+  // Something failed.
+  COLOR_ROLE_FAILURE = 6;
+}

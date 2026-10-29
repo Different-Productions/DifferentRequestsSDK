@@ -1,4 +1,6 @@
+import DifferentRequestsProtos
 import Foundation
+import SwiftProtobuf
 
 /// When each request was last heard to have changed.
 ///
@@ -12,34 +14,60 @@ import Foundation
 /// vote cast from a row lands; and the host app, when a push lands while it is running. None has to
 /// know what is holding a stale copy.
 ///
-/// Not observable. A screen asks this while its body is being built, which is the one moment a
-/// write to observed state must not happen, and nothing draws it directly.
+/// Observable, so a screen already up re-reads the moment news lands. A body reads this only to key
+/// a task; the re-read runs in that task, and only `heard(aboutRequest:at:)` writes, from a store's
+/// async work or the hub, never while a body is being built.
 @MainActor
+@Observable
 final class NewsAboutRequests {
 
   /// The newest instant each request was heard to have changed, by request id.
-  private var heardAt: [String: Date] = [:]
+  private(set) var news = NewsState()
 
   /// Records that this request changed at this instant.
   ///
-  /// Older news is dropped rather than written: an inbox re-read hands over every notification it
-  /// holds, and the newest is the only one that says anything a held copy does not already know.
+  /// News no newer than what is held is dropped without a write: an inbox re-read hands over every
+  /// notification it holds, the newest is the only one that says anything a held copy does not
+  /// already know, and a re-read that learns nothing wakes no screen.
   func heard(aboutRequest requestID: String, at instant: Date) {
-    if let already = heardAt[requestID] {
-      heardAt[requestID] = max(already, instant)
-    } else {
-      heardAt[requestID] = instant
+    if lastHeard(aboutRequest: requestID).date < instant {
+      news.heardAt[requestID] = Google_Protobuf_Timestamp(date: instant)
     }
   }
 
-  /// Whether this request changed after a copy read at `readAt` was taken.
+  /// When this request was last heard to have changed, or an unset instant when it never was.
+  ///
+  /// What a request's own screen keys its read on, so news about it reads it again while it is up.
+  func lastHeard(aboutRequest requestID: String) -> Google_Protobuf_Timestamp {
+    if let heard = news.heardAt[requestID] {
+      return heard
+    }
+    return Google_Protobuf_Timestamp()
+  }
+
+  /// Whether the request `detail` holds changed after its copy was read.
   ///
   /// A copy that was never read is not stale — it is absent, which the screen's own read state
   /// already says.
-  func hasNews(aboutRequest requestID: String, newerThan readAt: Date?) -> Bool {
-    guard let heard = heardAt[requestID], let readAt else {
-      return false
+  func hasNews(about detail: RequestDetailState) -> Bool {
+    if detail.hasReadAt {
+      return isNewer(aboutRequest: detail.requestID, than: detail.readAt)
     }
-    return heard > readAt
+    return false
+  }
+
+  /// Whether any row `board` holds changed after its copy arrived.
+  func hasNews(about board: BoardState) -> Bool {
+    board.copiedAt.contains { requestID, copied in
+      isNewer(aboutRequest: requestID, than: copied)
+    }
+  }
+
+  /// Whether this request was heard to have changed after `copied`.
+  private func isNewer(aboutRequest requestID: String, than copied: Google_Protobuf_Timestamp) -> Bool {
+    if let heard = news.heardAt[requestID] {
+      return heard.date > copied.date
+    }
+    return false
   }
 }

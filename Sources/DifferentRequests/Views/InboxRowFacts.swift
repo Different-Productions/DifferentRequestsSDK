@@ -11,21 +11,21 @@ struct InboxRowFacts: View {
 
   var body: some View {
     if dynamicTypeSize.isAccessibilitySize {
-      VStack(alignment: .leading, spacing: Spacing.xxSmall.rawValue) {
+      VStack(alignment: .leading, spacing: Spacing.xxSmall.points()) {
         Text(notification.requestTitle)
         if notification.hasCreatedAt {
-          Text(notification.createdAt.date.ago)
+          Text(notification.createdAt.ago())
         }
       }
       .textRole(.supporting)
       .foregroundStyle(ColorRole.secondaryLabel)
     } else {
-      HStack(alignment: .firstTextBaseline, spacing: Spacing.xSmall.rawValue) {
+      HStack(alignment: .firstTextBaseline, spacing: Spacing.xSmall.points()) {
         Text(notification.requestTitle)
           .lineLimit(1)
-        Spacer(minLength: Spacing.xSmall.rawValue)
+        Spacer(minLength: Spacing.xSmall.points())
         if notification.hasCreatedAt {
-          Text(notification.createdAt.date.ago)
+          Text(notification.createdAt.ago())
             .layoutPriority(1)
         }
       }

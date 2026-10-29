@@ -8,10 +8,10 @@ struct ReadTroubleSymbol: View {
   let trouble: ReadTrouble
 
   var body: some View {
-    switch trouble {
+    switch trouble.reason {
     case .offline:
       Image(systemName: "wifi.slash")
-    case .tooManyTries, .other:
+    case .tooManyTries, .none:
       Image(systemName: "exclamationmark.triangle")
     }
   }

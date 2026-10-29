@@ -24,28 +24,28 @@ the others:
 
 | Value | Type | Replaces |
 | --- | --- | --- |
-| `read` | `ReadState<Content>` | `isLoading`, `hasLoaded`, `loadError`, and the emptiness of the collection |
-| `page` | `PageState` | `hasMore`, `isLoadingMore`, and the half of `loadError` a paged read set |
-| `write` | `WriteState` | `isWriting`, `writeError` / `submitError` |
+| `status` + its content | `ReadStatus` (proto), beside `requests`, `notifications`, `entries`, `columns` or `answer` | `isLoading`, `hasLoaded`, `loadError` |
+| `page` | `PageState` (proto) | `hasMore`, `isLoadingMore`, and the half of `loadError` a paged read set |
+| `write` | `WriteState` (proto) | `isWriting`, `writeError` / `submitError` |
 
 Three rather than one because all three are true together: a vote is cast on a board that is
 already loaded, while its third page is arriving. Folding them into a single value would mean a
 failed vote erasing the list it was cast on.
 
-`ReadState` has six cases and four outcomes. `unread` and `reading` draw the same picture; `loaded`
-and `refreshing` draw the same picture. They are separate cases because the store needs the
-difference and the view does not — a read already running must not be started twice, and a refresh
-must not blank the list that is running it, because a pull-to-refresh lives on the list's own task
-and a list that disappears takes that task with it.
+`ReadStatus` has four states, and with the content held beside it they give four outcomes. A view
+draws the list whenever the content is non-empty, and switches on `status.state` only when it is
+empty. So a read in flight over held content draws the list — a read already running must not be
+started twice, and a refresh must not blank the list that is running it, because a pull-to-refresh
+lives on the list's own task and a list that disappears takes that task with it.
 
-```swift
-enum ReadState<Content> {
-  case unread                 // nothing has been asked for
-  case reading                // in flight, nothing to show
-  case failed(any Error)      // did not answer
-  case empty                  // answered, and there is nothing there
-  case loaded(Content)        // answered, and here it is
-  case refreshing(Content)    // in flight over what is already on screen
+```proto
+message ReadStatus {            // proto/differentrequests_sdk_state.proto
+  oneof state {
+                                // unset: nothing asked, or the read was called off
+    Reading reading = 1;        // in flight
+    ReadTrouble failed = 2;     // did not answer
+    ReadAnswered loaded = 3;    // answered; the content beside it says what was found
+  }
 }
 ```
 
@@ -57,15 +57,15 @@ Three things fell out of doing this that were the same defect wearing different 
   under the last row that spun forever. `PageState.failed` is now its own case and `NextPageRow`
   draws it.
 - **A request the server says is gone** was rendered as "This request couldn't load … Try again", which is a
-  button that will never work. `ReadState.empty` on `RequestDetailStore.read` is now that answer,
-  reached through `DifferentRequestsError.isNotFound`.
+  button that will never work. `RequestDetailStore.status` loaded with no request in `answer` is that
+  answer, reached through `DifferentRequestsError.isNotFound()`.
 - **A second tap during a write** was refused by the store — every store takes one write at a time
   — and refused silently. The controls now go inert from `write.isWriting`, and say so, because
   `.buttonStyle(.plain)` draws a disabled button exactly like an enabled one.
 - **A tap during a refresh** was refused for the same reason in reverse: `refreshing` and `loaded`
   draw the same screen, so every control on a refreshing surface is there to be tapped. A store
-  reading only the settled case would refuse all of them without a word. `ReadState.content` and
-  `ReadState.held` both answer from either, and `ReadState.holding(_:)` is how a write's answer
+  reading only the settled case would refuse all of them without a word. A store finds the row in
+  the content it holds whatever the status, and `ReadStatus.afterWrite()` is how a write's answer
   lands without clearing the mark that says a read is still running.
 
 ## Surfaces
@@ -80,10 +80,10 @@ Every surface this package ships, and what it now says when something does not w
 | `ChangelogView` | Yes: read and page. Nothing is written from here |
 | `RoadmapView` | Yes: read. There is no paging and nothing is written from here |
 | `SubmitRequestView` — the pushed New request form | Yes, as it already did. It now says it through the same component as everything else |
-| `VoteControl` — the component | Yes: takes `isWriting` and takes no tap while it is true. Since 2026-10-09 it is not dimmed: the tapped tile has already flipped |
+| `VoteControl` — the component | Yes: takes a `VoteTile` and takes no tap while its `writing` is true. Since 2026-10-09 it is not dimmed: the tapped tile has already flipped |
 | `WriteFailureNotice` — the component | This is the thing that says it, on four surfaces |
 | `NextPageRow`, `RetryRow`, `LoadFailure` — the components | These are what a failed read says |
-| `DifferentRequestsClient` — the API, for host apps building their own UI | Yes: everything throws `DifferentRequestsError`. `isNotFound` and `retryAfterSeconds` are what to branch on |
+| `DifferentRequestsClient` — the API, for host apps building their own UI | Yes: everything throws `DifferentRequestsError`. `reason`, `isNotFound()` and `retryAfterSeconds()` are what to branch on |
 | `DifferentRequestsHub` — the object the host holds | No UI of its own. `fileRequest()` reads `SubmitStore.submitted` to decide whether the board needs re-reading |
 | Example app (`Example/DifferentRequestsExample`) | Yes, through the SDK screens in its tabs |
 | Command line | None. This package ships no executable |
@@ -106,7 +106,7 @@ fills or empties and the count moves by one), and calls the client.
 **What happens.** While the call runs, every `VoteControl` on the board is `.disabled`, because the
 store takes one vote at a time. None is dimmed: the tapped tile has already answered the tap.
 On failure, the row goes back to what it was, `write` becomes
-`.failed(WriteFailure(attempt:error:))` and a line appears in a section at the top of the list:
+`.failed(WriteFailure(attempt:error:))`, holding the server's `ApiError` when it answered, and a line appears in a section at the top of the list:
 **"Your vote didn't go through. Try again."** with **Dismiss** beside it. On success the row is
 replaced by the request the write returned, found again by id rather than by an index taken before
 the call.
@@ -117,7 +117,7 @@ the call.
 `NextPageRow` asks for the next page, with the same network.
 
 **What happens.** A first read that fails replaces the board with "Requests couldn't load" and a **Try
-again**. A refresh keeps the list up for the whole read — `refreshing(held)` — and replaces it with
+again**. A refresh keeps the list up for the whole read — `.reading` with `requests` still held — and replaces it with
 the failure only when the answer is a failure. A *page* that fails leaves everything already read
 on screen and puts **"Couldn't load more requests."** with **Try again** where the spinner was. It does
 not retry itself: a retry that fires itself loops against a server that is down.
@@ -197,13 +197,14 @@ when nobody knows whether it is. It now shows "Roadmap couldn't load" with **Try
 
 **Trigger it.** Call anything.
 
-**What happens.** Unchanged, plus one addition: `isNotFound` says whether the server's answer
-carried the `notFound` arm of `DRApiError.reason`, which is the distinction between an outage and
-an answer. The `message` on a `DRApiError` is still written for whoever is debugging and may name
-internals — no copy in this SDK is derived from it.
+**What happens.** `DifferentRequestsError` is a generated message: `reason` (a
+`DifferentRequestsFault`), `message`, and `apiError` when the server answered. `isNotFound()` says
+whether that answer carried the `notFound` arm of `DRApiError.reason`, which is the distinction
+between an outage and an answer. The `message` on a `DRApiError` is written for whoever is debugging
+and may name internals — no copy in this SDK is derived from it.
 
-`retryAfterSeconds` reads the seconds off the `rateLimited` arm, so a failure of any other kind has
-no seconds to be asked for and the property answers nil.
+`retryAfterSeconds()` reads the seconds off the `rateLimited` arm, so a failure of any other kind
+has no seconds to be asked for.
 
 ## Expectations
 
@@ -211,9 +212,9 @@ no seconds to be asked for and the property answers nil.
 
 | What someone does | What they get |
 | --- | --- |
-| Opens a surface that has never read | A centred spinner, from `ReadState.unread` |
-| Opens a surface whose store has already read | What it read, with no second read. `firstRead` keys on `hasRead`, which is true from the first answer onward |
-| Pulls to refresh a loaded list | The list stays up for the whole read (`refreshing(held)`) and is replaced by the answer |
+| Opens a surface that has never read | A centered spinner, from an unset `ReadStatus` |
+| Opens a surface whose store has already read | What it read, with no second read. The view's `.task` keys on the store's `hasRead()`, which is true from the first answer onward |
+| Pulls to refresh a loaded list | The list stays up for the whole read (`.reading` over held content) and is replaced by the answer |
 | Votes successfully | On the board the tile flips at once, then the row is replaced by the request the write returned, so the count that stays is the server's |
 | Marks one notification read successfully | The row is replaced by the stamped one, and the badge drops by one — the server answered with the stamp, so this is not a guess |
 | Marks everything read successfully | The whole inbox and its badge are re-read; nothing marked means nothing changed, so nothing is re-read |
@@ -233,9 +234,9 @@ no seconds to be asked for and the property answers nil.
 | One notification fails to mark read | **"Couldn't mark this update as read. Try again."** at the top of the inbox. The dot stays blue |
 | Marking everything read fails | **"Couldn't mark every update as read. Try again."** at the top of the inbox. Nothing is re-read, because nothing was marked |
 | Filing a request fails | **"Your request didn't send. What you wrote is still here. Choose Send to try again."** under the Details field, with the title and detail exactly as typed. The form stays |
-| Any write is attempted with no end-user session | The same sentence for that write. `DifferentRequestsError.notAuthenticated(rpc)` is thrown from the audience the contract declares, before anything reaches the network, and it reaches the developer through `store.write.failure?.error` |
-| A second control is tapped while a write is in flight | It does not respond, and it is visibly dim — `disabled(write.isWriting)` plus a stated tertiary tint, because `.buttonStyle(.plain)` draws a disabled button exactly like an enabled one |
-| The server refuses the write itself | A sentence that says why, picked by `WriteRefusal` from the reason the contract carries: the request was removed (`notFound`), the account is not allowed (`permissionDenied`), or a field was empty or too long (`invalidArgument`, naming the title, the detail or the comment). No "try again", because the same write is refused every time |
+| Any write is attempted with no end-user session | The same sentence for that write. `DifferentRequestsError(notAuthenticated: rpc)` is thrown from the audience the contract declares, before anything reaches the network. `WriteFailure` holds only the server's `ApiError`, so no answer is held for it and the attempt's own sentence is drawn |
+| A second control is tapped while a write is in flight | It does not respond, and it is visibly dim — `disabled(write.isWriting())` plus a stated tertiary tint, because `.buttonStyle(.plain)` draws a disabled button exactly like an enabled one |
+| The server refuses the write itself | A sentence that says why, picked by `WriteFailure.message()` from the reason the contract carries: the request was removed (`notFound`), the account is not allowed (`permissionDenied`), or a field was empty or too long (`invalidArgument`, naming the title, the detail or the comment). No "try again", because the same write is refused every time |
 | A first read fails | The screen's own heading — "Requests couldn't load", "This request couldn't load", "Inbox couldn't load", "What's New couldn't load" or "Roadmap couldn't load" — with **Try again**, and a sentence picked by `ReadTrouble`: "You're offline. Check your connection and try again." for no connection, "Too many tries at once. Try again in N seconds." when the server asked for a pause, and "Something went wrong on the server. Try again in a moment." otherwise |
 | A refresh of a loaded list fails | The same screen. The stale list is not left up: on the roadmap that was the old behavior, and it presented columns as current when nobody knew whether they were |
 | A further page fails | **"Couldn't load more requests."** on the board, **"Couldn't load more updates."** in the inbox, **"Couldn't load more comments."** on a thread or **"Couldn't load more of What's New."** on the changelog, with **Try again**, in place of the spinner. Everything already read stays on screen, and the cursor stays where it was so the retry asks for that page rather than skipping it |
@@ -251,23 +252,23 @@ no seconds to be asked for and the property answers nil.
                      ┌──────────────────────────────────────────────────────┐
                      │  State/  — one value per thing that can be happening  │
                      ├──────────────────────────────────────────────────────┤
-  ReadState.swift    │  unread · reading · failed(Error) · empty             │
-                     │  loaded(Content) · refreshing(Content)                │
-                     │    .hasRead   ← what firstRead keys on                │
-                     │    .isReading ← what load() guards on                 │
-                     │    .whileReading ← keeps content up during a refresh  │
-                     │    .content   ← answers from loaded AND refreshing    │
-                     │    .holding(_:) ← a write's answer, without ending a  │
+  proto/differentrequests_sdk_state.proto, behavior in State/<Type>+<Purpose>.swift
+  ReadStatus         │  unset · reading · failed(ReadTrouble) · loaded       │
+   +Reading.swift    │    .hasRead(holdsContent:) ← what a view's .task keys │
+                     │    .isReading() ← what load() guards on               │
+                     │    .afterWrite() ← a write's answer, without ending a │
                      │                   read that is still running          │
-                     │    init(readFailure:) ← notFound becomes .empty       │
-  ReadState+Pages    │    init(page:) · .held · .appending(_:) · .replacing  │
-  PageState.swift    │  more · reading · failed(Error) · done                │
-  WriteAttempt.swift │  vote · clearVote · follow · unfollow · comment       │
+                     │    init(readFailure:) ← notFound becomes loaded with  │
+                     │      content cleared; canceled becomes unset          │
+  Array+Rows.swift   │    .replacingRow(_:identifiedBy:)                     │
+  PageState          │  unset (more) · reading · failed(ReadTrouble) · done  │
+  WriteAttempt       │  vote · clearVote · follow · unfollow · comment       │
                      │  markRead · markEverythingRead · fileRequest          │
-                     │    .failureMessage ← the sentence, per attempt        │
-  WriteFailure.swift │  attempt + error, .message = attempt.failureMessage   │
-  WriteState.swift   │  idle · writing(WriteAttempt) · failed(WriteFailure)  │
-                     │    .isWriting · .failure                              │
+                     │    .failureMessage() ← the sentence, per attempt      │
+  WriteFailure       │  attempt + the server's ApiError, .message() picks by │
+                     │    the contract's reason                              │
+  WriteState         │  unset (idle) · writing(WriteAttempt) · failed        │
+                     │    .isWriting() · .failure()                          │
                      └──────────────────────────────────────────────────────┘
 
 A WRITE THAT FAILS — the defect, and where it now goes
@@ -278,73 +279,72 @@ A WRITE THAT FAILS — the defect, and where it now goes
         │
         ▼
   BoardStore.swift  ── toggleVote(requestID:)
-        ├── write.isWriting ──► return          (one write at a time, per surface)
-        ├── read.held.first(where: id) ──► nil ──► return   (held answers from
-        │                                     loaded AND refreshing, or every tap
+        ├── write.isWriting() ──► return          (one write at a time, per surface)
+        ├── requests.first(where: id) ──► nil ──► return   (requests stay held
+        │                                     while a refresh reads, or every tap
         │                                     during a pull-to-refresh is dropped)
         ├── attempt = current.viewer.voted ? .clearVote : .vote
-        ├── write = .writing(attempt)  ──────────► every tile takes no tap
-        ├── read = read.replacing(withVoteFlipped(current))  ► the tapped tile flips, right now
+        ├── write.state = .writing(attempt)  ────► every tile takes no tap
+        ├── land(withVoteFlipped(current))  ► the tapped tile flips, right now
         │        (a refused write puts `current` back)
         │
         ├──► DifferentRequestsClient.vote/clearVote(requestID:)
         │        DifferentRequestsClient.swift ── perform(_:query:body:)
         │          ├── rpc.audience == .endUser && sessionToken == nil
-        │          │     └──► throw .notAuthenticated(rpc)     (no round trip)
-        │          ├── URLSession failure ──► throw .networkError(underlying:)
-        │          ├── non-2xx ──► throw .api(DRApiError)
+        │          │     └──► throw DifferentRequestsError(notAuthenticated: rpc)  (no round trip)
+        │          ├── URLSession failure ──► throw reason .networkError
+        │          ├── non-2xx ──► throw DifferentRequestsError(answer: DRApiError)
         │          └── 2xx ──► DRVoteResponse
         │
-        ├── success ──► read = read.replacing(written, identifiedBy: { $0.id })
-        │                      └── lands through .holding(_:), so a write answering
-        │                          mid-refresh does not report the read as finished
-        │               write = .idle
-        └── failure ──► write = .failed(WriteFailure(attempt:error:))
+        ├── success ──► land(written)
+        │                 requests = requests.replacingRow(written, identifiedBy: \.id)
+        │                 status = status.afterWrite(), so a write answering
+        │                 mid-refresh does not report the read as finished
+        │               write = WriteState()
+        └── failure ──► write.state = .failed(WriteFailure(attempt:error:))
                              │
                              │   ⟵ this is where it used to stop.
                              │      writeError = error, and nothing read it.
                              ▼
   DifferentRequestsView.swift ── list(_:)
-        └── if let failure = store.write.failure
+        └── if let failure = store.write.failure()
               └──► WriteFailureNotice.swift
-                     Text(failure.message)   ← WriteAttempt.failureMessage
+                     Text(failure.message())   ← WriteFailure+Message.swift
                      Button("Dismiss") ──► BoardStore.acknowledgeWriteFailure()
-                                              write = .idle
+                                              write = WriteState()
 
 A READ, AND ITS FOUR OUTCOMES
 
-  DifferentRequestsView.body
-    .firstRead(store.read) ──► View+FirstRead.swift
-                                 task { if hasRead == false { read() } }
+  RequestsScreen.body
+    .task(id: hub.board.query) ──► search(): load() unless hasRead() and this question was asked
                                     │        ▲
-                                    │        └── false only until the FIRST answer, so the
-                                    │            task's own progress cannot cancel it
+                                    │        └── hasRead() is false only until the FIRST answer
                                     ▼
   BoardStore.load()
-    ├── read.isReading ──► return
+    ├── status.isReading() ──► return
     ├── repeat {
-    │     read = read.whileReading      unread/failed/empty ──► .reading
-    │                                   loaded(h)/refreshing(h) ──► .refreshing(h)
-    │     loadedQuery = query; cursor = ""; page = .more
+    │     status.state = .reading(Reading())     requests stay where they are
+    │     loadedQuery = query; cursor = ""; page = PageState()
     │     readFirstPage()
     │       ├── client.requests(statuses:sort:query:cursor:)
-    │       ├── success ──► read = ReadState(page: answer.requests)
-    │       │                       empty? ──► .empty
-    │       │                       else   ──► .loaded(requests)
-    │       │               page = PageState(nextCursor:)  ""? .done : .more
-    │       └── failure ──► read = ReadState(readFailure: error)
-    │                               isNotFound? ──► .empty
-    │                               else       ──► .failed(error)
-    │                       page = .done
+    │       ├── success ──► requests = answer.requests
+    │       │               status.state = .loaded(ReadAnswered())
+    │       │               page = PageState(nextCursor:)  ""? .done : unset
+    │       └── failure ──► requests = []
+    │                       status = ReadStatus(readFailure: error)
+    │                               isNotFound()? ──► .loaded
+    │                               canceled?     ──► unset
+    │                               else          ──► .failed(ReadTrouble(error:))
+    │                       page.state = .done(NoMorePages())
     │   } while loadedQuery != query          (a search typed mid-read is not dropped)
     ▼
-  DifferentRequestsView.content
-    switch store.read {
-      case .unread, .reading            ──► ProgressView()
-      case .failed                      ──► LoadFailure.swift  "Requests couldn't load" + Try again
-      case .empty                       ──► ContentUnavailableView + New request
-      case .loaded(let r), .refreshing(let r) ──► list(r)
-    }                                        no default:, so a sixth case would not compile
+  RequestsContent.body
+    requests non-empty ──► list(requests)
+    else switch hub.board.status.state {
+      case .none, .reading       ──► ProgressView()
+      case .failed(let trouble)  ──► LoadFailure.swift  "Requests couldn't load" + Try again
+      case .loaded               ──► RequestsEmpty + New request
+    }                                no default:, so a fifth state would not compile
 
 A PAGE, WHICH USED TO SPIN FOREVER
 
@@ -361,36 +361,36 @@ A PAGE, WHICH USED TO SPIN FOREVER
                                               │
                                               ▼
   BoardStore.loadMore()
-    ├── page.isReading || page.isDone ──► return
-    ├── read.isReading ──► return
-    ├── page = .reading
-    ├── success ──► read = read.appending(answer.requests); page = PageState(nextCursor:)
-    └── failure ──► page = .failed(error)      read untouched — the list stays up
+    ├── page.isReading() || page.isDone() ──► return
+    ├── status.isReading() ──► return
+    ├── page.state = .reading(Reading())
+    ├── success ──► requests.append(contentsOf: answer.requests); page = PageState(nextCursor:)
+    └── failure ──► page.state = .failed(ReadTrouble(error:))  requests untouched — the list stays up
                        │
                        └── the cursor is NOT advanced, so Try again asks for this page
 
 ONE REQUEST — two reads, because they are two rpcs that fail apart
 
   RequestDetailStore.load()
-    ├── read.isReading || thread.isReading ──► return
-    ├── read = read.whileReading
+    ├── status.isReading() || threadStatus.isReading() ──► return
+    ├── status.state = .reading(Reading())
     ├── client.request(id:)
-    │     ├── success ──► read = .loaded(answer.request)
-    │     └── failure ──► read = ReadState(readFailure: error)
-    │                         .api(reason: .notFound) ──► .empty   "This request is gone"
-    │                         anything else           ──► .failed  "This request couldn't load"
-    │                     thread = .unread; page = .done; return
-    ├── thread = thread.whileReading; cursor = ""; page = .more
+    │     ├── success ──► answer = the response; status.state = .loaded(ReadAnswered())
+    │     └── failure ──► answer = DRGetRequestResponse(); status = ReadStatus(readFailure: error)
+    │                         isNotFound() ──► .loaded, no request   "This request is gone"
+    │                         anything else ──► .failed  "This request couldn't load"
+    │                     threadStatus = ReadStatus(); page = .done; return
+    ├── threadStatus.state = .reading(Reading()); cursor = ""; page = PageState()
     └── client.comments(requestID:cursor:)
-          ├── success ──► thread = ReadState(page: answer.comments)
-          └── failure ──► thread = ReadState(readFailure: error)
+          ├── success ──► comments = answer.comments; threadStatus.state = .loaded(ReadAnswered())
+          └── failure ──► threadStatus = ReadStatus(readFailure: error)
                               │
-  RequestDetailView.thread ◄──┘
-    switch store.thread {
-      .unread, .reading ──► spinner
-      .failed           ──► RetryRow "Couldn't load the comments." + Try again
-      .empty            ──► "No comments yet."
-      .loaded(c), .refreshing(c) ──► ForEach(c) + NextPageRow
+  RequestThread ◄─────────────┘
+    comments non-empty ──► ForEach(comments) + NextPageRow
+    else switch store.threadStatus.state {
+      .none, .reading ──► spinner
+      .failed         ──► RetryRow "Couldn't load the comments." + Try again
+      .loaded         ──► "No comments yet."
     }
 ```
 
@@ -423,7 +423,7 @@ DifferentRequestsView — a vote that did not land
   The picture above is the layout before 2026-10-09. The layout now is traced in
   docs/features/requests-in-tabs-on-a-design-system.md
 
-  first read in flight   → centred spinner; nav bar and [ ⊕ ] still there
+  first read in flight   → centered spinner; nav bar and [ ⊕ ] still there
   refresh in flight      → the list, unchanged, with the system refresh control
   read failed            → "Requests couldn't load" / "Something went wrong on the server. Try again in a moment." + [Try again]
   read empty             → "No requests yet" / "Ask for what you want in this app, and everyone can
@@ -433,7 +433,7 @@ DifferentRequestsView — a vote that did not land
                             under it to pull. The nav-bar [ ⊕ ] is still reachable.)
 
   end of the list, by PageState:
-     .more    ─►  ( spinner )        — and it asks, on appear
+     unset    ─►  ( spinner )        — and it asks, on appear
      .reading ─►  ( spinner )        — it is asking
      .failed  ─►  Couldn't load more requests.
                   [Try again]        — it stopped, and it waits to be told
@@ -502,7 +502,7 @@ SubmitRequestView — unchanged in copy, moved to the shared component
 └──────────────────────────────────────────────┘
 
 RoadmapView / ChangelogView
-  reading  → centred spinner
+  reading  → centered spinner
   failed   → "Roadmap couldn't load" / "What's New couldn't load" + [Try again]
               (roadmap: stale columns are no longer left up behind a failed refresh)
   empty    → "Nothing planned yet" / "When the team plans something, it shows up here."
@@ -524,7 +524,7 @@ RoadmapView / ChangelogView
 - **Pull to refresh.** `.refreshable` is a pull gesture on iOS and a menu command plus a scroll
   gesture on macOS. Both call the same `load()`, and both are why a refresh keeps the list up: the
   task belongs to the list.
-- **`ContentUnavailableView`.** Centres in the available space on both, which is the whole screen
+- **`ContentUnavailableView`.** Centers in the available space on both, which is the whole screen
   for a failed or empty surface here.
 - **`ToolbarItem(placement: .primaryAction)`** — trailing edge of the navigation bar on iOS, window
   toolbar on macOS. `Mark all as read` is there on both.

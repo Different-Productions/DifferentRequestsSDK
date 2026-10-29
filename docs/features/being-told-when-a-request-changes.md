@@ -18,14 +18,14 @@ they care about a request:
 Trigger: vote for a request (on the board, or on its own screen), or follow one on its own screen.
 
 **The host app decides who asks for notification permission**, set once on `DifferentRequestsHub`
-the way `appearance` and `emptyBoard` are:
+the way `emptyBoard` is:
 
-- `notificationPermission: .askedBySDK` — the SDK offers the card and brings up Apple's prompt, as
+- `notificationPermission: .askedBySdk` — the SDK offers the card and brings up Apple's prompt, as
   below. The Example app passes this.
 - `notificationPermission: .askedByApp` — the app asks for permission itself, when it chooses. The
   SDK never offers the card and never brings up Apple's prompt. Backlog passes this.
 
-With `.askedBySDK`, the card is offered only when all of these hold: the app's plan sends notifications
+With `.askedBySdk`, the card is offered only when all of these hold: the app's plan sends notifications
 (`DRAppConfig.pushEnabled`), the card was never answered on this phone, and Apple has not asked
 this app yet (`authorizationStatus == .notDetermined`). The host app no longer prompts on launch;
 it registers for remote notifications only where they are already allowed, and still hands the
@@ -65,27 +65,64 @@ FirstVoteNote.voted(requestID:)          (votes on a request's screen only)   Fi
         |     yes -> set true, requestID = this one -> the line is drawn
         v
 NotificationOffer.votedOrFollowed(requestID:)                                 NotificationOffer.swift
-        |  permission == .askedBySDK (from the hub)             NotificationPermission.swift
+        |  permission.sdkAsks() (from the hub)          NotificationPermission+Asking.swift
         |     .askedByApp -> stop: no card, no prompt
         |  no card up · AppConfigStore.config.pushEnabled ·
         |  UserDefaults "DifferentRequests.notificationOfferAnswered" false ·
         |  UNUserNotificationCenter settings .notDetermined
         v
-state = .offered(requestID:)                                                  NotificationOfferState.swift
+state.card = .offered(requestID)         proto/differentrequests_sdk_state.proto  NotificationOfferState
         |
         v
 NotificationOfferCard                                                         NotificationOfferCard.swift
-   Dismiss (DismissButton.swift) -> decline(): answered = true, state = .hidden
-   Turn on notifications  -> accept():  answered = true, state = .hidden
+   Dismiss (DismissButton.swift) -> decline(): answered = true, state = NotificationOfferState()
+   Turn on notifications  -> accept():  answered = true, state = NotificationOfferState()
                  requestAuthorization([.alert, .badge, .sound])
                    granted -> UIApplication / NSApplication.registerForRemoteNotifications()
-                   threw   -> state = .failed(NotificationOfferFailure)       NotificationOfferFailure.swift
+                   threw   -> state.card = .failed(NotificationOfferFailure)  proto: NotificationOfferFailure
         |
         v
 Host app delegate receives the token -> registerDevice   RemoteNotificationDelegate.swift · Session.swift
 ```
 
-Both stores are built once by `DifferentRequestsHub.swift`, with `UserDefaults.standard`, which
+## When the news lands
+
+A push, or an inbox read, says a request changed. Every screen holding that request reads it
+again, and every Inbox badge draws one count.
+
+| When it works | What the user sees |
+|---|---|
+| A push lands while the request's own screen is up | The screen reads again: the new status and the team's reply appear without leaving it |
+| A push lands, then they go back to Requests | The row shows the new status and comment count |
+| A push lands with the sheet up | The Inbox tab's badge goes up by one, and the Inbox list shows the update |
+| Any moment | The host app's Inbox row, the sheet's Inbox tab and Mark all as read all read one count |
+
+```
+Push lands (willPresent / didReceive)            RemoteNotificationDelegate.swift
+        |  await hub.heardThatARequestChanged(requestID:)
+        v
+NewsAboutRequests.heard(aboutRequest:at: now)    Stores/NewsAboutRequests.swift  (@Observable, NewsState)
+        |                                        also written by InboxStore.record (createdAt)
+        |                                        and BoardStore.toggleVote (row copied at the same instant)
+        +--> RequestDetailView .task(id: news.lastHeard(requestID))
+        |       hasNews(about: detail): heard > detail.readAt (stamped when the read was sent)
+        |       -> RequestDetailStore.load()
+        +--> RequestsScreen .task(id: news.news)
+        |       BoardStore.readAgainIfNewer(): any heard > board.copiedAt[id] (stamped when sent)
+        |       -> BoardStore.load(), whole board, so rank and narrowing come from the server
+        v
+hub.loadInbox() -> InboxStore.load()             DifferentRequestsHub.swift · Stores/InboxStore.swift
+        |  a read already in flight sets inbox.askedAgain and reads again when it lands
+        v
+inbox.unreadCount == hub.unreadCount()           read by RequestsTabView .badge, MarkAllReadButton,
+                                                 and the example's Session.badgeCount (home row)
+```
+
+Nothing is written while a body is built: a body reads the news only to key a task, and the
+re-read runs in that task. `BoardState.copied_at` and `InboxState.asked_again` are in
+`proto/differentrequests_sdk_screens.proto`.
+
+`NotificationOffer` and `FirstVoteNote` are built once by `DifferentRequestsHub.swift`, with `UserDefaults.standard`, which
 `PrivacyInfo.xcprivacy` declares under reason `CA92.1`. The hub hands `NotificationOffer` the
 `NotificationPermission` the host app passed to its `init`.
 
@@ -103,7 +140,7 @@ Both stores are built once by `DifferentRequestsHub.swift`, with `UserDefaults.s
 - A newly provisioned Free app ("Badge Walk"): a vote from the row drew no card, because Free sends no
   notifications.
 - 2026-09-26, fresh iPhone 18 Pro simulator "DR Permission Walk", iOS 27, SDK 0.13.0, development
-  server, a newly provisioned Pro app ("Permission Walk"). With `.askedBySDK`: filed "Dark mode for
+  server, a newly provisioned Pro app ("Permission Walk"). With `.askedBySdk`: filed "Dark mode for
   the walk", took the vote back and voted again from the row, and the card appeared under the row.
   Reinstalled with the Example set to `.askedByApp`: the vote went 1 → 0 → 1 from the row, and no
   card appeared and no Apple prompt came up.

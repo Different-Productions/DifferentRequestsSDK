@@ -10,9 +10,9 @@ struct SendButtonStyle: ButtonStyle {
     configuration.label
       .textRole(.rowTitle)
       .foregroundStyle(isEnabled ? ColorRole.onTint : ColorRole.secondaryLabel)
-      .frame(width: TargetSize.minimum.rawValue, height: TargetSize.minimum.rawValue)
+      .frame(width: TargetSize.minimum.points(), height: TargetSize.minimum.points())
       .background(isEnabled ? ColorRole.tint : ColorRole.fill, in: Circle())
       .contentShape(Circle())
-      .opacity(configuration.isPressed ? PressedLook.pressed.rawValue : PressedLook.atRest.rawValue)
+      .opacity(configuration.isPressed ? PressedLook.pressed.opacity() : PressedLook.atRest.opacity())
   }
 }

@@ -1,0 +1,228 @@
+syntax = "proto3";
+
+package differentrequests.sdk.v1;
+
+import "differentrequests_domain.proto";
+import "differentrequests_sdk.proto";
+import "differentrequests_sdk_state.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+// No prefix, for the reason differentrequests_sdk_state.proto gives.
+option swift_prefix = "";
+
+// What each store holds and what each view draws: every value the SDK's screens carry that is not
+// already a contract message or one of the read and write states beside it.
+//
+// Generated internal, like the state file: a host app never names any of these.
+
+// The board: what is asked of it, what came back, and where the next page starts.
+message BoardState {
+  // Which statuses the board covers. Empty means everything still on it.
+  repeated differentrequests.v1.RequestStatus statuses = 1;
+
+  // Whether the board is ranked by demand or by recency.
+  differentrequests.v1.RequestSort sort = 2;
+
+  // Free text over title and body, empty for the whole board.
+  string query = 3;
+
+  // The requests the board's reads found, in the order the server ranked them.
+  repeated differentrequests.v1.FeatureRequest requests = 4;
+
+  // The opaque continuation the previous page handed back.
+  string cursor = 5;
+
+  // The question the last read was started for, its cursor left empty. Kept apart from the
+  // controls, which move while a read is suspended.
+  differentrequests.v1.ListRequestsRequest asked = 6;
+
+  // How long a search settles before it is sent, so a typed word is one read and not five.
+  google.protobuf.Duration search_settle_delay = 7;
+
+  // When the copy of each held row arrived, by request id. News about a request after its row's
+  // copy is what makes the board read again.
+  map<string, google.protobuf.Timestamp> copied_at = 8;
+}
+
+// One request's own screen: which request, when the copy held arrived, its thread and the comment
+// being written.
+message RequestDetailState {
+  string request_id = 1;
+
+  // When the copy held arrived. Unset until a read lands: a copy nobody has is missing, not stale.
+  google.protobuf.Timestamp read_at = 2;
+
+  // The thread, oldest first.
+  repeated differentrequests.v1.Comment comments = 3;
+
+  // The opaque continuation the previous page of the thread handed back.
+  string cursor = 4;
+
+  // The comment being written, so what a reader typed survives a redraw.
+  string draft = 5;
+}
+
+// The inbox: what a reader has been told, and how much of it the server counts unread.
+message InboxState {
+  // Newest first.
+  repeated differentrequests.v1.Notification notifications = 1;
+
+  int32 unread_count = 2;
+
+  string cursor = 3;
+
+  // A read was asked for while one was in flight, which may have been sent before the update that
+  // prompted the ask. The read in flight reads again when it lands.
+  bool asked_again = 4;
+}
+
+// The changelog's entries, newest first, and where the next page starts.
+message ChangelogState {
+  repeated differentrequests.v1.ChangelogEntry entries = 1;
+  string cursor = 2;
+}
+
+// The roadmap's columns, in display order. Empty when every column is.
+message RoadmapState {
+  repeated differentrequests.v1.RoadmapColumn columns = 1;
+}
+
+// The request being written, and what the server filed once it answered.
+message SubmitState {
+  // What is being asked for, in one line.
+  string title = 1;
+
+  // The detail, which the server accepts empty.
+  string body = 2;
+
+  // Set once the server filed it: its presence is what tells a presenter the form is done.
+  differentrequests.v1.FeatureRequest submitted = 3;
+}
+
+// The sections the Mac sheet offers, in order.
+message OfferedTabs {
+  repeated ScreenTab offered = 1;
+}
+
+// The request whose screen says "You'll get an update in Inbox when this request changes." while it
+// does. Empty when no screen says it.
+message FirstVoteNoteState {
+  string request_id = 1;
+}
+
+// When each request was last heard to have changed, by request id.
+message NewsState {
+  map<string, google.protobuf.Timestamp> heard_at = 1;
+}
+
+// Who the host app signed in. Unset is nobody.
+message WhoIsHereState {
+  differentrequests.v1.EndUser person = 1;
+}
+
+// What the Requests screen has pushed.
+message RequestsScreenState {
+  // The new request form is pushed.
+  bool composing = 1;
+
+  // The request just filed, while its own screen is pushed. Empty when none is.
+  string opened_request_id = 2;
+}
+
+// What the new request form has up over it.
+message SubmitScreenState {
+  // The question about discarding what was typed is up.
+  bool confirming_discard = 1;
+}
+
+// Whether a screen is the first one of a presented sheet, as the platform last reported it.
+message SheetPlacement {
+  bool sheet_root = 1;
+}
+
+// Whether `DifferentRequestsView` already draws Close above a screen and sizes the sheet, as it does
+// on macOS.
+message RequestsSheetPresence {
+  bool inside = 1;
+}
+
+// The tint the SDK draws with, the one a label on the tint is measured against. Unset color is the
+// system's accent color.
+message DrawnTint {
+  differentrequests.v1.Color color = 1;
+}
+
+// A button whose action suspends: running from the tap until the action finishes.
+message AsyncButtonState {
+  bool running = 1;
+}
+
+// The field a comment composer can hand the keyboard to.
+enum ComposerField {
+  COMPOSER_FIELD_UNSPECIFIED = 0;
+  COMPOSER_FIELD_DRAFT = 1;
+}
+
+// How a pill button is filled.
+enum PillFill {
+  PILL_FILL_UNSPECIFIED = 0;
+
+  // Gray: not the choice in effect, not the main action.
+  PILL_FILL_GRAY = 1;
+
+  // The tint: the choice in effect, or the main action.
+  PILL_FILL_TINT = 2;
+}
+
+// A menu item's words, and whether what it names is in effect.
+message MenuCheckContent {
+  string title = 1;
+  bool checked = 2;
+}
+
+// A status as a word in the phone's language and the SF Symbol that gives it its shape.
+message StatusMarkContent {
+  string word = 1;
+  string symbol = 2;
+}
+
+// What a surface says in place of content it could not read.
+message LoadFailureContent {
+  // The heading, naming the screen that could not be read.
+  string title = 1;
+
+  // Why the read did not answer, which picks the sentence.
+  ReadTrouble trouble = 2;
+}
+
+// A row inside a list saying a read did not answer, in words for a reader.
+message RetryRowContent {
+  string message = 1;
+}
+
+// The row under a list's last one.
+message NextPageRowContent {
+  // Whether there is another page, and what became of the last attempt at one.
+  PageState page = 1;
+
+  // What the row says when the next page failed, naming what the list holds.
+  string failure_message = 2;
+}
+
+// The way in to the new request form.
+message NewRequestButtonContent {
+  // What the button says, and is called by VoiceOver.
+  string title = 1;
+}
+
+// How much room is left in a field: the limit minus what is typed. Negative once it is over.
+message CharactersLeftContent {
+  int32 left = 1;
+}
+
+// The Mac's Close at the leading edge of a row.
+message SheetCloseRowContent {
+  // This screen is the first of a sheet that does not draw Close itself.
+  bool shown = 1;
+}

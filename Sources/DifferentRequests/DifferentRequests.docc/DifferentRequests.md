@@ -22,10 +22,9 @@ struct MyApp: App {
   // Built once, held for the life of the app. A SwiftUI view is rebuilt on
   // every redraw above it, and the board's page cannot be.
   private let requests = DifferentRequestsHub(
-    client: DifferentRequestsClient(appKey: "your-app-key", baseURL: .production),
-    appearance: .standard,
-    emptyBoard: .standard,
-    notificationPermission: .askedBySDK
+    client: DifferentRequestsClient(appKey: "your-app-key", baseURL: SecureBaseURL(service: .production)),
+    emptyBoard: EmptyBoard(),
+    notificationPermission: .askedBySdk
   )
 
   var body: some Scene {
@@ -48,6 +47,12 @@ behalf of a person, so they need a session — see <doc:GettingStarted>.
 - ``DifferentRequestsHub``
 - ``DifferentRequestsClient``
 - ``DifferentRequestsError``
+- ``DifferentRequestsFault``
+
+### Your app's choices
+
+- ``EmptyBoard``
+- ``NotificationPermission``
 
 ### Screens
 
@@ -66,4 +71,5 @@ behalf of a person, so they need a session — see <doc:GettingStarted>.
 ### Pointing it somewhere
 
 - ``SecureBaseURL``
+- ``DifferentRequestsService``
 - ``LastCall``

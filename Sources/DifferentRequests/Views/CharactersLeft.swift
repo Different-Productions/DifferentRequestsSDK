@@ -5,19 +5,19 @@ import SwiftUI
 struct CharactersLeft: View {
 
   /// The limit minus what is typed. Negative once it is over.
-  let left: Int
+  let content: CharactersLeftContent
 
   var body: some View {
-    if left < 0 {
+    if content.left < 0 {
       Label {
-        Text("\(-left) characters too many", bundle: .module, comment: "Characters over a field's limit")
+        Text("\(Int(-content.left)) characters too many", bundle: .module, comment: "Characters over a field's limit")
       } icon: {
         Image(systemName: "exclamationmark.circle")
       }
       .textRole(.meta)
       .foregroundStyle(ColorRole.failure)
-    } else if left <= CharacterCountdown.shownFrom.rawValue {
-      Text("\(left) characters left", bundle: .module, comment: "Characters left before a field's limit")
+    } else if Int(content.left) <= CharacterCountdown.shownFrom.count() {
+      Text("\(Int(content.left)) characters left", bundle: .module, comment: "Characters left before a field's limit")
         .textRole(.meta)
         .foregroundStyle(ColorRole.secondaryLabel)
     }

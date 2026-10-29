@@ -21,7 +21,7 @@ Or in `Package.swift`:
 dependencies: [
   .package(
     url: "https://github.com/Different-Productions/DifferentRequestsSDK",
-    from: "0.15.1"
+    from: "0.16.0"
   ),
 ]
 ```
@@ -36,16 +36,15 @@ the process.
 import DifferentRequests
 
 let requests = DifferentRequestsHub(
-  client: DifferentRequestsClient(appKey: "your-app-key", baseURL: .production),
-  appearance: .standard,
-  emptyBoard: .standard,
-  notificationPermission: .askedBySDK
+  client: DifferentRequestsClient(appKey: "your-app-key", baseURL: SecureBaseURL(service: .production)),
+  emptyBoard: EmptyBoard(),
+  notificationPermission: .askedBySdk
 )
 ```
 
 Then await ``DifferentRequestsHub/configure()`` at launch. It reads what your
-app includes: the screens on your plan, the badge, and the tint chosen in the
-dashboard. No screen draws until that has answered, so nobody sees a color or a
+app includes: the screens on your plan, the badge, and the color and font chosen
+in the dashboard. No screen draws until that has answered, so nobody sees a color or a
 tab that then changes:
 
 ```swift
@@ -57,12 +56,17 @@ WindowGroup {
 }
 ```
 
-``Appearance/standard`` is the SDK's own look. Pass an ``Appearance`` with your
-app's accent and a system font design to have every screen wear your app instead.
-On Pro, a tint chosen in the dashboard's Appearance tab wins over the accent passed
-here, and reaches your app the next time it calls `configure()`.
+The board's color and font are set on the dashboard's Appearance page, not in
+code. On a plan that includes Appearance, they reach every user the next time
+your app calls `configure()`, with no app update. Until then, and on a plan
+without it, every screen is drawn in the system color and the system's default
+font.
 
-``NotificationPermission/askedBySDK`` lets the SDK ask for notification permission
+`EmptyBoard()` is the SDK's own words for a board with nothing on it. Pass an
+``EmptyBoard`` with your own symbol, title, message and button words instead; a
+field you leave empty keeps the SDK's.
+
+``NotificationPermission/askedBySdk`` lets the SDK ask for notification permission
 after a person's first vote or follow. If your app asks for permission itself, pass
 ``NotificationPermission/askedByApp`` and the SDK never prompts.
 
@@ -70,7 +74,7 @@ A SwiftUI view is a value that is thrown away and rebuilt whenever anything
 above it redraws. A hub built inside a view would take the board's page, the
 search text and a half-written request with it every time.
 
-``SecureBaseURL/production`` is the live service. A staging server takes a
+``SecureBaseURL/init(service:)``, given ``DifferentRequestsService/production``, is the live service. A staging server takes a
 ``SecureBaseURL`` of its own, which refuses anything that is not `https` rather
 than letting an app ship talking over plain text:
 
@@ -82,9 +86,8 @@ struct MyApp: App {
       appKey: "your-app-key",
       baseURL: SecureBaseURL(literal: "https://staging.example.com")
     ),
-    appearance: .standard,
-    emptyBoard: .standard,
-    notificationPermission: .askedBySDK
+    emptyBoard: EmptyBoard(),
+    notificationPermission: .askedBySdk
   )
 
   var body: some Scene {
@@ -217,28 +220,56 @@ override func viewDidLoad() {
 It draws rows on the first frame after that. Call it as often as you like: a
 board already read is not read again.
 
+## Tell it when a push arrives
+
+Every push carries the request it is about under `requestID`. Hand it to
+``DifferentRequestsHub/heardThatARequestChanged(requestID:)`` when a push lands
+and when someone taps one, and a request already open, the board and the Inbox
+badge read the change at once.
+
+```swift
+func userNotificationCenter(
+  _ center: UNUserNotificationCenter,
+  willPresent notification: UNNotification
+) async -> UNNotificationPresentationOptions {
+  if let requestID = notification.request.content.userInfo["requestID"] as? String {
+    await requests.heardThatARequestChanged(requestID: requestID)
+  }
+  return [.banner, .list, .sound]
+}
+```
+
 ## Handle errors
 
-Every client method throws ``DifferentRequestsError``. The one worth branching
-on is `api`, which carries what the server actually said:
+Every client method throws ``DifferentRequestsError``. Branch on its
+``DifferentRequestsError/reason``. The one worth reading closely is
+``DifferentRequestsFault/api``, where ``DifferentRequestsError/apiError`` holds
+what the server actually said. ``DifferentRequestsError/message`` describes any
+failure for your logs:
 
 ```swift
 do {
   let answer = try await requests.client.request(id: "req_4f2a")
   print(answer.request.title)
 } catch let error as DifferentRequestsError {
-  switch error {
-  case .api(let refusal):
+  switch error.reason {
+  case .api:
     // What the server refused, and why. Written for you, not for your users.
-    logger.error("DifferentRequests refused: \(refusal.message)")
+    logger.error("DifferentRequests refused: \(error.apiError.message)")
   case .networkError:
     // Worth a retry. Everything else is not.
     logger.error("DifferentRequests could not be reached")
-  default:
-    logger.error("DifferentRequests: \(error.localizedDescription)")
+  case .unspecified, .notAuthenticated, .unreadableError, .decodingFailed,
+    .incompleteResponse, .canceled, .notAnHTTPResponse, .invalidBaseURL,
+    .unspellableMethod, .UNRECOGNIZED:
+    logger.error("DifferentRequests: \(error.message)")
   }
 }
 ```
+
+``DifferentRequestsError/isNotFound()``, ``DifferentRequestsError/isRefusal()``
+and ``DifferentRequestsError/retryAfterSeconds()`` answer the three questions a
+retry depends on, from the server's own answer.
 
 The screens in this package already do this. You only need it when you are
 calling the client yourself.

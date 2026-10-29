@@ -86,5 +86,6 @@ struct PoweredByPage: View {
     }
     .groupedList()
     .navigationTitle(Text("What is this?", bundle: .module, comment: "Title of the page behind the Powered by row"))
+    .backRow()
   }
 }

@@ -4,7 +4,7 @@ import Foundation
 extension DRRequestStatus {
   /// The status in the phone's language. The contract's `label` is the English, and each case here
   /// says the same word; a case the contract adds breaks this switch until it has a translation.
-  var localizedLabel: String {
+  func localizedLabel() -> String {
     switch self {
     case .open: return String(localized: "Open", bundle: .module, comment: "Status of a request nobody has answered yet")
     case .planned: return String(localized: "Planned", bundle: .module, comment: "Status of a request the team plans to build")
@@ -18,7 +18,7 @@ extension DRRequestStatus {
 
   /// The inbox headline for a request that moved into this status: "Now planned". One whole phrase
   /// per status, so a language can order the words its own way.
-  var movedHeadline: String {
+  func movedHeadline() -> String {
     switch self {
     case .open:
       return String(localized: "Now open", bundle: .module, comment: "Inbox headline: the request moved back to open")

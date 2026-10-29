@@ -14,7 +14,7 @@ struct DismissButton: View {
         .textRole(.meta)
         .fontWeight(.semibold)
         .foregroundStyle(ColorRole.label)
-        .frame(width: TargetSize.minimum.rawValue, height: TargetSize.minimum.rawValue)
+        .frame(width: TargetSize.minimum.points(), height: TargetSize.minimum.points())
         .contentShape(Rectangle())
     }
     .buttonStyle(.borderless)

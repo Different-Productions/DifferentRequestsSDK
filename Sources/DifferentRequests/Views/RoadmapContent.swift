@@ -2,44 +2,46 @@ import SwiftUI
 
 /// What the Roadmap draws under its title. Whether this app has a roadmap is answered first, on the
 /// screen, so an app without one never makes a read that can only be refused; then the roadmap's own
-/// read state picks one of four outcomes.
+/// read status and the columns it holds pick one of four outcomes. The list is drawn whenever there
+/// are columns, reading or not, so a refresh keeps the list that runs it.
 struct RoadmapContent: View {
 
   /// What holds the roadmap.
   let hub: DifferentRequestsHub
 
   /// What opens the host's requests list, or nil for no See requests.
-  let isShowingRequests: Binding<Bool>?
+  let requestsPresentation: Binding<RequestsPresentation>?
 
   var body: some View {
-    switch hub.roadmap.plan {
-    case .unread, .reading:
+    switch hub.roadmap.plan.state {
+    case .none, .reading:
       ProgressView()
-    case .failed(let error):
-      LoadFailure(
-        title: String(localized: "Roadmap couldn't load", bundle: .module, comment: "Heading when the Roadmap screen failed to load"),
-        error: error
-      ) {
+    case .failed(let failure):
+      LoadFailure(content: LoadFailureContent(title: failureTitle(), trouble: failure)) {
         await hub.roadmap.load()
       }
     case .excluded:
-      AbsentSurface(surface: .roadmap, isShowingRequests: isShowingRequests)
+      AbsentSurface(surface: .roadmap, requestsPresentation: requestsPresentation)
     case .included:
-      switch hub.roadmap.read {
-      case .unread, .reading:
-        ProgressView()
-      case .failed(let error):
-        LoadFailure(
-          title: String(localized: "Roadmap couldn't load", bundle: .module, comment: "Heading when the Roadmap screen failed to load"),
-          error: error
-        ) {
-          await hub.roadmap.load()
-        }
-      case .empty:
-        RoadmapEmpty(isShowingRequests: isShowingRequests)
-      case .loaded, .refreshing:
+      if hub.roadmap.roadmap.columns.isEmpty == false {
         RoadmapList(hub: hub)
+      } else {
+        switch hub.roadmap.status.state {
+        case .none, .reading:
+          ProgressView()
+        case .failed(let trouble):
+          LoadFailure(content: LoadFailureContent(title: failureTitle(), trouble: trouble)) {
+            await hub.roadmap.load()
+          }
+        case .loaded:
+          RoadmapEmpty(requestsPresentation: requestsPresentation)
+        }
       }
     }
+  }
+
+  /// The heading over a roadmap that could not be read.
+  private func failureTitle() -> String {
+    String(localized: "Roadmap couldn't load", bundle: .module, comment: "Heading when the Roadmap screen failed to load")
   }
 }

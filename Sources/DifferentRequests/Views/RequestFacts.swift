@@ -10,24 +10,24 @@ struct RequestFacts: View {
 
   var body: some View {
     if dynamicTypeSize.isAccessibilitySize {
-      VStack(alignment: .leading, spacing: Spacing.xxSmall.rawValue) {
+      VStack(alignment: .leading, spacing: Spacing.xxSmall.points()) {
         StatusBadge(state: request.state)
         if request.commentCount > 0 {
-          CommentCount(count: Int(request.commentCount))
+          CommentCount(request: request)
         }
         if request.hasCreatedAt {
-          RequestAge(createdAt: request.createdAt.date)
+          RequestAge(createdAt: request.createdAt)
         }
       }
     } else {
-      HStack(alignment: .firstTextBaseline, spacing: Spacing.small.rawValue) {
+      HStack(alignment: .firstTextBaseline, spacing: Spacing.small.points()) {
         StatusBadge(state: request.state)
         if request.commentCount > 0 {
-          CommentCount(count: Int(request.commentCount))
+          CommentCount(request: request)
         }
-        Spacer(minLength: Spacing.xSmall.rawValue)
+        Spacer(minLength: Spacing.xSmall.points())
         if request.hasCreatedAt {
-          RequestAge(createdAt: request.createdAt.date)
+          RequestAge(createdAt: request.createdAt)
         }
       }
     }

@@ -125,7 +125,7 @@ in the scheme, or it never signs in and never reaches the board at all.
 | --- | --- |
 | Title is empty, or only spaces and newlines | **Send** is grayed out and does nothing. No error text — nothing has been attempted |
 | The write is in flight | **Send** is grayed out for the duration; a second tap cannot file a second request |
-| No end-user session exists (`createSession` was never called) | "Your request didn't send. What you wrote is still here. Choose Send to try again." The thrown `DifferentRequestsError.notAuthenticated(.createRequest)` never reaches the network, and reaches the developer through `SubmitStore.write.failure?.error` |
+| No end-user session exists (`createSession` was never called) | "Your request didn't send. What you wrote is still here. Choose Send to try again." The thrown `DifferentRequestsError(notAuthenticated: .createRequest)` never reaches the network, and reaches the developer through `SubmitStore.write.failure?.error` |
 | The server refuses — plan required, rate limited, anything with a `DRApiError` | "Your request didn't send. What you wrote is still here. Choose Send to try again." The server's own message is written for whoever is debugging and may name internals, so it is not shown |
 | The network is unreachable or times out | "Your request didn't send. What you wrote is still here. Choose Send to try again." |
 | Any failure at all while sending | The sheet stays up with the title and detail exactly as typed. Dismissing on a failure would throw the words away |
@@ -138,7 +138,7 @@ in the scheme, or it never signs in and never reaches the board at all.
 ```
 Host app (composition root, built once and held)
   DifferentRequestsExampleApp.swift
-    let session = Session(hub: DifferentRequestsHub(client:appearance:emptyBoard:))
+    let session = Session(hub: DifferentRequestsHub(client:emptyBoard:notificationPermission:))
         │
         ▼
   DifferentRequestsHub.swift ─── init assigns, in dependency order:
@@ -152,7 +152,7 @@ Host app (composition root, built once and held)
     body
      ├── .searchable(text: $store.query) ──► BoardStore.query
      ├── .toolbar { primaryAction: askButton.labelStyle(.iconOnly) }    ── always present
-     ├── .firstRead(store.read)  ──► View+FirstRead.swift ──► BoardStore.load()   once per store
+     ├── .task(id: query) ──► BoardStore.search() ──► load() unless hasRead() for this question
      ├── .task(id: store.query)  ──► runSearch()
      │        ├── store.isShowingQuery == true  ──► return   (a redraw is not a search)
      │        ├── query non-empty ──► Task.sleep(300ms)      (canceled by the next keystroke)
@@ -175,7 +175,7 @@ Host app (composition root, built once and held)
     Form
      ├── TextField("What you want, in a few words", text: $store.title)
      ├── TextField("Why you'd use it (optional)", text: $store.body)
-     ├── if let failure = store.write.failure ──► WriteFailureNotice.swift
+     ├── if let failure = store.write.failure() ──► WriteFailureNotice.swift
      │        "Your request didn't send. What you wrote is still here. Choose Send to try again."  + Dismiss
      └── toolbar
           ├── Cancel ──► dismiss()
@@ -194,7 +194,7 @@ Host app (composition root, built once and held)
                                  │                    ├── non-2xx ──► throw .api(DRApiError)
                                  │                    └── 2xx ──► DRCreateRequestResponse
                                  │      success ──► submitted = written.request
-                                 │      failure ──► write = .failed(WriteFailure(.fileRequest,
+                                 │      failure ──► write.state = .failed(WriteFailure(.fileRequest,
                                  │                                              error))  (sheet stays up)
                                  └── submitted == nil ? return : BoardStore.load()
                         │

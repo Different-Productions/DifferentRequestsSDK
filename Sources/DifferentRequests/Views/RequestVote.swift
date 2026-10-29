@@ -11,16 +11,12 @@ struct RequestVote: View {
   let request: DRFeatureRequest
 
   var body: some View {
-    if hub.whoIsHere.somebodyIsHere {
-      VoteControl(
-        voteCount: Int(request.voteCount),
-        voted: request.viewer.voted,
-        isWriting: hub.board.write.isWriting
-      ) {
+    if hub.whoIsHere.somebodyIsHere() {
+      VoteControl(tile: VoteTile(request: request, writing: hub.board.write.isWriting())) {
         await hub.board.toggleVote(requestID: request.id)
       }
     } else {
-      VoteTally(voteCount: Int(request.voteCount), voted: request.viewer.voted)
+      VoteTally(tile: VoteTile(request: request))
     }
   }
 }

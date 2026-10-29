@@ -10,11 +10,11 @@ requests** opens the app's requests list, but only when the host app gave the sc
 The way there is a binding, a public parameter on both screens:
 
 ```swift
-RoadmapView(hub: requests, isShowingRequests: $isShowingRequests)
-ChangelogView(hub: requests, isShowingRequests: $isShowingRequests)
+RoadmapView(hub: requests, requestsPresentation: $requestsPresentation)
+ChangelogView(hub: requests, requestsPresentation: $requestsPresentation)
 ```
 
-**See requests** sets it to `true`. `RoadmapView(hub:)` and `ChangelogView(hub:)` draw no button.
+**See requests** sets its `showing`. `RoadmapView(hub:)` and `ChangelogView(hub:)` draw no button.
 The SDK's own sheet builds both that way, because Requests is the tab beside them.
 
 The server answers a roadmap with every column even when all are empty, so `RoadmapStore` reads a
@@ -41,18 +41,19 @@ published.
 ## Flow chart
 
 ```
-Host: RoadmapView(hub:, isShowingRequests:)        RootView.swift (example)
+Host: RoadmapView(hub:, requestsPresentation:)     RootView.swift (example)
         |
         v
 RoadmapStore.readColumns()                          RoadmapStore.swift
-   every column totalCount == 0 ? .empty : ReadState(page: columns)
+   every column totalCount == 0 ? roadmap.columns = [] : roadmap.columns = answer.columns
+   status.state = .loaded(ReadAnswered())
         |
         v
-RoadmapView.columns  case .empty                    RoadmapView.swift
-ChangelogView.entries case .empty                   ChangelogView.swift
+RoadmapContent   columns empty,  case .loaded       RoadmapContent.swift
+ChangelogContent entries empty,  case .loaded       ChangelogContent.swift
    ContentUnavailableView + actions:
-     if let isShowingRequests -> SeeRequestsButton  SeeRequestsButton.swift
-        |  isShowingRequests = true
+     if let requestsPresentation -> SeeRequestsButton  SeeRequestsButton.swift
+        |  requestsPresentation.showing = true
         v
 Host opens its requests list                        RootView.swift  session.show(.requests)
 ```

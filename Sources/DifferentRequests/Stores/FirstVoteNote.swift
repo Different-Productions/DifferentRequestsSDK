@@ -13,7 +13,7 @@ final class FirstVoteNote {
   let defaults: UserDefaults
 
   /// The request whose screen says the line, while it does.
-  private(set) var requestID: String?
+  private(set) var note = FirstVoteNoteState()
 
   /// - Parameter defaults: Where the first vote is remembered.
   init(defaults: UserDefaults) {
@@ -25,12 +25,17 @@ final class FirstVoteNote {
   func voted(requestID: String) {
     if defaults.bool(forKey: Self.votedKey) == false {
       defaults.set(true, forKey: Self.votedKey)
-      self.requestID = requestID
+      note.requestID = requestID
     }
+  }
+
+  /// Whether the line is said under `requestID`.
+  func isSaid(on requestID: String) -> Bool {
+    note.requestID.isEmpty == false && note.requestID == requestID
   }
 
   /// The screen saying the line went away; it is not said again.
   func putAway() {
-    requestID = nil
+    note = FirstVoteNoteState()
   }
 }

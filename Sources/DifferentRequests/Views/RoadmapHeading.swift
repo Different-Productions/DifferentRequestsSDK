@@ -8,11 +8,11 @@ struct RoadmapHeading: View {
   let column: DRRoadmapColumn
 
   var body: some View {
-    HStack(alignment: .firstTextBaseline, spacing: Spacing.xSmall.rawValue) {
-      Text(column.status.localizedLabel)
+    HStack(alignment: .firstTextBaseline, spacing: Spacing.xSmall.points()) {
+      Text(column.status.localizedLabel())
         .textRole(.rowTitle)
         .foregroundStyle(ColorRole.label)
-      Spacer(minLength: Spacing.xSmall.rawValue)
+      Spacer(minLength: Spacing.xSmall.points())
       Text("\(Int(column.totalCount)) requests", bundle: .module, comment: "How many requests a roadmap status holds")
         .textRole(.reading)
         .foregroundStyle(ColorRole.secondaryLabel)

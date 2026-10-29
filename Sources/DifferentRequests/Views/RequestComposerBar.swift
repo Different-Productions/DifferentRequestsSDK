@@ -10,16 +10,18 @@ struct RequestComposerBar: View {
   @Bindable var store: RequestDetailStore
 
   var body: some View {
-    switch store.commenting {
-    case .unread, .reading:
+    switch store.commenting.state {
+    case .none, .reading:
       ProgressView()
-        .frame(maxWidth: .infinity, minHeight: TargetSize.minimum.rawValue)
+        .frame(maxWidth: .infinity, minHeight: TargetSize.minimum.points())
     case .failed:
       RetryRow(
-        message: String(
-          localized: "Comments didn't load.",
-          bundle: .module,
-          comment: "Row where the comment field goes when the app's comment setting failed to load"
+        content: RetryRowContent(
+          message: String(
+            localized: "Comments didn't load.",
+            bundle: .module,
+            comment: "Row where the comment field goes when the app's comment setting failed to load"
+          )
         )
       ) {
         await store.loadCommenting()
@@ -27,14 +29,7 @@ struct RequestComposerBar: View {
     case .excluded:
       CommentsOff()
     case .included:
-      CommentComposer(
-        draft: $store.draft,
-        canSend: store.canPostComment,
-        charactersLeft: store.commentCharactersLeft,
-        isWriting: store.write.isWriting
-      ) {
-        await store.postComment()
-      }
+      CommentComposer(store: store)
     }
   }
 }

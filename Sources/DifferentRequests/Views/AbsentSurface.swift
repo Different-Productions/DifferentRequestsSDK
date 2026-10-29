@@ -1,3 +1,4 @@
+import DifferentRequestsProtos
 import SwiftUI
 
 /// What a screen shows in place of a surface this app does not have.
@@ -12,19 +13,21 @@ import SwiftUI
 struct AbsentSurface: View {
 
   /// Which surface is not here, and therefore what is said in its place.
-  let surface: PlanSurface
+  let surface: DRPlanSurface
 
   /// What opens the host's requests list, or nil for no **See requests**.
-  let isShowingRequests: Binding<Bool>?
+  let requestsPresentation: Binding<RequestsPresentation>?
 
   var body: some View {
-    ContentUnavailableView {
-      Label(surface.absentTitle, systemImage: surface.absentSymbol)
-    } description: {
-      Text(surface.absentDescription)
-    } actions: {
-      if let isShowingRequests {
-        SeeRequestsButton(isShowingRequests: isShowingRequests)
+    if let absence = surface.absence() {
+      ContentUnavailableView {
+        Label(absence.title, systemImage: absence.symbol)
+      } description: {
+        Text(absence.message)
+      } actions: {
+        if let requestsPresentation {
+          SeeRequestsButton(requestsPresentation: requestsPresentation)
+        }
       }
     }
   }

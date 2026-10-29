@@ -20,13 +20,13 @@ struct DiagnosticsView: View {
   /// What the client says about itself, read once when the screen appears.
   ///
   /// Held rather than asked for while drawing: the client is an actor, so asking it is a wait, and
-  /// a body cannot wait. Read inline it compiled with a warning and would have stopped compiling.
-  @State private var described = ""
+  /// a body cannot wait.
+  @State private var diagnostics = DiagnosticsContent()
 
   var body: some View {
     // Both directions, and never wrapped, so each value stays on its label's line.
     ScrollView([.vertical, .horizontal]) {
-      Text(described)
+      Text(diagnostics.described)
         .font(.system(.footnote, design: .monospaced))
         .textSelection(.enabled)
         .fixedSize(horizontal: true, vertical: false)
@@ -40,17 +40,17 @@ struct DiagnosticsView: View {
       ToolbarItem(placement: .primaryAction) {
         Button("Copy") {
           #if os(iOS)
-          UIPasteboard.general.string = described
+          UIPasteboard.general.string = diagnostics.described
           #else
           NSPasteboard.general.clearContents()
-          NSPasteboard.general.setString(described, forType: .string)
+          NSPasteboard.general.setString(diagnostics.described, forType: .string)
           #endif
         }
-        .disabled(described.isEmpty)
+        .disabled(diagnostics.described.isEmpty)
       }
     }
     .task {
-      described = await session.client.describeIntegration()
+      diagnostics.described = await session.hub.client.describeIntegration()
     }
   }
 }

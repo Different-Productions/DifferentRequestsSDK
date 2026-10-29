@@ -7,11 +7,8 @@ import SwiftUI
 /// which reads only the failure's kind.
 struct LoadFailure: View {
 
-  /// The heading, naming the screen that could not be read.
-  let title: String
-
-  /// What the read threw, which picks the sentence.
-  let error: any Error
+  /// The heading naming the screen that could not be read, and why the read did not answer.
+  let content: LoadFailureContent
 
   /// What "Try again" does.
   let retry: () async -> Void
@@ -19,12 +16,12 @@ struct LoadFailure: View {
   var body: some View {
     ContentUnavailableView {
       Label {
-        Text(title)
+        Text(content.title)
       } icon: {
-        ReadTroubleSymbol(trouble: ReadTrouble(error: error))
+        ReadTroubleSymbol(trouble: content.trouble)
       }
     } description: {
-      Text(ReadTrouble(error: error).message)
+      Text(content.trouble.message())
     } actions: {
       AsyncButton {
         await retry()
