@@ -21,7 +21,7 @@ Or in `Package.swift`:
 dependencies: [
   .package(
     url: "https://github.com/Different-Productions/DifferentRequestsSDK",
-    from: "0.16.0"
+    from: "0.16.1"
   ),
 ]
 ```

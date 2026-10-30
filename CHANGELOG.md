@@ -3,6 +3,21 @@
 Every released version, newest first. Versions are tags on the public repository,
 `Different-Productions/DifferentRequestsSDK`.
 
+## 0.16.1 — 2026-10-30
+
+**One source change to make, only if you call `unregisterDevice(deviceID:)`.**
+
+`DifferentRequestsClient.unregisterDevice(deviceID:)` returns nothing. Its answer has no fields,
+so returning without a throw is the whole result, and a caller no longer gets an unused-result
+warning.
+
+```swift
+// Before
+let dropped = try await client.unregisterDevice(deviceID: deviceID)
+// After
+try await client.unregisterDevice(deviceID: deviceID)
+```
+
 ## 0.16.0 — 2026-10-29
 
 `DifferentRequestsError`, `EmptyBoard`, `NotificationPermission`, `SecureBaseURL` and `LastCall`

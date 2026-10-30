@@ -8,7 +8,7 @@ extension SDKClient {
   /// way to read its own tag at runtime. The release workflow reads it from the line below.
   init(process: ProcessInfo) {
     self.init()
-    version = "0.16.0"
+    version = "0.16.1"
     #if os(iOS)
     platform = "iOS"
     #elseif os(macOS)

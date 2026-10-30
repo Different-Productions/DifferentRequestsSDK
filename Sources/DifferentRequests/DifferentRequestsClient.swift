@@ -258,9 +258,20 @@ public actor DifferentRequestsClient {
     try await send(.registerDevice, body: DRRegisterDeviceRequest(tokenData: tokenData, environment: environment))
   }
 
-  /// Drop a device, by the id registration handed back.
-  public func unregisterDevice(deviceID: String) async throws -> DRUnregisterDeviceResponse {
-    try await send(.unregisterDevice(deviceId: deviceID), body: DRUnregisterDeviceRequest())
+  /// Drop a device, by the id registration handed back. Returning without a throw means the server
+  /// dropped it.
+  public func unregisterDevice(deviceID: String) async throws {
+    let endpoint = DRRequestsServiceEndpoint.unregisterDevice(deviceId: deviceID)
+    var reply = Data()
+    try await deliver(
+      endpoint,
+      request: try request(
+        for: endpoint,
+        at: try url(for: endpoint),
+        carrying: try DRUnregisterDeviceRequest().serializedData()
+      ),
+      into: &reply
+    )
   }
 
   // MARK: - Public surfaces
@@ -285,7 +296,7 @@ public actor DifferentRequestsClient {
     _ endpoint: DRRequestsServiceEndpoint,
     query: [URLQueryItem]
   ) async throws -> Answer {
-    try await perform(endpoint, query: query, body: nil)
+    try await perform(endpoint, request: try request(for: endpoint, at: try url(for: endpoint, query: query)))
   }
 
   /// A write: the request message as the body.
@@ -293,39 +304,38 @@ public actor DifferentRequestsClient {
     _ endpoint: DRRequestsServiceEndpoint,
     body: some Message
   ) async throws -> Answer {
-    try await perform(endpoint, query: [], body: try body.serializedData())
+    try await perform(
+      endpoint,
+      request: try request(for: endpoint, at: try url(for: endpoint), carrying: try body.serializedData())
+    )
   }
 
-  /// Builds the request, sends it, and decodes what came back.
-  ///
-  /// The audience check happens before anything is sent, so an unauthenticated call costs no round
-  /// trip and reports the rpc that needed a session rather than a bare 401.
-  private func perform<Answer: Message>(
-    _ endpoint: DRRequestsServiceEndpoint,
-    query: [URLQueryItem],
-    body: Data?
-  ) async throws -> Answer {
-    let rpc = endpoint.rpc
-    if rpc.audience == .endUser, sessionToken == nil {
-      throw DifferentRequestsError(notAuthenticated: rpc)
-    }
-
+  /// The endpoint's address on the base URL.
+  private func url(for endpoint: DRRequestsServiceEndpoint) throws -> URL {
     let base = try baseURL.dialable()
-    guard var components = URLComponents(
-      url: base.appendingPathComponent(endpoint.path),
-      resolvingAgainstBaseURL: false
-    ) else {
-      throw DifferentRequestsError(invalidBaseURL: baseURL.url)
-    }
-    if query.isEmpty == false {
-      components.queryItems = query
-    }
-    guard let url = components.url else {
-      throw DifferentRequestsError(invalidBaseURL: baseURL.url)
-    }
+    return base.appendingPathComponent(endpoint.path)
+  }
 
+  /// The endpoint's address with `query` appended, or bare when `query` is empty.
+  private func url(for endpoint: DRRequestsServiceEndpoint, query: [URLQueryItem]) throws -> URL {
+    let address = try url(for: endpoint)
+    guard query.isEmpty == false else {
+      return address
+    }
+    guard var components = URLComponents(url: address, resolvingAgainstBaseURL: false) else {
+      throw DifferentRequestsError(invalidBaseURL: baseURL.url)
+    }
+    components.queryItems = query
+    guard let queried = components.url else {
+      throw DifferentRequestsError(invalidBaseURL: baseURL.url)
+    }
+    return queried
+  }
+
+  /// A request for `endpoint` at `url`, with the rpc's method and every header but the body's.
+  private func request(for endpoint: DRRequestsServiceEndpoint, at url: URL) throws -> URLRequest {
     var request = URLRequest(url: url)
-    request.httpMethod = try rpc.spelledMethod()
+    request.httpMethod = try endpoint.rpc.spelledMethod()
     request.setValue(DRMediaType.protobuf.rawValue, forHTTPHeaderField: DRHTTPHeaderName.accept.rawValue)
     request.setValue(appKey, forHTTPHeaderField: DRHTTPHeaderName.appKey.rawValue)
     request.setValue(
@@ -338,18 +348,51 @@ public actor DifferentRequestsClient {
         forHTTPHeaderField: DRHTTPHeaderName.authorization.rawValue
       )
     }
-    if let body {
-      request.httpBody = body
-      request.setValue(
-        DRMediaType.protobuf.rawValue,
-        forHTTPHeaderField: DRHTTPHeaderName.contentType.rawValue
-      )
+    return request
+  }
+
+  /// A request for `endpoint` at `url` carrying `body`, a serialized request message.
+  private func request(for endpoint: DRRequestsServiceEndpoint, at url: URL, carrying body: Data) throws -> URLRequest {
+    var request = try request(for: endpoint, at: url)
+    request.httpBody = body
+    request.setValue(DRMediaType.protobuf.rawValue, forHTTPHeaderField: DRHTTPHeaderName.contentType.rawValue)
+    return request
+  }
+
+  /// Sends the request and decodes what came back as the rpc's answer.
+  private func perform<Answer: Message>(
+    _ endpoint: DRRequestsServiceEndpoint,
+    request: URLRequest
+  ) async throws -> Answer {
+    var reply = Data()
+    try await deliver(endpoint, request: request, into: &reply)
+    do {
+      return try Answer(serializedBytes: [UInt8](reply))
+    } catch {
+      let failure = DifferentRequestsError(decodingFailed: endpoint.rpc, underlying: error)
+      lastCall = LastCall(rpc: endpoint.rpc, status: lastCall.status, failure: failure)
+      throw failure
+    }
+  }
+
+  /// Sends `request` and writes a 2xx body into `reply`; any other answer throws.
+  ///
+  /// The audience check happens before anything is sent, so an unauthenticated call costs no round
+  /// trip and reports the rpc that needed a session rather than a bare 401.
+  private func deliver(
+    _ endpoint: DRRequestsServiceEndpoint,
+    request: URLRequest,
+    into reply: inout Data
+  ) async throws {
+    let rpc = endpoint.rpc
+    if rpc.audience.needsSession(), sessionToken == nil {
+      throw DifferentRequestsError(notAuthenticated: rpc)
     }
 
-    let data: Data
+    let answerBody: Data
     let response: URLResponse
     do {
-      (data, response) = try await session.data(for: request)
+      (answerBody, response) = try await session.data(for: request)
     } catch {
       let failure = DifferentRequestsError(networkFailure: error)
       lastCall = LastCall(rpc: rpc, status: 0, failure: failure)
@@ -369,20 +412,13 @@ public actor DifferentRequestsClient {
     // The status says only whether the body is the answer or a failure. Which failure is in the
     // body, because a status code cannot distinguish "upgrade to Pro" from "not your request".
     guard (200..<300).contains(http.statusCode) else {
-      let refusal = DifferentRequestsError(failureBody: data)
+      let refusal = DifferentRequestsError(failureBody: answerBody)
       lastCall = LastCall(rpc: rpc, status: status, failure: refusal)
       throw refusal
     }
 
-    do {
-      let answer = try Answer(serializedBytes: [UInt8](data))
-      lastCall = LastCall(rpc: rpc, status: status)
-      return answer
-    } catch {
-      let failure = DifferentRequestsError(decodingFailed: rpc, underlying: error)
-      lastCall = LastCall(rpc: rpc, status: status, failure: failure)
-      throw failure
-    }
+    lastCall = LastCall(rpc: rpc, status: status)
+    reply = answerBody
   }
 
   /// The query item carrying `cursor` under `name`, or none for the first page.
